@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>투수 관리</title>
+
+<style>
+body {
+  background: #0f172a;
+  color: #e2e8f0;
+  font-family: 'Segoe UI', sans-serif;
+  text-align: center;
+  padding: 40px;
+}
+
+.container {
+  max-width: 700px;
+  margin: auto;
+}
+
+.card {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+}
+
+input {
+  width: 80%;
+  padding: 10px;
+  margin: 8px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: none;
+  margin: 3px;
+  cursor: pointer;
+}
+
+.add { background: #3b82f6; color: white; }
+.edit { background: #f59e0b; color: white; }
+.delete { background: #ef4444; color: white; }
+
+.team-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+.logo {
+  width: 30px;
+  height: 30px;
+}
+
+.list-item {
+  background: #020617;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>⚾ 투수 관리 시스템</h1>
+
+  <div class="card">
+    <h2>투수 추가 / 수정</h2>
+    <input id="name" placeholder="닉네임"><br>
+    <input id="team" placeholder="팀 코드 (KRA 등)"><br>
+    <input id="angle" placeholder="팔각도"><br>
+    <input id="pitch" placeholder="직구40 슬라이더30"><br>
+    <button class="add" onclick="savePitcher()">저장</button>
+    <div id="mode"></div>
+  </div>
+
+  <div class="card">
+    <h2>검색</h2>
+    <input id="searchInput" placeholder="🔍 검색" oninput="searchPitchers()">
+  </div>
+
+  <div class="card">
+    <h2>팀별 목록</h2>
+    <button onclick="showAll()">전체 보기</button>
+    <div id="list"></div>
+  </div>
+</div>
+
+<script>
+// 팀 색상
+const teamColors = {
+  "KRA": "#c40000",
+  "RMS": "#c9982c",
+  "NDG": "#120725",
+  "CPX": "#1B65BA",
+  "CLP": "#0cb218",
+  "SLU": "#850000",
+  "IH": "#FEC804",
+  "ODV": "#FF6A00"
+};
+
+// 팀 로고
+const teamLogos = {
+  "KRA": "logos/크라켄즈.png",
+  "RMS": "logos/마린스.png",
+  "NDG": "logos/드래곤즈.png",
+  "CPX": "logos/청피.png",
+  "CLP": "logos/플랜츠.png",
+  "SLU": "logos/슬러거즈.png",
+  "IH": "logos/호네츠.png",
+  "ODV": "logos/오버드라이브.png"
+};
+
+let pitchers = JSON.parse(localStorage.getItem("pitchers")) || {};
+
+function save() {
+  localStorage.setItem("pitchers", JSON.stringify(pitchers));
+}
+
+function savePitcher() {
+  const name = document.getElementById("name").value;
+  const team = document.getElementById("team").value.toUpperCase();
+  const angle = document.getElementById("angle").value;
+  const pitchInput = document.getElementById("pitch").value.split(" ");
+
+  const pitches = pitchInput.map(p => {
+    const pname = p.replace(/[0-9]/g, '');
+    const speed = p.replace(/[^0-9]/g, '');
+    return `${pname}(${speed})`;
+  });
+
+  pitchers[name] = {
+    team,
+    text: `${name}(${angle}) - ${pitches.join(", ")}`
+  };
+
+  save();
+  showAll();
+  resetForm();
+}
+
+function edit(name) {
+  const data = pitchers[name];
+
+  document.getElementById("name").value = name;
+  document.getElementById("team").value = data.team;
+
+  const angle = data.text.match(/\((.*?)\)/)[1];
+  const pitchPart = data.text.split("-")[1].trim();
+
+  const pitches = pitchPart.split(", ").map(p =>
+    p.replace("(", "").replace(")", "")
+  ).join(" ");
+
+  document.getElementById("angle").value = angle;
+  document.getElementById("pitch").value = pitches;
+
+  document.getElementById("mode").innerText = "✏️ 수정 중...";
+}
+
+function remove(name) {
+  if (confirm(name + " 삭제할까?")) {
+    delete pitchers[name];
+    save();
+    showAll();
+  }
+}
+
+function showAll() {
+  document.getElementById("searchInput").value = "";
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  const teams = {};
+
+  for (let name in pitchers) {
+    const team = pitchers[name].team;
+    if (!teams[team]) teams[team] = [];
+    teams[team].push(name);
+  }
+
+  for (let team in teams) {
+    const color = teamColors[team] || "#fff";
+    const logo = teamLogos[team] || "";
+
+    list.innerHTML += `
+      <div class="team-title" style="color:${color}">
+        <img src="${logo}" class="logo">
+        ${team}
+      </div>
+    `;
+
+    teams[team].forEach(name => {
+      list.innerHTML += `
+        <div class="list-item" style="border-left:5px solid ${color}">
+          ${pitchers[name].text}<br>
+          <button class="edit" onclick="edit('${name}')">수정</button>
+          <button class="delete" onclick="remove('${name}')">삭제</button>
+        </div>
+      `;
+    });
+  }
+}
+
+function searchPitchers() {
+  const keyword = document.getElementById("searchInput").value.toLowerCase();
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  for (let name in pitchers) {
+    if (name.toLowerCase().includes(keyword)) {
+      const team = pitchers[name].team;
+      const color = teamColors[team];
+      const logo = teamLogos[team];
+
+      list.innerHTML += `
+        <div class="list-item" style="border-left:5px solid ${color}">
+          <img src="${logo}" class="logo">
+          [${team}] ${pitchers[name].text}<br>
+          <button class="edit" onclick="edit('${name}')">수정</button>
+          <button class="delete" onclick="remove('${name}')">삭제</button>
+        </div>
+      `;
+    }
+  }
+}
+
+function resetForm() {
+  document.getElementById("name").value = "";
+  document.getElementById("team").value = "";
+  document.getElementById("angle").value = "";
+  document.getElementById("pitch").value = "";
+  document.getElementById("mode").innerText = "";
+}
+
+showAll();
+</script>
+
+</body>
+</html>
