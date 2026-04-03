@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>투수 정보 관리</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .pitcher-wrap {
+      width: 95%;
+      max-width: 1100px;
+      margin: 34px auto;
+    }
+
+    .pitcher-card {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      margin-bottom: 18px;
+    }
+
+    .pitcher-card h2 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 34px;
+    }
+
+    .pitcher-input {
+      width: 100%;
+      box-sizing: border-box;
+      margin: 10px 0;
+      padding: 14px 16px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 18px;
+      background: #fff;
+    }
+
+    .pitcher-btn {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 12px;
+      background: #111;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 10px;
+    }
+
+    .pitcher-btn.delete {
+      background: #b00020;
+    }
+
+    .pitcher-btn.sub {
+      background: #666;
+    }
+
+    .team-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 18px;
+      margin-bottom: 10px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .team-logo {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: white;
+    }
+
+    .list-item {
+      background: #f8f8f8;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .list-item p {
+      margin: 0 0 10px 0;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .page-note {
+      color: #666;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top-title">
+      <h1>레이 마린스</h1>
+      <a class="top-link" href="index.html">메인으로</a>
+    </div>
+
+    <div class="menu">
+      <a href="roster.html">로스터</a>
+      <a href="pitchers.html">투수 정보</a>
+      <a href="lineup.html">라인업</a>
+      <a href="record.html">기록실</a>
+      <a href="scoresheet.html">기록지</a>
+      <a href="mypage.html">마이페이지</a>
+    </div>
+  </div>
+
+  <div class="pitcher-wrap">
+    <div class="pitcher-card">
+      <h2>투수 정보 관리</h2>
+      <p class="page-note">최고관리자 / 관리자 / 기록원만 수정할 수 있어.</p>
+
+      <input id="name" class="pitcher-input" placeholder="닉네임">
+      <input id="team" class="pitcher-input" placeholder="팀 코드 (KRA, RMS, NDG, CPX, CLP, SLU, IH, ODV)">
+      <input id="angle" class="pitcher-input" placeholder="팔각도">
+      <input id="pitch" class="pitcher-input" placeholder="직구40 슬라이더30 커브20">
+
+      <div class="action-row">
+        <button class="pitcher-btn" id="saveBtn">저장</button>
+        <button class="pitcher-btn sub" id="cancelBtn">초기화</button>
+      </div>
+
+      <p id="modeText" class="page-note"></p>
+    </div>
+
+    <div class="pitcher-card">
+      <h2>검색</h2>
+      <input id="searchInput" class="pitcher-input" placeholder="닉네임 검색" oninput="searchPitchers()">
+    </div>
+
+    <div class="pitcher-card">
+      <h2>목록</h2>
+      <div id="list"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+    function isStaff(user) {
+      if (!user) return false;
+      return user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
+    }
+
+    if (!isStaff(currentUser)) {
+      alert("접근 권한이 없어.");
+      location.href = "pitchers.html";
+    }
+
+    const teamColors = {
+      "KRA": "#c40000",
+      "RMS": "#c9982c",
+      "NDG": "#120725",
+      "CPX": "#1B65BA",
+      "CLP": "#0cb218",
+      "SLU": "#850000",
+      "IH": "#FEC804",
+      "ODV": "#FF6A00"
+    };
+
+    const teamLogos = {
+      "KRA": "logos/크라켄즈.png",
+      "RMS": "logos/마린스.jpg",
+      "NDG": "logos/드래곤즈.png",
+      "CPX": "logos/청피.png",
+      "CLP": "logos/플랜츠.png",
+      "SLU": "logos/슬러거즈.png",
+      "IH": "logos/호네츠.png",
+      "ODV": "logos/오버드라이브.png"
+    };
+
+    let pitchers = [];
+    let editId = null;
+
+    const nameInput = document.getElementById("name");
+    const teamInput = document.getElementById("team");
+    const angleInput = document.getElementById("angle");
+    const pitchInput = document.getElementById("pitch");
+    const modeText = document.getElementById("modeText");
+    const saveBtn = document.getElementById("saveBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const list = document.getElementById("list");
+
+    function resetForm() {
+      editId = null;
+      nameInput.value = "";
+      teamInput.value = "";
+      angleInput.value = "";
+      pitchInput.value = "";
+      modeText.textContent = "";
+      saveBtn.textContent = "저장";
+    }
+
+    function parsePitchText(raw) {
+      const arr = raw.trim().split(" ").filter(Boolean);
+
+      return arr.map(p => {
+        const pname = p.replace(/[0-9]/g, "");
+        const speed = p.replace(/[^0-9]/g, "");
+
+        if (!pname || !["20", "30", "40"].includes(speed)) {
+          throw new Error(`구종 입력 형식 오류: ${p}`);
+        }
+
+        return `${pname}(${speed})`;
+      });
+    }
+
+    async function savePitcher() {
+      const name = nameInput.value.trim();
+      const team = teamInput.value.trim().toUpperCase();
+      const angle = angleInput.value.trim();
+      const pitchRaw = pitchInput.value.trim();
+
+      if (!name || !team || !angle || !pitchRaw) {
+        alert("모든 값을 입력해줘.");
+        return;
+      }
+
+      try {
+        const pitches = parsePitchText(pitchRaw);
+        const text = `${name}(${angle}) - ${pitches.join(", ")}`;
+
+        saveBtn.disabled = true;
+        saveBtn.textContent = editId ? "수정 중..." : "저장 중...";
+
+        if (editId) {
+          await updateDoc(doc(db, "pitchers", editId), {
+            name,
+            team,
+            angle,
+            pitchRaw,
+            text,
+            updatedAt: Date.now()
+          });
+          alert("수정 완료!");
+        } else {
+          await addDoc(collection(db, "pitchers"), {
+            name,
+            team,
+            angle,
+            pitchRaw,
+            text,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          });
+          alert("추가 완료!");
+        }
+
+        resetForm();
+      } catch (error) {
+        console.error(error);
+        alert(error.message || "저장 중 오류가 발생했어.");
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = editId ? "저장" : "저장";
+      }
+    }
+
+    function editPitcher(id) {
+      const target = pitchers.find(p => p.id === id);
+      if (!target) return;
+
+      editId = id;
+      nameInput.value = target.name || "";
+      teamInput.value = target.team || "";
+      angleInput.value = target.angle || "";
+      pitchInput.value = target.pitchRaw || "";
+      modeText.textContent = `수정 중: ${target.name}`;
+      saveBtn.textContent = "수정 저장";
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function removePitcher(id) {
+      const target = pitchers.find(p => p.id === id);
+      if (!target) return;
+
+      if (!confirm(`${target.name} 투수 정보를 삭제할까?`)) return;
+
+      try {
+        await deleteDoc(doc(db, "pitchers", id));
+        alert("삭제 완료!");
+        if (editId === id) resetForm();
+      } catch (error) {
+        console.error(error);
+        alert("삭제 중 오류가 발생했어.");
+      }
+    }
+
+    function renderPitchers(keyword = "") {
+      list.innerHTML = "";
+
+      if (pitchers.length === 0) {
+        list.innerHTML = `<div class="list-item"><p>등록된 투수 정보가 없어.</p></div>`;
+        return;
+      }
+
+      const filtered = pitchers.filter(p =>
+        p.name.toLowerCase().includes(keyword.toLowerCase())
+      );
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="list-item"><p>검색 결과가 없어.</p></div>`;
+        return;
+      }
+
+      const grouped = {};
+      filtered.forEach(p => {
+        if (!grouped[p.team]) grouped[p.team] = [];
+        grouped[p.team].push(p);
+      });
+
+      Object.keys(grouped).forEach(team => {
+        const color = teamColors[team] || "#999";
+        const logo = teamLogos[team] || "";
+
+        list.innerHTML += `
+          <div class="team-title" style="color:${color}">
+            ${logo ? `<img src="${logo}" class="team-logo" alt="${team} 로고">` : ""}
+            ${team}
+          </div>
+        `;
+
+        grouped[team].forEach(p => {
+          list.innerHTML += `
+            <div class="list-item" style="border-left:6px solid ${color}">
+              <p>${p.text}</p>
+              <div class="action-row">
+                <button class="pitcher-btn" onclick="window.editPitcher('${p.id}')">수정</button>
+                <button class="pitcher-btn delete" onclick="window.removePitcher('${p.id}')">삭제</button>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    window.searchPitchers = function () {
+      const keyword = document.getElementById("searchInput").value.trim();
+      renderPitchers(keyword);
+    };
+
+    window.editPitcher = editPitcher;
+    window.removePitcher = removePitcher;
+
+    saveBtn.addEventListener("click", savePitcher);
+    cancelBtn.addEventListener("click", resetForm);
+
+    onSnapshot(collection(db, "pitchers"), (snapshot) => {
+      pitchers = [];
+      snapshot.forEach((docu) => {
+        pitchers.push({
+          id: docu.id,
+          ...docu.data()
+        });
+      });
+      renderPitchers(document.getElementById("searchInput").value.trim());
+    }, (error) => {
+      console.error(error);
+      list.innerHTML = `<div class="list-item"><p>투수 정보를 불러오지 못했어.</p></div>`;
+    });
+  </script>
+</body>
+</html>

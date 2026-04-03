@@ -30,8 +30,10 @@
         <a href="pitchers.html">투수 정보</a>
         <a href="record.html">기록실</a>
         <a href="mypage.html">마이페이지</a>
+
         <a id="homeLineup" class="hidden" href="lineup.html">라인업</a>
         <a id="homeSheet" class="hidden" href="scoresheet.html">기록지</a>
+        <a id="homePitcherManage" class="hidden" href="pitchers-manage.html">투수 정보 관리</a>
         <a id="superAdminLink" class="hidden" href="super-admin.html">비공개 관리 페이지</a>
       </div>
     </div>
@@ -40,29 +42,45 @@
   <script>
     const user = JSON.parse(sessionStorage.getItem("currentUser"));
     const topAccount = document.getElementById("topAccount");
+    const welcomeText = document.getElementById("welcomeText");
+
+    function isStaff(user) {
+      if (!user) return false;
+      return user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
+    }
 
     if (user) {
       topAccount.textContent = `${user.mcNick} / 로그아웃`;
       topAccount.href = "#";
-      topAccount.onclick = () => {
+      topAccount.onclick = (e) => {
+        e.preventDefault();
         sessionStorage.removeItem("currentUser");
         location.reload();
       };
 
-      document.getElementById("welcomeText").textContent =
-        `${user.mcNick}님 환영합니다. 역할: ${user.role}`;
+      let roleText = "선수";
 
-      const isStaff = user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
-      if (isStaff) {
+      if (user.role === "owner") roleText = "구단주";
+      else if (user.role === "admin") roleText = "관리진";
+      else if (user.role === "scorer") roleText = "기록원";
+      else if (user.role === "super_admin") roleText = "선수";
+
+      welcomeText.textContent = `${user.mcNick}님 환영합니다. 현재 역할: ${roleText}`;
+
+      if (isStaff(user)) {
         document.getElementById("menuLineup").classList.remove("hidden");
         document.getElementById("menuSheet").classList.remove("hidden");
+
         document.getElementById("homeLineup").classList.remove("hidden");
         document.getElementById("homeSheet").classList.remove("hidden");
+        document.getElementById("homePitcherManage").classList.remove("hidden");
       }
 
       if (user.role === "super_admin") {
         document.getElementById("superAdminLink").classList.remove("hidden");
       }
+    } else {
+      welcomeText.textContent = "로그인 후 팀 페이지 기능을 이용할 수 있습니다.";
     }
   </script>
 </body>
