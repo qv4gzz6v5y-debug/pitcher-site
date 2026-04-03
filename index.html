@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>레이 마린스</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="top-title">
+      <h1>레이 마린스</h1>
+      <a id="topAccount" class="top-link" href="login.html">로그인/회원가입</a>
+    </div>
+
+    <div class="menu">
+      <a href="roster.html">로스터</a>
+      <a href="pitchers.html">투수 정보</a>
+      <a id="menuLineup" class="hidden" href="lineup.html">라인업</a>
+      <a href="record.html">기록실</a>
+      <a id="menuSheet" class="hidden" href="scoresheet.html">기록지</a>
+      <a href="mypage.html">마이페이지</a>
+    </div>
+
+    <div class="home-box">
+      <h2>레이 마린스 팀 페이지</h2>
+      <p id="welcomeText">환영합니다.</p>
+
+      <div class="home-links">
+        <a href="roster.html">로스터</a>
+        <a href="pitchers.html">투수 정보</a>
+        <a href="record.html">기록실</a>
+        <a href="mypage.html">마이페이지</a>
+        <a id="homeLineup" class="hidden" href="lineup.html">라인업</a>
+        <a id="homeSheet" class="hidden" href="scoresheet.html">기록지</a>
+        <a id="superAdminLink" class="hidden" href="super-admin.html">비공개 관리 페이지</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const user = JSON.parse(sessionStorage.getItem("currentUser"));
+    const topAccount = document.getElementById("topAccount");
+
+    if (user) {
+      topAccount.textContent = `${user.mcNick} / 로그아웃`;
+      topAccount.href = "#";
+      topAccount.onclick = () => {
+        sessionStorage.removeItem("currentUser");
+        location.reload();
+      };
+
+      document.getElementById("welcomeText").textContent =
+        `${user.mcNick}님 환영합니다. 역할: ${user.role}`;
+
+      const isStaff = user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
+      if (isStaff) {
+        document.getElementById("menuLineup").classList.remove("hidden");
+        document.getElementById("menuSheet").classList.remove("hidden");
+        document.getElementById("homeLineup").classList.remove("hidden");
+        document.getElementById("homeSheet").classList.remove("hidden");
+      }
+
+      if (user.role === "super_admin") {
+        document.getElementById("superAdminLink").classList.remove("hidden");
+      }
+    }
+  </script>
+</body>
+</html>

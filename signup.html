@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>회원가입</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="card-box">
+    <h2>회원가입</h2>
+    <input id="mcNick" class="input" placeholder="마인크래프트 닉네임">
+    <input id="discordTag" class="input" placeholder="디스코드 태그">
+    <input id="password" type="password" class="input" placeholder="비밀번호">
+    <button class="btn" id="signupBtn">회원가입</button>
+    <button class="btn sub" onclick="location.href='login.html'">로그인으로 이동</button>
+    <div id="msg" class="msg"></div>
+  </div>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      getDocs,
+      query,
+      where,
+      addDoc
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const msg = document.getElementById("msg");
+
+    document.getElementById("signupBtn").addEventListener("click", async () => {
+      const mcNick = document.getElementById("mcNick").value.trim();
+      const discordTag = document.getElementById("discordTag").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!mcNick || !discordTag || !password) {
+        msg.textContent = "모든 칸을 입력해줘.";
+        return;
+      }
+
+      const userRef = collection(db, "users");
+
+      const dupQ = query(userRef, where("mcNick", "==", mcNick));
+      const dupSnap = await getDocs(dupQ);
+      if (!dupSnap.empty) {
+        msg.textContent = "이미 존재하는 마인크래프트 닉네임이야.";
+        return;
+      }
+
+      const allUsers = await getDocs(userRef);
+      const isFirstUser = allUsers.empty;
+
+      const role = isFirstUser ? "super_admin" : "member";
+      const approved = isFirstUser ? true : false;
+
+      await addDoc(userRef, {
+        mcNick,
+        discordTag,
+        password,
+        approved,
+        role,
+        rosterNick: "",
+        backNumber: "",
+        createdAt: Date.now()
+      });
+
+      if (isFirstUser) {
+        msg.textContent = "첫 가입자라서 최고관리자로 등록됐어. 이제 로그인하면 돼.";
+        msg.className = "msg ok";
+      } else {
+        msg.textContent = "회원가입 신청 완료. 관리자 승인 후 로그인할 수 있어.";
+        msg.className = "msg ok";
+      }
+    });
+  </script>
+</body>
+</html>

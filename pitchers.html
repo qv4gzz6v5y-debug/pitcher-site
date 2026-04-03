@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>투수 정보</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    .pitcher-wrap {
+      width: 95%;
+      max-width: 1100px;
+      margin: 34px auto;
+    }
+
+    .pitcher-card {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      margin-bottom: 18px;
+    }
+
+    .pitcher-card h2 {
+      font-size: 34px;
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    .pitcher-input {
+      width: 100%;
+      box-sizing: border-box;
+      margin: 10px 0;
+      padding: 14px 16px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 18px;
+    }
+
+    .pitcher-btn {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 12px;
+      background: #111;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 10px;
+    }
+
+    .pitcher-btn.delete {
+      background: #b00020;
+    }
+
+    .team-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 18px;
+      margin-bottom: 10px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .team-logo {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: white;
+    }
+
+    .list-item {
+      background: #f8f8f8;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .list-item p {
+      margin: 0 0 10px 0;
+      font-size: 18px;
+    }
+
+    .search-box {
+      margin-bottom: 14px;
+    }
+
+    .page-note {
+      color: #666;
+      font-size: 15px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top-title">
+      <h1>레이 마린스</h1>
+      <a class="top-link" href="index.html">메인으로</a>
+    </div>
+
+    <div class="menu">
+      <a href="roster.html">로스터</a>
+      <a href="pitchers.html">투수 정보</a>
+      <a href="lineup.html">라인업</a>
+      <a href="record.html">기록실</a>
+      <a href="scoresheet.html">기록지</a>
+      <a href="mypage.html">마이페이지</a>
+    </div>
+  </div>
+
+  <div class="pitcher-wrap">
+    <div class="pitcher-card">
+      <h2>투수 추가 / 수정</h2>
+
+      <input id="name" class="pitcher-input" placeholder="닉네임">
+      <input id="team" class="pitcher-input" placeholder="팀 코드 (KRA, RMS, NDG, CPX, CLP, SLU, IH, ODV)">
+      <input id="angle" class="pitcher-input" placeholder="팔각도 (오버핸드 / 쓰리쿼터 / 사이드암 / 언더)">
+      <input id="pitch" class="pitcher-input" placeholder="직구40 슬라이더30 커브20">
+
+      <button class="pitcher-btn" onclick="savePitcher()">저장</button>
+      <div id="mode" class="page-note"></div>
+    </div>
+
+    <div class="pitcher-card">
+      <h2>검색</h2>
+      <div class="search-box">
+        <input id="searchInput" class="pitcher-input" placeholder="닉네임 검색" oninput="searchPitchers()">
+      </div>
+    </div>
+
+    <div class="pitcher-card">
+      <h2>팀별 목록</h2>
+      <button class="pitcher-btn" onclick="showAll()">전체 보기</button>
+      <div id="list"></div>
+    </div>
+  </div>
+
+  <script>
+    const teamColors = {
+      "KRA": "#c40000",
+      "RMS": "#c9982c",
+      "NDG": "#120725",
+      "CPX": "#1B65BA",
+      "CLP": "#0cb218",
+      "SLU": "#850000",
+      "IH": "#FEC804",
+      "ODV": "#FF6A00"
+    };
+
+    const teamLogos = {
+      "KRA": "logos/크라켄즈.png",
+      "RMS": "logos/마린스.jpg",
+      "NDG": "logos/드래곤즈.png",
+      "CPX": "logos/청피.png",
+      "CLP": "logos/플랜츠.png",
+      "SLU": "logos/슬러거즈.png",
+      "IH": "logos/호네츠.png",
+      "ODV": "logos/오버드라이브.png"
+    };
+
+    let pitchers = JSON.parse(localStorage.getItem("pitchers")) || {};
+
+    function saveData() {
+      localStorage.setItem("pitchers", JSON.stringify(pitchers));
+    }
+
+    function savePitcher() {
+      const name = document.getElementById("name").value.trim();
+      const team = document.getElementById("team").value.trim().toUpperCase();
+      const angle = document.getElementById("angle").value.trim();
+      const pitchRaw = document.getElementById("pitch").value.trim();
+
+      if (!name || !team || !angle || !pitchRaw) {
+        alert("모든 값을 입력해줘.");
+        return;
+      }
+
+      const pitchInput = pitchRaw.split(" ");
+
+      const pitches = pitchInput.map(p => {
+        const pname = p.replace(/[0-9]/g, "");
+        const speed = p.replace(/[^0-9]/g, "");
+
+        if (!pname || !["20", "30", "40"].includes(speed)) {
+          throw new Error(`구종 입력 형식 오류: ${p}`);
+        }
+
+        return `${pname}(${speed})`;
+      });
+
+      pitchers[name] = {
+        team,
+        text: `${name}(${angle}) - ${pitches.join(", ")}`
+      };
+
+      saveData();
+      showAll();
+      resetForm();
+    }
+
+    function editPitcher(name) {
+      const data = pitchers[name];
+      if (!data) return;
+
+      document.getElementById("name").value = name;
+      document.getElementById("team").value = data.team;
+
+      const angleMatch = data.text.match(/\((.*?)\)/);
+      const angle = angleMatch ? angleMatch[1] : "";
+
+      const pitchPart = data.text.split("-")[1]?.trim() || "";
+      const pitches = pitchPart
+        .split(", ")
+        .map(p => p.replace("(", "").replace(")", ""))
+        .join(" ");
+
+      document.getElementById("angle").value = angle;
+      document.getElementById("pitch").value = pitches;
+      document.getElementById("mode").textContent = "수정 중...";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function removePitcher(name) {
+      if (!confirm(`${name} 선수를 삭제할까?`)) return;
+      delete pitchers[name];
+      saveData();
+      showAll();
+    }
+
+    function resetForm() {
+      document.getElementById("name").value = "";
+      document.getElementById("team").value = "";
+      document.getElementById("angle").value = "";
+      document.getElementById("pitch").value = "";
+      document.getElementById("mode").textContent = "";
+    }
+
+    function showAll() {
+      document.getElementById("searchInput").value = "";
+      renderPitchers("");
+    }
+
+    function searchPitchers() {
+      const keyword = document.getElementById("searchInput").value.toLowerCase();
+      renderPitchers(keyword);
+    }
+
+    function renderPitchers(keyword) {
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      if (keyword) {
+        Object.keys(pitchers).forEach(name => {
+          if (name.toLowerCase().includes(keyword)) {
+            const team = pitchers[name].team;
+            const color = teamColors[team] || "#999";
+            const logo = teamLogos[team] || "";
+
+            list.innerHTML += `
+              <div class="list-item" style="border-left: 6px solid ${color};">
+                <p>
+                  ${logo ? `<img src="${logo}" class="team-logo" alt="${team} 로고">` : ""}
+                  <strong>[${team}]</strong> ${pitchers[name].text}
+                </p>
+                <button class="pitcher-btn" onclick="editPitcher('${name}')">수정</button>
+                <button class="pitcher-btn delete" onclick="removePitcher('${name}')">삭제</button>
+              </div>
+            `;
+          }
+        });
+        return;
+      }
+
+      const teams = {};
+
+      Object.keys(pitchers).forEach(name => {
+        const team = pitchers[name].team;
+        if (!teams[team]) teams[team] = [];
+        teams[team].push(name);
+      });
+
+      Object.keys(teams).forEach(team => {
+        const color = teamColors[team] || "#999";
+        const logo = teamLogos[team] || "";
+
+        list.innerHTML += `
+          <div class="team-title" style="color:${color}">
+            ${logo ? `<img src="${logo}" class="team-logo" alt="${team} 로고">` : ""}
+            ${team}
+          </div>
+        `;
+
+        teams[team].forEach(name => {
+          list.innerHTML += `
+            <div class="list-item" style="border-left: 6px solid ${color};">
+              <p>${pitchers[name].text}</p>
+              <button class="pitcher-btn" onclick="editPitcher('${name}')">수정</button>
+              <button class="pitcher-btn delete" onclick="removePitcher('${name}')">삭제</button>
+            </div>
+          `;
+        });
+      });
+    }
+
+    showAll();
+  </script>
+</body>
+</html>

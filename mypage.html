@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>마이페이지</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="section">
+    <h2>마이페이지</h2>
+    <div class="panel" id="box"></div>
+  </div>
+
+  <script>
+    const user = JSON.parse(sessionStorage.getItem("currentUser"));
+    const box = document.getElementById("box");
+
+    if (!user) {
+      box.innerHTML = `<p>로그인이 필요해.</p><button class="small-btn" onclick="location.href='login.html'">로그인</button>`;
+    } else {
+      box.innerHTML = `
+        <p><strong>마인크래프트 닉네임:</strong> ${user.mcNick}</p>
+        <p><strong>디스코드 태그:</strong> ${user.discordTag}</p>
+        <p><strong>역할:</strong> ${user.role}</p>
+        <p><strong>로스터용 닉네임:</strong> ${user.rosterNick || "-"}</p>
+        <p><strong>등번호:</strong> ${user.backNumber || "-"}</p>
+      `;
+    }
+  </script>
+</body>
+</html>
