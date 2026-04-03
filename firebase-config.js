@@ -4,12 +4,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "여기에_진짜_apiKey",
-  authDomain: "여기에_진짜_authDomain",
-  projectId: "여기에_진짜_projectId",
-  storageBucket: "여기에_진짜_storageBucket",
-  messagingSenderId: "여기에_진짜_messagingSenderId",
-  appId: "여기에_진짜_appId"
+  apiKey: "AIzaSyD4vxfTrybnA6fUtV5Ykrz371ZBus-L-RM",
+  authDomain: "pitcher-site.firebaseapp.com",
+  projectId: "pitcher-site",
+  storageBucket: "pitcher-site.firebasestorage.app",
+  messagingSenderId: "522000011066",
+  appId: "1:522000011066:web:1e41439a5a1fef29cbca03"
 };
 
 const app = initializeApp(firebaseConfig);
