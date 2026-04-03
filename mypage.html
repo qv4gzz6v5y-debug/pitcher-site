@@ -4,28 +4,546 @@
   <meta charset="UTF-8">
   <title>마이페이지</title>
   <link rel="stylesheet" href="styles.css">
+
+  <style>
+    .mypage-wrap {
+      width: 95%;
+      max-width: 1100px;
+      margin: 34px auto;
+    }
+
+    .mypage-card {
+      background: white;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      margin-bottom: 22px;
+    }
+
+    .card-title {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .mypage-note {
+      color: #666;
+      font-size: 15px;
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 10px 18px;
+      align-items: center;
+    }
+
+    .info-label {
+      font-weight: 700;
+      color: #333;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .info-value {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      color: #111;
+    }
+
+    .mypage-input {
+      width: 100%;
+      padding: 12px 14px;
+      margin: 8px 0;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 16px;
+      background: #fff;
+    }
+
+    .mypage-btn {
+      padding: 11px 18px;
+      border-radius: 10px;
+      border: none;
+      background: #111;
+      color: white;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 12px;
+      font-size: 15px;
+    }
+
+    .mypage-btn.sub {
+      background: #666;
+    }
+
+    .mypage-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .status-approved {
+      background: #e8f7ec;
+      color: #0a7a2f;
+    }
+
+    .status-pending {
+      background: #fff4e5;
+      color: #b26a00;
+    }
+
+    .role-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .role-owner {
+      background: #ff6a00;
+    }
+
+    .role-admin {
+      background: #8b0000;
+    }
+
+    .role-scorer {
+      background: #1b65ba;
+    }
+
+    .role-member {
+      background: #666;
+    }
+
+    .msg {
+      margin-top: 12px;
+      font-size: 15px;
+      color: #b00020;
+    }
+
+    .msg.ok {
+      color: #0a7a2f;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .stat-box {
+      background: #f8f8f8;
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: #111;
+    }
+
+    @media (max-width: 700px) {
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .info-label,
+      .info-value {
+        border-bottom: none;
+        padding: 4px 0;
+      }
+
+      .info-label {
+        margin-top: 10px;
+        color: #666;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="section">
-    <h2>마이페이지</h2>
-    <div class="panel" id="box"></div>
+
+  <div class="wrap">
+    <div class="top-title">
+      <h1>레이 마린스</h1>
+      <a class="top-link" href="index.html">메인으로</a>
+    </div>
+
+    <div class="menu">
+      <a href="roster.html">로스터</a>
+      <a href="pitchers.html">투수 정보</a>
+      <a href="lineup.html">라인업</a>
+      <a href="record.html">기록실</a>
+      <a href="scoresheet.html">기록지</a>
+      <a href="mypage.html">마이페이지</a>
+    </div>
   </div>
 
-  <script>
-    const user = JSON.parse(sessionStorage.getItem("currentUser"));
-    const box = document.getElementById("box");
+  <div class="mypage-wrap">
 
-    if (!user) {
-      box.innerHTML = `<p>로그인이 필요해.</p><button class="small-btn" onclick="location.href='login.html'">로그인</button>`;
-    } else {
-      box.innerHTML = `
-        <p><strong>마인크래프트 닉네임:</strong> ${user.mcNick}</p>
-        <p><strong>디스코드 태그:</strong> ${user.discordTag}</p>
-        <p><strong>역할:</strong> ${user.role}</p>
-        <p><strong>로스터용 닉네임:</strong> ${user.rosterNick || "-"}</p>
-        <p><strong>등번호:</strong> ${user.backNumber || "-"}</p>
-      `;
+    <div class="mypage-card">
+      <div class="card-title">마이페이지</div>
+      <p class="mypage-note">내 계정 정보와 팀 등록 정보를 확인할 수 있습니다.</p>
+
+      <div class="info-grid">
+        <div class="info-label">마인크래프트 닉네임</div>
+        <div class="info-value" id="mcNickView">불러오는 중...</div>
+
+        <div class="info-label">디스코드 태그</div>
+        <div class="info-value" id="discordView">-</div>
+
+        <div class="info-label">역할</div>
+        <div class="info-value" id="roleView">-</div>
+
+        <div class="info-label">승인 상태</div>
+        <div class="info-value" id="approvedView">-</div>
+
+        <div class="info-label">로스터 이름</div>
+        <div class="info-value" id="rosterNickView">-</div>
+
+        <div class="info-label">등번호</div>
+        <div class="info-value" id="backNumberView">-</div>
+      </div>
+    </div>
+
+    <div class="mypage-card">
+      <div class="card-title">내 시즌 타자 기록</div>
+      <p class="mypage-note">기록지에 저장된 타자 기록을 기준으로 자동 계산됩니다.</p>
+
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-label">경기 수</div><div class="stat-value" id="batG">0</div></div>
+        <div class="stat-box"><div class="stat-label">타수</div><div class="stat-value" id="batAB">0</div></div>
+        <div class="stat-box"><div class="stat-label">안타</div><div class="stat-value" id="batH">0</div></div>
+        <div class="stat-box"><div class="stat-label">2루타</div><div class="stat-value" id="bat2B">0</div></div>
+        <div class="stat-box"><div class="stat-label">3루타</div><div class="stat-value" id="bat3B">0</div></div>
+        <div class="stat-box"><div class="stat-label">홈런</div><div class="stat-value" id="batHR">0</div></div>
+        <div class="stat-box"><div class="stat-label">타점</div><div class="stat-value" id="batRBI">0</div></div>
+        <div class="stat-box"><div class="stat-label">득점</div><div class="stat-value" id="batR">0</div></div>
+        <div class="stat-box"><div class="stat-label">삼진</div><div class="stat-value" id="batSO">0</div></div>
+        <div class="stat-box"><div class="stat-label">타율</div><div class="stat-value" id="batAVG">0.000</div></div>
+      </div>
+    </div>
+
+    <div class="mypage-card">
+      <div class="card-title">내 시즌 투수 기록</div>
+      <p class="mypage-note">기록지에 저장된 투수 기록을 기준으로 자동 계산됩니다.</p>
+
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-label">경기 수</div><div class="stat-value" id="pitG">0</div></div>
+        <div class="stat-box"><div class="stat-label">이닝</div><div class="stat-value" id="pitIP">0.0</div></div>
+        <div class="stat-box"><div class="stat-label">실점</div><div class="stat-value" id="pitR">0</div></div>
+        <div class="stat-box"><div class="stat-label">자책</div><div class="stat-value" id="pitER">0</div></div>
+        <div class="stat-box"><div class="stat-label">피안타</div><div class="stat-value" id="pitH">0</div></div>
+        <div class="stat-box"><div class="stat-label">피홈런</div><div class="stat-value" id="pitHR">0</div></div>
+        <div class="stat-box"><div class="stat-label">탈삼진</div><div class="stat-value" id="pitSO">0</div></div>
+        <div class="stat-box"><div class="stat-label">사사구</div><div class="stat-value" id="pitBB">0</div></div>
+        <div class="stat-box"><div class="stat-label">ERA</div><div class="stat-value" id="pitERA">0.00</div></div>
+      </div>
+    </div>
+
+    <div class="mypage-card">
+      <div class="card-title">비밀번호 변경</div>
+      <p class="mypage-note">현재 비밀번호를 확인한 뒤 새 비밀번호로 변경할 수 있습니다.</p>
+
+      <input id="currentPassword" type="password" class="mypage-input" placeholder="현재 비밀번호">
+      <input id="newPassword" type="password" class="mypage-input" placeholder="새 비밀번호">
+      <input id="newPasswordCheck" type="password" class="mypage-input" placeholder="새 비밀번호 확인">
+
+      <button id="changePwBtn" class="mypage-btn">비밀번호 변경</button>
+      <button id="logoutBtn" class="mypage-btn sub">로그아웃</button>
+
+      <div id="msg" class="msg"></div>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      doc,
+      getDoc,
+      updateDoc,
+      collection,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+    if (!currentUser || !currentUser.id) {
+      alert("로그인이 필요해.");
+      location.href = "login.html";
     }
+
+    const mcNickView = document.getElementById("mcNickView");
+    const discordView = document.getElementById("discordView");
+    const roleView = document.getElementById("roleView");
+    const approvedView = document.getElementById("approvedView");
+    const rosterNickView = document.getElementById("rosterNickView");
+    const backNumberView = document.getElementById("backNumberView");
+
+    const currentPasswordInput = document.getElementById("currentPassword");
+    const newPasswordInput = document.getElementById("newPassword");
+    const newPasswordCheckInput = document.getElementById("newPasswordCheck");
+    const changePwBtn = document.getElementById("changePwBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const msg = document.getElementById("msg");
+
+    let userData = null;
+
+    function getRoleHtml(role) {
+      if (role === "owner") return `<span class="role-badge role-owner">구단주</span>`;
+      if (role === "admin") return `<span class="role-badge role-admin">관리진</span>`;
+      if (role === "scorer") return `<span class="role-badge role-scorer">기록원</span>`;
+      return `<span class="role-badge role-member">선수</span>`;
+    }
+
+    function getApprovedHtml(approved) {
+      if (approved) return `<span class="status-badge status-approved">승인 완료</span>`;
+      return `<span class="status-badge status-pending">승인 대기</span>`;
+    }
+
+    function samePlayerName(name, user) {
+      if (!name || !user) return false;
+      const target = String(name).trim().toLowerCase();
+      const mcNick = String(user.mcNick || "").trim().toLowerCase();
+      const rosterNick = String(user.rosterNick || "").trim().toLowerCase();
+      return target === mcNick || (rosterNick && target === rosterNick);
+    }
+
+    function inningsToOuts(value) {
+      const str = String(value || "").trim();
+      if (!str) return 0;
+      if (!str.includes(".")) return (Number(str) || 0) * 3;
+      const [whole, part] = str.split(".");
+      return (Number(whole) || 0) * 3 + (Number(part) || 0);
+    }
+
+    function outsToInnings(outs) {
+      const full = Math.floor(outs / 3);
+      const rem = outs % 3;
+      return `${full}.${rem}`;
+    }
+
+    function setText(id, value) {
+      document.getElementById(id).textContent = value;
+    }
+
+    function updateSeasonStats(scoresheets) {
+      if (!userData) return;
+
+      const batting = {
+        games: 0,
+        ab: 0,
+        h: 0,
+        double: 0,
+        triple: 0,
+        hr: 0,
+        rbi: 0,
+        r: 0,
+        so: 0
+      };
+
+      const pitching = {
+        games: 0,
+        outs: 0,
+        runs: 0,
+        er: 0,
+        hits: 0,
+        hr: 0,
+        so: 0,
+        bb: 0
+      };
+
+      scoresheets.forEach(sheet => {
+        let playedAsBatterThisGame = false;
+        let playedAsPitcherThisGame = false;
+
+        (sheet.batters || []).forEach(b => {
+          if (samePlayerName(b.name, userData)) {
+            playedAsBatterThisGame = true;
+            batting.ab += Number(b.stats?.ab || 0);
+            batting.h += Number(b.stats?.h || 0);
+            batting.double += Number(b.stats?.double || 0);
+            batting.triple += Number(b.stats?.triple || 0);
+            batting.hr += Number(b.stats?.hr || 0);
+            batting.rbi += Number(b.stats?.rbi || 0);
+            batting.r += Number(b.stats?.r || 0);
+            batting.so += Number(b.stats?.so || 0);
+          }
+        });
+
+        (sheet.pitchers || []).forEach(p => {
+          if (samePlayerName(p.name, userData)) {
+            playedAsPitcherThisGame = true;
+            pitching.outs += inningsToOuts(p.inning);
+            pitching.runs += Number(p.runs || 0);
+            pitching.er += Number(p.er || 0);
+            pitching.hits += Number(p.hits || 0);
+            pitching.hr += Number(p.hr || 0);
+            pitching.so += Number(p.so || 0);
+            pitching.bb += Number(p.bb || 0);
+          }
+        });
+
+        if (playedAsBatterThisGame) batting.games += 1;
+        if (playedAsPitcherThisGame) pitching.games += 1;
+      });
+
+      const avg = batting.ab > 0 ? (batting.h / batting.ab).toFixed(3) : "0.000";
+      const era = pitching.outs > 0 ? ((pitching.er * 27) / pitching.outs).toFixed(2) : "0.00";
+
+      setText("batG", batting.games);
+      setText("batAB", batting.ab);
+      setText("batH", batting.h);
+      setText("bat2B", batting.double);
+      setText("bat3B", batting.triple);
+      setText("batHR", batting.hr);
+      setText("batRBI", batting.rbi);
+      setText("batR", batting.r);
+      setText("batSO", batting.so);
+      setText("batAVG", avg);
+
+      setText("pitG", pitching.games);
+      setText("pitIP", outsToInnings(pitching.outs));
+      setText("pitR", pitching.runs);
+      setText("pitER", pitching.er);
+      setText("pitH", pitching.hits);
+      setText("pitHR", pitching.hr);
+      setText("pitSO", pitching.so);
+      setText("pitBB", pitching.bb);
+      setText("pitERA", era);
+    }
+
+    async function loadMyPage() {
+      try {
+        const snap = await getDoc(doc(db, "users", currentUser.id));
+
+        if (!snap.exists()) {
+          alert("사용자 정보를 찾을 수 없습니다.");
+          sessionStorage.removeItem("currentUser");
+          location.href = "login.html";
+          return;
+        }
+
+        userData = {
+          id: snap.id,
+          ...snap.data()
+        };
+
+        sessionStorage.setItem("currentUser", JSON.stringify(userData));
+
+        mcNickView.textContent = userData.mcNick || "-";
+        discordView.textContent = userData.discordTag || "-";
+        roleView.innerHTML = getRoleHtml(userData.role);
+        approvedView.innerHTML = getApprovedHtml(userData.approved);
+        rosterNickView.textContent = userData.rosterNick || "-";
+        backNumberView.textContent = userData.backNumber || "-";
+      } catch (error) {
+        console.error(error);
+        alert("마이페이지 정보를 불러오지 못했습니다.");
+      }
+    }
+
+    async function changePassword() {
+      const currentPassword = currentPasswordInput.value.trim();
+      const newPassword = newPasswordInput.value.trim();
+      const newPasswordCheck = newPasswordCheckInput.value.trim();
+
+      msg.textContent = "";
+      msg.className = "msg";
+
+      if (!currentPassword || !newPassword || !newPasswordCheck) {
+        msg.textContent = "모든 칸을 입력해주세요.";
+        return;
+      }
+
+      if (!userData) {
+        msg.textContent = "사용자 정보를 아직 불러오지 못했습니다.";
+        return;
+      }
+
+      if (currentPassword !== userData.password) {
+        msg.textContent = "현재 비밀번호가 맞지 않습니다.";
+        return;
+      }
+
+      if (newPassword.length < 4) {
+        msg.textContent = "새 비밀번호는 4글자 이상으로 해주세요.";
+        return;
+      }
+
+      if (newPassword !== newPasswordCheck) {
+        msg.textContent = "새 비밀번호 확인이 일치하지 않습니다.";
+        return;
+      }
+
+      changePwBtn.disabled = true;
+      changePwBtn.textContent = "변경 중...";
+
+      try {
+        await updateDoc(doc(db, "users", userData.id), {
+          password: newPassword
+        });
+
+        userData.password = newPassword;
+        sessionStorage.setItem("currentUser", JSON.stringify(userData));
+
+        currentPasswordInput.value = "";
+        newPasswordInput.value = "";
+        newPasswordCheckInput.value = "";
+
+        msg.textContent = "비밀번호 변경 완료!";
+        msg.className = "msg ok";
+      } catch (error) {
+        console.error(error);
+        msg.textContent = "비밀번호 변경 중 오류가 발생했습니다.";
+      } finally {
+        changePwBtn.disabled = false;
+        changePwBtn.textContent = "비밀번호 변경";
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem("currentUser");
+      location.href = "login.html";
+    }
+
+    changePwBtn.addEventListener("click", changePassword);
+    logoutBtn.addEventListener("click", logout);
+
+    await loadMyPage();
+
+    onSnapshot(collection(db, "scoresheets"), (snapshot) => {
+      const scoresheets = [];
+      snapshot.forEach((docu) => {
+        scoresheets.push({
+          id: docu.id,
+          ...docu.data()
+        });
+      });
+      updateSeasonStats(scoresheets);
+    });
   </script>
+
 </body>
 </html>
