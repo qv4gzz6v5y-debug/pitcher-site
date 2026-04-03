@@ -107,7 +107,7 @@
   <div class="pitcher-wrap">
     <div class="pitcher-card">
       <h2>투수 정보</h2>
-      <p class="page-note">검색해서 투수 정보를 확인할 수 있어.</p>
+      <p class="page-note">검색해서 투수 정보를 확인할 수 있습니다.</p>
       <input
         id="searchInput"
         class="pitcher-input"
@@ -171,7 +171,7 @@
       list.innerHTML = "";
 
       if (pitchers.length === 0) {
-        list.innerHTML = `<div class="list-item"><p>등록된 투수 정보가 없어.</p></div>`;
+        list.innerHTML = `<div class="list-item"><p>등록된 투수 정보가 없습니다.</p></div>`;
         return;
       }
 
@@ -230,7 +230,7 @@
       },
       (error) => {
         console.error(error);
-        list.innerHTML = `<div class="list-item"><p>투수 정보를 불러오지 못했어.</p></div>`;
+        list.innerHTML = `<div class="list-item"><p>투수 정보를 불러오지 못했습니다.</p></div>`;
       }
     );
   </script>
