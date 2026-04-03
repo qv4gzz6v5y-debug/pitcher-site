@@ -107,12 +107,18 @@
   <div class="pitcher-wrap">
     <div class="pitcher-card">
       <h2>투수 정보</h2>
-      <input id="searchInput" class="pitcher-input" placeholder="닉네임 검색" oninput="searchPitchers()">
+      <p class="page-note">검색해서 투수 정보를 확인할 수 있어.</p>
+      <input
+        id="searchInput"
+        class="pitcher-input"
+        placeholder="닉네임 검색"
+        oninput="searchPitchers()"
+      >
       <a id="manageLink" class="staff-link hidden" href="pitchers-manage.html">투수 정보 관리 페이지로 이동</a>
     </div>
 
     <div class="pitcher-card">
-      <h2>목록</h2>
+      <h2>검색 결과</h2>
       <div id="list"></div>
     </div>
   </div>
@@ -170,7 +176,7 @@
       }
 
       const filtered = pitchers.filter(p =>
-        p.name.toLowerCase().includes(keyword.toLowerCase())
+        (p.name || "").toLowerCase().includes(keyword.toLowerCase())
       );
 
       if (filtered.length === 0) {
@@ -210,19 +216,23 @@
       renderPitchers(keyword);
     };
 
-    onSnapshot(collection(db, "pitchers"), (snapshot) => {
-      pitchers = [];
-      snapshot.forEach((doc) => {
-        pitchers.push({
-          id: doc.id,
-          ...doc.data()
+    onSnapshot(
+      collection(db, "pitchers"),
+      (snapshot) => {
+        pitchers = [];
+        snapshot.forEach((doc) => {
+          pitchers.push({
+            id: doc.id,
+            ...doc.data()
+          });
         });
-      });
-      renderPitchers(document.getElementById("searchInput").value.trim());
-    }, (error) => {
-      console.error(error);
-      list.innerHTML = `<div class="list-item"><p>투수 정보를 불러오지 못했어.</p></div>`;
-    });
+        searchPitchers();
+      },
+      (error) => {
+        console.error(error);
+        list.innerHTML = `<div class="list-item"><p>투수 정보를 불러오지 못했어.</p></div>`;
+      }
+    );
   </script>
 </body>
 </html>
