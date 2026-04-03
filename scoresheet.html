@@ -81,6 +81,13 @@
       background: #b00020;
     }
 
+    .sheet-btn.small {
+      padding: 6px 10px;
+      margin: 0;
+      font-size: 12px;
+      border-radius: 8px;
+    }
+
     .sheet-btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
@@ -95,7 +102,7 @@
       width: 100%;
       border-collapse: collapse;
       background: white;
-      min-width: 1000px;
+      min-width: 1100px;
     }
 
     .sheet-table th,
@@ -153,6 +160,10 @@
       background: #f9fafb;
       font-weight: 700;
     }
+
+    .sub-row {
+      background: #fcfcfc;
+    }
   </style>
 </head>
 <body>
@@ -177,7 +188,7 @@
 
     <div class="sheet-card">
       <div class="card-title">기록지</div>
-      <p class="sheet-note">날짜가 같은 라인업이 있으면 자동으로 불러와져.</p>
+      <p class="sheet-note">날짜가 같은 라인업을 자동으로 불러와서 타자 기록표를 채워주세요.</p>
     </div>
 
     <div id="editCard" class="sheet-card hidden">
@@ -270,7 +281,6 @@
               <th>타순</th>
               <th>선수명</th>
               <th>포지션</th>
-              <th>타석</th>
               <th>기록 입력</th>
               <th>타수</th>
               <th>안타</th>
@@ -280,6 +290,7 @@
               <th>타점</th>
               <th>득점</th>
               <th>삼진</th>
+              <th>기능</th>
             </tr>
           </thead>
           <tbody id="battersBody"></tbody>
@@ -363,6 +374,7 @@
 
     let currentEditId = null;
     let sheets = [];
+    let batterRowCounter = 0;
 
     function getDefaultDate() {
       const now = new Date();
@@ -372,26 +384,47 @@
       return `${yyyy}-${mm}-${dd}`;
     }
 
+    function createBatterRow(data = {}) {
+      batterRowCounter += 1;
+      const rowId = batterRowCounter;
+      const row = document.createElement("tr");
+      if (data.isSub) row.classList.add("sub-row");
+      row.dataset.rowId = rowId;
+
+      row.innerHTML = `
+        <td><input id="b_order_${rowId}" class="cell-input" value="${data.order ?? ""}"></td>
+        <td><input id="b_name_${rowId}" class="cell-input" value="${data.name ?? ""}"></td>
+        <td><input id="b_pos_${rowId}" class="cell-input" value="${data.position ?? ""}"></td>
+        <td><input id="b_record_${rowId}" class="cell-input" placeholder="예: 안타 삼진 2루타(1타점)" value="${data.record ?? ""}"></td>
+        <td class="stat-cell" id="b_ab_${rowId}">0</td>
+        <td class="stat-cell" id="b_h_${rowId}">0</td>
+        <td class="stat-cell" id="b_2b_${rowId}">0</td>
+        <td class="stat-cell" id="b_3b_${rowId}">0</td>
+        <td class="stat-cell" id="b_hr_${rowId}">0</td>
+        <td class="stat-cell" id="b_rbi_${rowId}">0</td>
+        <td class="stat-cell" id="b_r_${rowId}">0</td>
+        <td class="stat-cell" id="b_so_${rowId}">0</td>
+        <td>
+          <button type="button" class="sheet-btn small sub" onclick="window.addSubRow(${rowId})">교체 추가</button>
+          <button type="button" class="sheet-btn small delete" onclick="window.removeBatterRow(${rowId})">삭제</button>
+        </td>
+      `;
+
+      const recordInput = row.querySelector(`#b_record_${rowId}`);
+      recordInput.addEventListener("input", () => updateBatterStats(rowId));
+
+      if (data.record) {
+        setTimeout(() => updateBatterStats(rowId), 0);
+      }
+
+      return row;
+    }
+
     function createBattersRows() {
       battersBody.innerHTML = "";
-      for (let i = 1; i <= 12; i++) {
-        battersBody.innerHTML += `
-          <tr>
-            <td><input id="b_order_${i}" class="cell-input" value="${i <= 9 ? i : ""}"></td>
-            <td><input id="b_name_${i}" class="cell-input"></td>
-            <td><input id="b_pos_${i}" class="cell-input"></td>
-            <td><input id="b_bat_${i}" class="cell-input" placeholder="우/좌/양"></td>
-            <td><input id="b_record_${i}" class="cell-input" placeholder="예: 안타 삼진 2루타(1타점)"></td>
-            <td class="stat-cell" id="b_ab_${i}">0</td>
-            <td class="stat-cell" id="b_h_${i}">0</td>
-            <td class="stat-cell" id="b_2b_${i}">0</td>
-            <td class="stat-cell" id="b_3b_${i}">0</td>
-            <td class="stat-cell" id="b_hr_${i}">0</td>
-            <td class="stat-cell" id="b_rbi_${i}">0</td>
-            <td class="stat-cell" id="b_r_${i}">0</td>
-            <td class="stat-cell" id="b_so_${i}">0</td>
-          </tr>
-        `;
+      batterRowCounter = 0;
+      for (let i = 1; i <= 9; i++) {
+        battersBody.appendChild(createBatterRow({ order: i }));
       }
     }
 
@@ -415,21 +448,7 @@
       }
     }
 
-    function attachAutoCalcEvents() {
-      for (let i = 1; i <= 12; i++) {
-        document.getElementById(`b_record_${i}`).addEventListener("input", () => {
-          const stats = calculateBatterStats(document.getElementById(`b_record_${i}`).value);
-          document.getElementById(`b_ab_${i}`).textContent = stats.ab;
-          document.getElementById(`b_h_${i}`).textContent = stats.h;
-          document.getElementById(`b_2b_${i}`).textContent = stats.double;
-          document.getElementById(`b_3b_${i}`).textContent = stats.triple;
-          document.getElementById(`b_hr_${i}`).textContent = stats.hr;
-          document.getElementById(`b_rbi_${i}`).textContent = stats.rbi;
-          document.getElementById(`b_r_${i}`).textContent = stats.r;
-          document.getElementById(`b_so_${i}`).textContent = stats.so;
-        });
-      }
-
+    function attachPitcherAutoCalcEvents() {
       for (let i = 1; i <= 8; i++) {
         ["p_inning_", "p_er_"].forEach(prefix => {
           document.getElementById(`${prefix}${i}`).addEventListener("input", () => {
@@ -453,36 +472,40 @@
       const hr = count(/홈런/g);
       const triple = count(/3루타/g);
       const double = count(/2루타/g);
-
       const hitOnly = count(/(?:^|[\s(])안타(?:[\s)]|$)/g);
       const single = Math.max(hitOnly - double - triple - hr, 0);
       const h = single + double + triple + hr;
-
       const so = count(/삼진/g);
-
-      const outKeywords = count(/뜬공|땅볼|병살타|직선타|파울플라이|희생번트실패/g);
-      const walkLike = count(/볼넷|사구|고의4구/g);
-      const sf = count(/희생플라이/g);
-      const sh = count(/희생번트/g);
-
+      const outKeywords = count(/뜬공|땅볼|병살타|직선타|파울플라이/g);
       const ab = h + so + outKeywords;
+
       const rbiMatches = [...raw.matchAll(/(\d+)타점/g)];
       const rMatches = [...raw.matchAll(/(\d+)득점/g)];
 
       const rbi = rbiMatches.reduce((sum, m) => sum + Number(m[1]), 0);
       const r = rMatches.reduce((sum, m) => sum + Number(m[1]), 0);
 
-      return { ab, h, double, triple, hr, rbi, r, so, walkLike, sf, sh };
+      return { ab, h, double, triple, hr, rbi, r, so };
+    }
+
+    function updateBatterStats(rowId) {
+      const stats = calculateBatterStats(document.getElementById(`b_record_${rowId}`).value);
+      document.getElementById(`b_ab_${rowId}`).textContent = stats.ab;
+      document.getElementById(`b_h_${rowId}`).textContent = stats.h;
+      document.getElementById(`b_2b_${rowId}`).textContent = stats.double;
+      document.getElementById(`b_3b_${rowId}`).textContent = stats.triple;
+      document.getElementById(`b_hr_${rowId}`).textContent = stats.hr;
+      document.getElementById(`b_rbi_${rowId}`).textContent = stats.rbi;
+      document.getElementById(`b_r_${rowId}`).textContent = stats.r;
+      document.getElementById(`b_so_${rowId}`).textContent = stats.so;
     }
 
     function inningsToOuts(value) {
       const str = String(value || "").trim();
       if (!str) return 0;
-      if (!str.includes(".")) return Number(str) * 3 || 0;
+      if (!str.includes(".")) return (Number(str) || 0) * 3;
       const [whole, part] = str.split(".");
-      const wholeNum = Number(whole) || 0;
-      const partNum = Number(part) || 0;
-      return wholeNum * 3 + partNum;
+      return (Number(whole) || 0) * 3 + (Number(part) || 0);
     }
 
     function calculateEra(inningValue, erValue) {
@@ -490,8 +513,7 @@
       const er = Number(erValue || 0);
       if (!outs) return "0.00";
       const innings = outs / 3;
-      const era = (er * 9) / innings;
-      return era.toFixed(2);
+      return ((er * 9) / innings).toFixed(2);
     }
 
     function getInningRow(prefix) {
@@ -504,16 +526,19 @@
 
     function getBatters() {
       const arr = [];
-      for (let i = 1; i <= 12; i++) {
-        const recordText = document.getElementById(`b_record_${i}`).value.trim();
+      const rows = [...battersBody.querySelectorAll("tr")];
+
+      rows.forEach(row => {
+        const rowId = row.dataset.rowId;
+        const recordText = document.getElementById(`b_record_${rowId}`).value.trim();
         const stats = calculateBatterStats(recordText);
 
         const item = {
-          order: document.getElementById(`b_order_${i}`).value.trim(),
-          name: document.getElementById(`b_name_${i}`).value.trim(),
-          position: document.getElementById(`b_pos_${i}`).value.trim(),
-          batting: document.getElementById(`b_bat_${i}`).value.trim(),
+          order: document.getElementById(`b_order_${rowId}`).value.trim(),
+          name: document.getElementById(`b_name_${rowId}`).value.trim(),
+          position: document.getElementById(`b_pos_${rowId}`).value.trim(),
           record: recordText,
+          isSub: row.classList.contains("sub-row"),
           stats: {
             ab: stats.ab,
             h: stats.h,
@@ -527,7 +552,8 @@
         };
 
         if (item.name || item.position || item.record) arr.push(item);
-      }
+      });
+
       return arr;
     }
 
@@ -570,7 +596,7 @@
 
       createBattersRows();
       createPitchersRows();
-      attachAutoCalcEvents();
+      attachPitcherAutoCalcEvents();
       saveBtn.textContent = "저장";
     }
 
@@ -579,7 +605,7 @@
     }
 
     async function loadLineupToSheet(dateStr) {
-      if (!dateStr) return;
+      if (!dateStr || currentEditId) return;
 
       const snap = await getDoc(doc(db, "lineups", dateStr));
       if (!snap.exists()) return;
@@ -588,16 +614,15 @@
       if (!lineup?.players) return;
 
       createBattersRows();
-      attachAutoCalcEvents();
 
       lineup.players.forEach((player, idx) => {
-        const i = idx + 1;
-        if (i > 12) return;
+        const row = battersBody.querySelectorAll("tr")[idx];
+        if (!row) return;
+        const rowId = row.dataset.rowId;
 
-        document.getElementById(`b_order_${i}`).value = player.order || "";
-        document.getElementById(`b_name_${i}`).value = player.name || "";
-        document.getElementById(`b_pos_${i}`).value = player.position || "";
-        document.getElementById(`b_bat_${i}`).value = player.batting || "";
+        document.getElementById(`b_order_${rowId}`).value = player.order || "";
+        document.getElementById(`b_name_${rowId}`).value = player.name || "";
+        document.getElementById(`b_pos_${rowId}`).value = player.position || "";
       });
 
       if (lineup.pitcher) {
@@ -656,7 +681,6 @@
                   <th>타순</th>
                   <th>선수명</th>
                   <th>포지션</th>
-                  <th>타석</th>
                   <th>기록</th>
                   <th>타수</th>
                   <th>안타</th>
@@ -670,11 +694,10 @@
               </thead>
               <tbody>
                 ${(sheet.batters || []).map(b => `
-                  <tr>
+                  <tr ${b.isSub ? 'class="sub-row"' : ""}>
                     <td>${b.order || ""}</td>
                     <td>${b.name || ""}</td>
                     <td>${b.position || ""}</td>
-                    <td>${b.batting || ""}</td>
                     <td>${b.record || ""}</td>
                     <td>${b.stats?.ab ?? 0}</td>
                     <td>${b.stats?.h ?? 0}</td>
@@ -818,24 +841,18 @@
 
       createBattersRows();
       createPitchersRows();
-      attachAutoCalcEvents();
+      attachPitcherAutoCalcEvents();
 
-      (sheet.batters || []).forEach((b, idx) => {
-        const i = idx + 1;
-        if (i > 12) return;
-        document.getElementById(`b_order_${i}`).value = b.order || "";
-        document.getElementById(`b_name_${i}`).value = b.name || "";
-        document.getElementById(`b_pos_${i}`).value = b.position || "";
-        document.getElementById(`b_bat_${i}`).value = b.batting || "";
-        document.getElementById(`b_record_${i}`).value = b.record || "";
-        document.getElementById(`b_ab_${i}`).textContent = b.stats?.ab ?? 0;
-        document.getElementById(`b_h_${i}`).textContent = b.stats?.h ?? 0;
-        document.getElementById(`b_2b_${i}`).textContent = b.stats?.double ?? 0;
-        document.getElementById(`b_3b_${i}`).textContent = b.stats?.triple ?? 0;
-        document.getElementById(`b_hr_${i}`).textContent = b.stats?.hr ?? 0;
-        document.getElementById(`b_rbi_${i}`).textContent = b.stats?.rbi ?? 0;
-        document.getElementById(`b_r_${i}`).textContent = b.stats?.r ?? 0;
-        document.getElementById(`b_so_${i}`).textContent = b.stats?.so ?? 0;
+      battersBody.innerHTML = "";
+      batterRowCounter = 0;
+      (sheet.batters || []).forEach((b) => {
+        battersBody.appendChild(createBatterRow({
+          order: b.order || "",
+          name: b.name || "",
+          position: b.position || "",
+          record: b.record || "",
+          isSub: !!b.isSub
+        }));
       });
 
       (sheet.pitchers || []).forEach((p, idx) => {
@@ -879,6 +896,27 @@
       }
     }
 
+    window.addSubRow = function(rowId) {
+      const baseRow = battersBody.querySelector(`tr[data-row-id="${rowId}"]`);
+      if (!baseRow) return;
+
+      const currentOrder = document.getElementById(`b_order_${rowId}`).value.trim();
+      const newRow = createBatterRow({
+        order: currentOrder,
+        isSub: true
+      });
+
+      baseRow.insertAdjacentElement("afterend", newRow);
+    };
+
+    window.removeBatterRow = function(rowId) {
+      const row = battersBody.querySelector(`tr[data-row-id="${rowId}"]`);
+      if (!row) return;
+
+      if (battersBody.querySelectorAll("tr").length <= 1) return;
+      row.remove();
+    };
+
     window.editSheet = editSheet;
     window.deleteSheet = deleteSheet;
 
@@ -893,7 +931,7 @@
 
     createBattersRows();
     createPitchersRows();
-    attachAutoCalcEvents();
+    attachPitcherAutoCalcEvents();
     gameDateInput.value = getDefaultDate();
 
     const sheetQuery = query(collection(db, "scoresheets"), orderBy("createdAt", "desc"));
@@ -909,7 +947,7 @@
       renderSheets();
     }, (error) => {
       console.error(error);
-      sheetList.innerHTML = `<p class="empty-text">기록지를 불러오지 못했습니다</p>`;
+      sheetList.innerHTML = `<p class="empty-text">기록지를 불러오지 못했습니다.</p>`;
     });
 
     loadLineupToSheet(gameDateInput.value);
