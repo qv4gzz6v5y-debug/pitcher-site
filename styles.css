@@ -394,4 +394,22 @@ body {
     font-size: 22px;
     padding: 22px;
   }
+  
+  .logo-area {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo-area:hover {
+  opacity: 0.85;
+}
+
+.logo-img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
 }
