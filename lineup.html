@@ -173,7 +173,7 @@
     <!-- 라인업 수정 -->
     <div id="editCard" class="lineup-card hidden">
       <div class="card-title">라인업 수정</div>
-      
+
       <label for="pitcher">선발투수</label>
       <select id="pitcher" class="lineup-select">
         <option value="">선발투수 선택</option>
@@ -219,6 +219,18 @@
 
     let rosterPlayers = [];
 
+    const positionList = [
+      { name: "투수", value: "P" },
+      { name: "포수", value: "C" },
+      { name: "1루", value: "1B" },
+      { name: "2루", value: "2B" },
+      { name: "3루", value: "3B" },
+      { name: "유격수", value: "SS" },
+      { name: "좌익수", value: "LF" },
+      { name: "중견수", value: "CF" },
+      { name: "우익수", value: "RF" }
+    ];
+
     function isStaff(user) {
       if (!user) return false;
       return user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
@@ -243,7 +255,9 @@
             </select>
           </td>
           <td>
-            <input id="pos-${i}" class="lineup-input" placeholder="포지션">
+            <select id="pos-${i}" class="lineup-select">
+              <option value="">포지션 선택</option>
+            </select>
           </td>
           <td>
             <select id="bat-${i}" class="lineup-select">
@@ -263,7 +277,6 @@
         getDisplayName(a).localeCompare(getDisplayName(b), "ko")
       );
 
-      // 선발투수 선택
       pitcherSelect.innerHTML = `<option value="">선발투수 선택</option>`;
       sortedPlayers.forEach(player => {
         const option = document.createElement("option");
@@ -272,7 +285,6 @@
         pitcherSelect.appendChild(option);
       });
 
-      // 타자 선택
       for (let i = 1; i <= 9; i++) {
         const select = document.getElementById(`name-${i}`);
         if (!select) continue;
@@ -282,6 +294,22 @@
           const option = document.createElement("option");
           option.value = getDisplayName(player);
           option.textContent = getDisplayName(player);
+          select.appendChild(option);
+        });
+      }
+    }
+
+    function fillPositionOptions() {
+      for (let i = 1; i <= 9; i++) {
+        const select = document.getElementById(`pos-${i}`);
+        if (!select) continue;
+
+        select.innerHTML = `<option value="">포지션 선택</option>`;
+
+        positionList.forEach(pos => {
+          const option = document.createElement("option");
+          option.value = pos.value;
+          option.textContent = pos.name;
           select.appendChild(option);
         });
       }
@@ -386,6 +414,7 @@
     }
 
     createLineupInputs();
+    fillPositionOptions();
 
     if (isStaff(currentUser)) {
       editCard.classList.remove("hidden");
@@ -394,7 +423,6 @@
     saveBtn.addEventListener("click", saveLineup);
     resetBtn.addEventListener("click", resetInputs);
 
-    // 로스터 불러오기
     const rosterQuery = query(
       collection(db, "users"),
       where("approved", "==", true)
@@ -414,7 +442,6 @@
       console.error(error);
     });
 
-    // 현재 라인업 실시간 반영
     onSnapshot(doc(db, "lineup", "main"), (snap) => {
       if (snap.exists()) {
         const data = snap.data();

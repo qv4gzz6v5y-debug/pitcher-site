@@ -26,7 +26,7 @@
     <h2>비공개 관리 페이지</h2>
 
     <div class="panel">
-      <p><strong>주의:</strong> 이 페이지는 최고관리자만 볼 수 있어.</p>
+      <p><strong>주의:</strong> 이 페이지는 최고관리자만 볼 수 있습니다.</p>
       <p id="adminMsg">회원가입 대기 명단을 불러오는 중...</p>
     </div>
 
@@ -70,7 +70,7 @@
       pendingList.innerHTML = "";
 
       if (users.length === 0) {
-        adminMsg.textContent = "현재 승인 대기 중인 회원이 없어.";
+        adminMsg.textContent = "현재 승인 대기 중인 회원이 없습니다.";
         pendingList.innerHTML = `
           <div class="user-row">
             <p>대기 중인 회원이 없습니다.</p>
@@ -167,7 +167,7 @@
             alert("승인 완료!");
           } catch (error) {
             console.error("승인 오류:", error);
-            alert("승인 중 오류가 발생했어.");
+            alert("승인 중 오류가 발생했습니다.");
             btn.disabled = false;
             btn.textContent = "승인";
           }
@@ -178,7 +178,7 @@
         btn.addEventListener("click", async () => {
           const id = btn.dataset.id;
 
-          const ok = confirm("이 가입 신청을 거절할까?");
+          const ok = confirm("이 가입 신청을 거절할까요?");
           if (!ok) return;
 
           btn.disabled = true;
@@ -189,7 +189,7 @@
             alert("거절 완료!");
           } catch (error) {
             console.error("거절 오류:", error);
-            alert("거절 중 오류가 발생했어.");
+            alert("거절 중 오류가 발생했습니다.");
             btn.disabled = false;
             btn.textContent = "거절";
           }
@@ -218,7 +218,7 @@
       },
       (error) => {
         console.error("대기 명단 불러오기 오류:", error);
-        adminMsg.textContent = "대기 명단을 불러오지 못했어.";
+        adminMsg.textContent = "대기 명단을 불러오지 못했습니다.";
         pendingList.innerHTML = `
           <div class="user-row">
             <p>오류: ${escapeHtml(error.message)}</p>
