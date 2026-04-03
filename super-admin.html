@@ -6,11 +6,28 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="wrap">
+    <div class="top-title">
+      <h1>레이 마린스</h1>
+      <a class="top-link" href="index.html">메인으로</a>
+    </div>
+
+    <div class="menu">
+      <a href="roster.html">로스터</a>
+      <a href="pitchers.html">투수 정보</a>
+      <a href="lineup.html">라인업</a>
+      <a href="record.html">기록실</a>
+      <a href="scoresheet.html">기록지</a>
+      <a href="mypage.html">마이페이지</a>
+    </div>
+  </div>
+
   <div class="section">
     <h2>비공개 관리 페이지</h2>
+
     <div class="panel">
-      <p>이 페이지는 최고관리자만 볼 수 있어.</p>
-      <button class="small-btn" onclick="location.href='index.html'">메인으로</button>
+      <p><strong>주의:</strong> 이 페이지는 최고관리자만 볼 수 있어.</p>
+      <p id="adminMsg">회원가입 대기 명단을 불러오는 중...</p>
     </div>
 
     <div class="panel">
@@ -33,56 +50,108 @@
 
     const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
     const pendingList = document.getElementById("pendingList");
+    const adminMsg = document.getElementById("adminMsg");
 
     if (!currentUser || currentUser.role !== "super_admin") {
       alert("접근 권한이 없어.");
       location.href = "index.html";
     }
 
+    function escapeHtml(text) {
+      return String(text ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
     function renderPending(users) {
       pendingList.innerHTML = "";
 
       if (users.length === 0) {
-        pendingList.innerHTML = "<p>대기 중인 회원이 없어.</p>";
+        adminMsg.textContent = "현재 승인 대기 중인 회원이 없어.";
+        pendingList.innerHTML = `
+          <div class="user-row">
+            <p>대기 중인 회원이 없습니다.</p>
+          </div>
+        `;
         return;
       }
+
+      adminMsg.textContent = `현재 승인 대기: ${users.length}명`;
 
       users.forEach((user) => {
         const row = document.createElement("div");
         row.className = "user-row";
-        row.innerHTML = `
-          <p><strong>마크닉:</strong> ${user.mcNick}</p>
-          <p><strong>디스코드 태그:</strong> ${user.discordTag}</p>
 
-          <input class="inline-input" id="rosterNick-${user.id}" placeholder="마크닉 입력" value="${user.mcNick}">
-          <input class="inline-input" id="backNumber-${user.id}" placeholder="등번호 입력">
+        row.innerHTML = `
+          <p><strong>마인크래프트 닉네임:</strong> ${escapeHtml(user.mcNick)}</p>
+          <p><strong>디스코드 태그:</strong> ${escapeHtml(user.discordTag)}</p>
+
+          <input
+            class="inline-input"
+            id="rosterNick-${user.id}"
+            placeholder="마크닉 입력"
+            value="${escapeHtml(user.mcNick)}"
+          >
+
+          <input
+            class="inline-input"
+            id="backNumber-${user.id}"
+            placeholder="등번호 입력"
+            value="${escapeHtml(user.backNumber || "")}"
+          >
 
           <label class="inline-check">
-            <input type="checkbox" id="admin-${user.id}"> 관리자 역할
+            <input type="checkbox" id="owner-${user.id}">
+            구단주 역할 부여
           </label>
 
           <label class="inline-check">
-            <input type="checkbox" id="scorer-${user.id}"> 기록원 역할
+            <input type="checkbox" id="admin-${user.id}">
+            관리자 역할 부여
+          </label>
+
+          <label class="inline-check">
+            <input type="checkbox" id="scorer-${user.id}">
+            기록원 역할 부여
           </label>
 
           <br>
+
           <button class="small-btn approve-btn" data-id="${user.id}">승인</button>
           <button class="small-btn red reject-btn" data-id="${user.id}">거절</button>
         `;
+
         pendingList.appendChild(row);
       });
 
-      document.querySelectorAll(".approve-btn").forEach(btn => {
+      bindButtons();
+    }
+
+    function bindButtons() {
+      const approveButtons = document.querySelectorAll(".approve-btn");
+      const rejectButtons = document.querySelectorAll(".reject-btn");
+
+      approveButtons.forEach((btn) => {
         btn.addEventListener("click", async () => {
           const id = btn.dataset.id;
+
           const rosterNick = document.getElementById(`rosterNick-${id}`).value.trim();
           const backNumber = document.getElementById(`backNumber-${id}`).value.trim();
+          const isOwner = document.getElementById(`owner-${id}`).checked;
           const isAdmin = document.getElementById(`admin-${id}`).checked;
           const isScorer = document.getElementById(`scorer-${id}`).checked;
 
           let role = "member";
-          if (isAdmin) role = "admin";
-          else if (isScorer) role = "scorer";
+          if (isOwner) {
+            role = "owner";
+          } else if (isAdmin) {
+            role = "admin";
+          } else if (isScorer) {
+            role = "scorer";
+          }
 
           btn.disabled = true;
           btn.textContent = "승인 중...";
@@ -90,13 +159,14 @@
           try {
             await updateDoc(doc(db, "users", id), {
               approved: true,
+              role,
               rosterNick,
-              backNumber,
-              role
+              backNumber
             });
+
             alert("승인 완료!");
           } catch (error) {
-            console.error(error);
+            console.error("승인 오류:", error);
             alert("승인 중 오류가 발생했어.");
             btn.disabled = false;
             btn.textContent = "승인";
@@ -104,11 +174,12 @@
         });
       });
 
-      document.querySelectorAll(".reject-btn").forEach(btn => {
+      rejectButtons.forEach((btn) => {
         btn.addEventListener("click", async () => {
           const id = btn.dataset.id;
 
-          if (!confirm("이 가입 신청을 거절할까?")) return;
+          const ok = confirm("이 가입 신청을 거절할까?");
+          if (!ok) return;
 
           btn.disabled = true;
           btn.textContent = "거절 중...";
@@ -117,7 +188,7 @@
             await deleteDoc(doc(db, "users", id));
             alert("거절 완료!");
           } catch (error) {
-            console.error(error);
+            console.error("거절 오류:", error);
             alert("거절 중 오류가 발생했어.");
             btn.disabled = false;
             btn.textContent = "거절";
@@ -126,15 +197,35 @@
       });
     }
 
-    const q = query(collection(db, "users"), where("approved", "==", false));
+    const pendingQuery = query(
+      collection(db, "users"),
+      where("approved", "==", false)
+    );
 
-    onSnapshot(q, (snap) => {
-      const users = [];
-      snap.forEach((d) => {
-        users.push({ id: d.id, ...d.data() });
-      });
-      renderPending(users);
-    });
+    onSnapshot(
+      pendingQuery,
+      (snapshot) => {
+        const users = [];
+
+        snapshot.forEach((d) => {
+          users.push({
+            id: d.id,
+            ...d.data()
+          });
+        });
+
+        renderPending(users);
+      },
+      (error) => {
+        console.error("대기 명단 불러오기 오류:", error);
+        adminMsg.textContent = "대기 명단을 불러오지 못했어.";
+        pendingList.innerHTML = `
+          <div class="user-row">
+            <p>오류: ${escapeHtml(error.message)}</p>
+          </div>
+        `;
+      }
+    );
   </script>
 </body>
 </html>

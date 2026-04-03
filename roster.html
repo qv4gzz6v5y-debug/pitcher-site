@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로스터</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .roster-wrap {
+      width: 95%;
+      max-width: 1100px;
+      margin: 34px auto;
+    }
+
+    .roster-header-card {
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+    }
+
+    .roster-header-card h2 {
+      margin: 0 0 10px 0;
+      font-size: 34px;
+    }
+
+    .roster-header-card p {
+      margin: 0;
+      color: #666;
+      font-size: 16px;
+    }
+
+    .roster-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .roster-card {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      border-top: 6px solid #c9982c;
+    }
+
+    .roster-number {
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .roster-name {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .roster-sub {
+      color: #555;
+      font-size: 15px;
+      margin-bottom: 14px;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .badge.owner {
+      background: #ff6a00;
+      color: white;
+    }
+
+    .badge.admin {
+      background: #8b0000;
+      color: white;
+    }
+
+    .badge.scorer {
+      background: #1b65ba;
+      color: white;
+    }
+
+    .empty-box {
+      background: white;
+      border-radius: 18px;
+      padding: 30px;
+      text-align: center;
+      color: #666;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top-title">
+      <h1>레이 마린스</h1>
+      <a class="top-link" href="index.html">메인으로</a>
+    </div>
+
+    <div class="menu">
+      <a href="roster.html">로스터</a>
+      <a href="pitchers.html">투수 정보</a>
+      <a href="lineup.html">라인업</a>
+      <a href="record.html">기록실</a>
+      <a href="scoresheet.html">기록지</a>
+      <a href="mypage.html">마이페이지</a>
+    </div>
+  </div>
+
+  <div class="roster-wrap">
+    <div class="roster-header-card">
+      <h2>로스터</h2>
+      <p id="rosterInfo">선수 정보를 불러오는 중...</p>
+    </div>
+
+    <div id="rosterGrid" class="roster-grid"></div>
+  </div>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      query,
+      where,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const rosterGrid = document.getElementById("rosterGrid");
+    const rosterInfo = document.getElementById("rosterInfo");
+
+    function getRoleLabel(role) {
+      if (role === "owner") return "구단주";
+      if (role === "admin") return "관리진";
+      if (role === "scorer") return "기록원";
+      return "";
+    }
+
+    function getDisplayName(user) {
+      return user.rosterNick && user.rosterNick.trim()
+        ? user.rosterNick.trim()
+        : user.mcNick;
+    }
+
+    function getDisplayNumber(user) {
+      return user.backNumber && String(user.backNumber).trim()
+        ? String(user.backNumber).trim()
+        : "-";
+    }
+
+    function getRolePriority(role) {
+      if (role === "owner") return 0;
+      if (role === "admin") return 1;
+      return 2;
+    }
+
+    function sortUsers(users) {
+      return users.sort((a, b) => {
+        const roleDiff = getRolePriority(a.role) - getRolePriority(b.role);
+        if (roleDiff !== 0) return roleDiff;
+
+        const aNum = parseInt(a.backNumber, 10);
+        const bNum = parseInt(b.backNumber, 10);
+
+        const aValid = !Number.isNaN(aNum);
+        const bValid = !Number.isNaN(bNum);
+
+        if (aValid && bValid) return aNum - bNum;
+        if (aValid) return -1;
+        if (bValid) return 1;
+
+        return getDisplayName(a).localeCompare(getDisplayName(b), "ko");
+      });
+    }
+
+    function renderRoster(users) {
+      rosterGrid.innerHTML = "";
+
+      if (users.length === 0) {
+        rosterInfo.textContent = "승인된 로스터가 아직 없어.";
+        rosterGrid.innerHTML = `
+          <div class="empty-box">
+            아직 등록된 선수가 없습니다.
+          </div>
+        `;
+        return;
+      }
+
+      rosterInfo.textContent = `현재 등록 인원: ${users.length}명`;
+
+      const sorted = sortUsers(users);
+
+      sorted.forEach((user) => {
+        const displayName = getDisplayName(user);
+        const displayNumber = getDisplayNumber(user);
+        const role = user.role || "member";
+        const roleLabel = getRoleLabel(role);
+
+        const card = document.createElement("div");
+        card.className = "roster-card";
+
+        card.innerHTML = `
+          <div class="roster-number">#${displayNumber}</div>
+          <div class="roster-name">${displayName}</div>
+          <div class="roster-sub">마인크래프트 닉네임: ${user.mcNick}</div>
+          <div class="badge-row">
+            ${roleLabel ? `<span class="badge ${role}">${roleLabel}</span>` : ""}
+          </div>
+        `;
+
+        rosterGrid.appendChild(card);
+      });
+    }
+
+    const rosterQuery = query(
+      collection(db, "users"),
+      where("approved", "==", true)
+    );
+
+    onSnapshot(
+      rosterQuery,
+      (snapshot) => {
+        const users = [];
+        snapshot.forEach((doc) => {
+          users.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+        renderRoster(users);
+      },
+      (error) => {
+        console.error("로스터 불러오기 오류:", error);
+        rosterInfo.textContent = "로스터를 불러오지 못했어.";
+        rosterGrid.innerHTML = `
+          <div class="empty-box">
+            오류: ${error.message}
+          </div>
+        `;
+      }
+    );
+  </script>
+</body>
+</html>
