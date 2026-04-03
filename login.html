@@ -32,7 +32,7 @@
       const password = document.getElementById("password").value.trim();
 
       if (!mcNick || !password) {
-        msg.textContent = "모든 칸을 입력해줘.";
+        msg.textContent = "모든 칸을 입력해주세요.";
         return;
       }
 
@@ -48,7 +48,7 @@
         const snap = await getDocs(q);
 
         if (snap.empty) {
-          msg.textContent = "존재하지 않는 닉네임이야.";
+          msg.textContent = "존재하지 않는 닉네임입니다.";
           return;
         }
 
@@ -56,12 +56,12 @@
         const user = { id: docData.id, ...docData.data() };
 
         if (user.password !== password) {
-          msg.textContent = "비밀번호가 맞지 않아.";
+          msg.textContent = "비밀번호가 맞지 않습니다.";
           return;
         }
 
         if (!user.approved) {
-          msg.textContent = "아직 관리자 승인이 안 된 계정이야.";
+          msg.textContent = "아직 관리자 승인이 안 된 계정입니다.";
           return;
         }
 
@@ -70,7 +70,7 @@
 
       } catch (error) {
         console.error(error);
-        msg.textContent = "로그인 중 오류가 발생했어.";
+        msg.textContent = "로그인 중 오류가 발생했습니다.";
       } finally {
         loginBtn.disabled = false;
         loginBtn.textContent = "로그인";
