@@ -25,7 +25,8 @@
       font-size: 34px;
     }
 
-    .pitcher-input {
+    .pitcher-input,
+    .pitcher-select {
       width: 100%;
       box-sizing: border-box;
       margin: 10px 0;
@@ -99,6 +100,49 @@
       gap: 8px;
       flex-wrap: wrap;
     }
+
+    .pitch-add-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+      margin-top: 8px;
+    }
+
+    .pitch-list {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pitch-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #111827;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .chip-remove {
+      border: none;
+      background: transparent;
+      color: #b00020;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0;
+    }
+
+    @media (max-width: 700px) {
+      .pitch-add-row {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -123,9 +167,72 @@
       <h2>투수 정보 관리</h2>
 
       <input id="name" class="pitcher-input" placeholder="닉네임">
-      <input id="team" class="pitcher-input" placeholder="팀 코드 (KRA, RMS, NDG, CPX, CLP, SLU, IH, ODV)">
-      <input id="angle" class="pitcher-input" placeholder="팔각도">
-      <input id="pitch" class="pitcher-input" placeholder="직구40 슬라이더30 커브20">
+
+      <select id="team" class="pitcher-select">
+        <option value="">팀 선택</option>
+        <option value="KRA">KRA</option>
+        <option value="RMS">RMS</option>
+        <option value="NDG">NDG</option>
+        <option value="CPX">CPX</option>
+        <option value="CLP">CLP</option>
+        <option value="SLU">SLU</option>
+        <option value="IH">IH</option>
+        <option value="ODV">ODV</option>
+      </select>
+
+      <select id="angle" class="pitcher-select">
+        <option value="">팔각도 선택</option>
+        <option value="오버핸드">오버핸드</option>
+        <option value="쓰리쿼터">쓰리쿼터</option>
+        <option value="사이드암">사이드암</option>
+        <option value="언더핸드">언더핸드</option>
+      </select>
+
+      <div class="pitch-add-row">
+        <div>
+          <label for="pitchType" class="page-note">구종</label>
+          <select id="pitchType" class="pitcher-select">
+            <option value="">구종 선택</option>
+            <option value="포심">포심</option>
+            <option value="투심">투심</option>
+            <option value="싱커">싱커</option>
+            <option value="커터">커터</option>
+            <option value="슬라이더">슬라이더</option>
+            <option value="자이로 슬라이더">자이로 슬라이더</option>
+            <option value="스위퍼">스위퍼</option>
+            <option value="슬러터">슬러터</option>
+            <option value="슬러브">슬러브</option>
+            <option value="커브볼">커브볼</option>
+            <option value="너클커브">너클커브</option>
+            <option value="이퓨스">이퓨스</option>
+            <option value="너클볼">너클볼</option>
+            <option value="체인지업">체인지업</option>
+            <option value="서클 체인지업">서클 체인지업</option>
+            <option value="벌칸 체인지업">벌칸 체인지업</option>
+            <option value="킥 체인지">킥 체인지</option>
+            <option value="스플리터">스플리터</option>
+            <option value="포크볼">포크볼</option>
+            <option value="팜볼">팜볼</option>
+            <option value="스크류볼">스크류볼</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="pitchSpeed" class="page-note">구속 단계</label>
+          <select id="pitchSpeed" class="pitcher-select">
+            <option value="">선택</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
+          </select>
+        </div>
+
+        <div>
+          <button class="pitcher-btn sub" type="button" id="addPitchBtn">구종 추가</button>
+        </div>
+      </div>
+
+      <div id="pitchList" class="pitch-list"></div>
 
       <div class="action-row">
         <button class="pitcher-btn" id="saveBtn">저장</button>
@@ -193,55 +300,108 @@
 
     let pitchers = [];
     let editId = null;
+    let selectedPitches = [];
 
     const nameInput = document.getElementById("name");
     const teamInput = document.getElementById("team");
     const angleInput = document.getElementById("angle");
-    const pitchInput = document.getElementById("pitch");
+    const pitchTypeInput = document.getElementById("pitchType");
+    const pitchSpeedInput = document.getElementById("pitchSpeed");
+    const addPitchBtn = document.getElementById("addPitchBtn");
+    const pitchList = document.getElementById("pitchList");
     const modeText = document.getElementById("modeText");
     const saveBtn = document.getElementById("saveBtn");
     const cancelBtn = document.getElementById("cancelBtn");
     const list = document.getElementById("list");
+
+    function renderPitchList() {
+      pitchList.innerHTML = "";
+
+      if (selectedPitches.length === 0) {
+        pitchList.innerHTML = `<span class="page-note">추가된 구종이 없습니다.</span>`;
+        return;
+      }
+
+      selectedPitches.forEach((pitch, index) => {
+        const chip = document.createElement("span");
+        chip.className = "pitch-chip";
+        chip.innerHTML = `
+          ${pitch.name}(${pitch.speed})
+          <button type="button" class="chip-remove" onclick="removePitchAt(${index})">✕</button>
+        `;
+        pitchList.appendChild(chip);
+      });
+    }
+
+    window.removePitchAt = function(index) {
+      selectedPitches.splice(index, 1);
+      renderPitchList();
+    };
 
     function resetForm() {
       editId = null;
       nameInput.value = "";
       teamInput.value = "";
       angleInput.value = "";
-      pitchInput.value = "";
+      pitchTypeInput.value = "";
+      pitchSpeedInput.value = "";
+      selectedPitches = [];
+      renderPitchList();
       modeText.textContent = "";
       saveBtn.textContent = "저장";
     }
 
-    function parsePitchText(raw) {
-      const arr = raw.trim().split(" ").filter(Boolean);
+    function buildPitchText() {
+      return selectedPitches.map(p => `${p.name}(${p.speed})`).join(", ");
+    }
 
-      return arr.map(p => {
-        const pname = p.replace(/[0-9]/g, "");
-        const speed = p.replace(/[^0-9]/g, "");
+    function buildPitchRaw() {
+      return selectedPitches.map(p => `${p.name}${p.speed}`).join(" ");
+    }
 
-        if (!pname || !["20", "30", "40"].includes(speed)) {
-          throw new Error(`구종 입력 형식 오류: ${p}`);
-        }
+    function parsePitchRaw(raw) {
+      const arr = String(raw || "").trim().split(" ").filter(Boolean);
 
-        return `${pname}(${speed})`;
+      return arr.map(item => {
+        const speed = item.match(/(20|30|40)$/)?.[1] || "";
+        const name = item.replace(/(20|30|40)$/, "").trim();
+        return { name, speed };
+      }).filter(v => v.name && v.speed);
+    }
+
+    function addPitch() {
+      const pitchType = pitchTypeInput.value.trim();
+      const pitchSpeed = pitchSpeedInput.value.trim();
+
+      if (!pitchType || !pitchSpeed) {
+        alert("구종과 구속 단계를 선택해주세요.");
+        return;
+      }
+
+      selectedPitches.push({
+        name: pitchType,
+        speed: pitchSpeed
       });
+
+      pitchTypeInput.value = "";
+      pitchSpeedInput.value = "";
+      renderPitchList();
     }
 
     async function savePitcher() {
       const name = nameInput.value.trim();
-      const team = teamInput.value.trim().toUpperCase();
+      const team = teamInput.value.trim();
       const angle = angleInput.value.trim();
-      const pitchRaw = pitchInput.value.trim();
 
-      if (!name || !team || !angle || !pitchRaw) {
+      if (!name || !team || !angle || selectedPitches.length === 0) {
         alert("모든 값을 입력해주세요.");
         return;
       }
 
       try {
-        const pitches = parsePitchText(pitchRaw);
-        const text = `${name}(${angle}) - ${pitches.join(", ")}`;
+        const pitchRaw = buildPitchRaw();
+        const pitchText = buildPitchText();
+        const text = `${name}(${angle}) - ${pitchText}`;
 
         saveBtn.disabled = true;
         saveBtn.textContent = editId ? "수정 중..." : "저장 중...";
@@ -272,10 +432,10 @@
         resetForm();
       } catch (error) {
         console.error(error);
-        alert(error.message || "저장 중 오류가 발생했습니다.");
+        alert("저장 중 오류가 발생했습니다.");
       } finally {
         saveBtn.disabled = false;
-        saveBtn.textContent = editId ? "저장" : "저장";
+        saveBtn.textContent = "저장";
       }
     }
 
@@ -287,7 +447,8 @@
       nameInput.value = target.name || "";
       teamInput.value = target.team || "";
       angleInput.value = target.angle || "";
-      pitchInput.value = target.pitchRaw || "";
+      selectedPitches = parsePitchRaw(target.pitchRaw || "");
+      renderPitchList();
       modeText.textContent = `수정 중: ${target.name}`;
       saveBtn.textContent = "수정 저장";
 
@@ -366,6 +527,7 @@
     window.editPitcher = editPitcher;
     window.removePitcher = removePitcher;
 
+    addPitchBtn.addEventListener("click", addPitch);
     saveBtn.addEventListener("click", savePitcher);
     cancelBtn.addEventListener("click", resetForm);
 
@@ -382,6 +544,8 @@
       console.error(error);
       list.innerHTML = `<div class="list-item"><p>투수 정보를 불러오지 못했습니다.</p></div>`;
     });
+
+    renderPitchList();
   </script>
 </body>
 </html>
