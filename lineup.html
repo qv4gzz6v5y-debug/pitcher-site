@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>라인업</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .lineup-wrap {
+      width: 95%;
+      max-width: 1100px;
+      margin: 34px auto;
+    }
+
+    .lineup-card {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      margin-bottom: 18px;
+    }
+
+    .lineup-card h2 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 34px;
+    }
+
+    .lineup-note {
+      color: #666;
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .lineup-input {
+      width: 100%;
+      box-sizing: border-box;
+      margin: 8px 0;
+      padding: 12px 14px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 16px;
+      background: #fff;
+    }
+
+    .lineup-btn {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 12px;
+      background: #111;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 10px;
+    }
+
+    .lineup-btn.sub {
+      background: #666;
+    }
+
+    .lineup-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .lineup-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .lineup-table th,
+    .lineup-table td {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 8px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .lineup-table th {
+      font-size: 16px;
+      background: #f8f8f8;
+    }
+
+    .lineup-order {
+      width: 60px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .view-box {
+      background: #f8f8f8;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .view-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .view-row:last-child {
+      border-bottom: none;
+    }
+
+    .view-left {
+      font-weight: 700;
+      min-width: 50px;
+    }
+
+    .view-mid {
+      flex: 1;
+    }
+
+    .view-right {
+      color: #555;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    .empty-text {
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top-title">
+      <h1>레이 마린스</h1>
+      <a class="top-link" href="index.html">메인으로</a>
+    </div>
+
+    <div class="menu">
+      <a href="roster.html">로스터</a>
+      <a href="pitchers.html">투수 정보</a>
+      <a href="lineup.html">라인업</a>
+      <a href="record.html">기록실</a>
+      <a href="scoresheet.html">기록지</a>
+      <a href="mypage.html">마이페이지</a>
+    </div>
+  </div>
+
+  <div class="lineup-wrap">
+    <div class="lineup-card">
+      <h2>라인업</h2>
+      <p id="roleText" class="lineup-note">권한 확인 중...</p>
+    </div>
+
+    <div id="editCard" class="lineup-card" style="display:none;">
+      <h2>라인업 수정</h2>
+      <p class="lineup-note">관리자 / 기록원 / 최고관리자만 수정할 수 있어.</p>
+
+      <label>선발투수</label>
+      <input id="pitcher" class="lineup-input" placeholder="선발투수 이름">
+
+      <table class="lineup-table">
+        <thead>
+          <tr>
+            <th class="lineup-order">타순</th>
+            <th>선수 이름</th>
+            <th>포지션</th>
+          </tr>
+        </thead>
+        <tbody id="lineupBody"></tbody>
+      </table>
+
+      <button id="saveBtn" class="lineup-btn">저장</button>
+      <button id="resetBtn" class="lineup-btn sub">초기화</button>
+    </div>
+
+    <div class="lineup-card">
+      <h2>현재 라인업</h2>
+      <div id="viewBox" class="view-box">
+        <p class="empty-text">라인업을 불러오는 중...</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      doc,
+      setDoc,
+      getDoc,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+    const roleText = document.getElementById("roleText");
+    const editCard = document.getElementById("editCard");
+    const lineupBody = document.getElementById("lineupBody");
+    const saveBtn = document.getElementById("saveBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const pitcherInput = document.getElementById("pitcher");
+    const viewBox = document.getElementById("viewBox");
+
+    function isStaff(user) {
+      if (!user) return false;
+      return user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
+    }
+
+    function createLineupInputs() {
+      lineupBody.innerHTML = "";
+
+      for (let i = 1; i <= 9; i++) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="lineup-order">${i}</td>
+          <td><input id="name-${i}" class="lineup-input" placeholder="${i}번 타자 이름"></td>
+          <td><input id="pos-${i}" class="lineup-input" placeholder="포지션"></td>
+        `;
+        lineupBody.appendChild(row);
+      }
+    }
+
+    function getLineupData() {
+      const players = [];
+
+      for (let i = 1; i <= 9; i++) {
+        players.push({
+          order: i,
+          name: document.getElementById(`name-${i}`).value.trim(),
+          position: document.getElementById(`pos-${i}`).value.trim()
+        });
+      }
+
+      return {
+        pitcher: pitcherInput.value.trim(),
+        players,
+        updatedAt: Date.now()
+      };
+    }
+
+    function fillInputs(data) {
+      pitcherInput.value = data?.pitcher || "";
+
+      for (let i = 1; i <= 9; i++) {
+        const player = data?.players?.find(p => p.order === i);
+        document.getElementById(`name-${i}`).value = player?.name || "";
+        document.getElementById(`pos-${i}`).value = player?.position || "";
+      }
+    }
+
+    function renderView(data) {
+      if (!data || (!data.pitcher && (!data.players || data.players.every(p => !p.name && !p.position)))) {
+        viewBox.innerHTML = `<p class="empty-text">아직 저장된 라인업이 없어.</p>`;
+        return;
+      }
+
+      let html = `
+        <div class="view-row">
+          <div class="view-left">SP</div>
+          <div class="view-mid">${data.pitcher || "-"}</div>
+          <div class="view-right">선발투수</div>
+        </div>
+      `;
+
+      (data.players || []).forEach(player => {
+        html += `
+          <div class="view-row">
+            <div class="view-left">${player.order}</div>
+            <div class="view-mid">${player.name || "-"}</div>
+            <div class="view-right">${player.position || "-"}</div>
+          </div>
+        `;
+      });
+
+      viewBox.innerHTML = html;
+    }
+
+    async function loadInitialLineup() {
+      const docRef = doc(db, "lineup", "main");
+      const snap = await getDoc(docRef);
+
+      if (snap.exists()) {
+        const data = snap.data();
+        fillInputs(data);
+        renderView(data);
+      } else {
+        renderView(null);
+      }
+    }
+
+    async function saveLineup() {
+      const data = getLineupData();
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = "저장 중...";
+
+      try {
+        await setDoc(doc(db, "lineup", "main"), data);
+        alert("라인업 저장 완료!");
+      } catch (error) {
+        console.error(error);
+        alert("라인업 저장 중 오류가 발생했어.");
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "저장";
+      }
+    }
+
+    function resetInputs() {
+      pitcherInput.value = "";
+      for (let i = 1; i <= 9; i++) {
+        document.getElementById(`name-${i}`).value = "";
+        document.getElementById(`pos-${i}`).value = "";
+      }
+    }
+
+    createLineupInputs();
+
+    if (isStaff(currentUser)) {
+      roleText.textContent = "현재 권한으로 라인업을 수정할 수 있어.";
+      editCard.style.display = "block";
+    } else {
+      roleText.textContent = "현재 라인업 조회만 가능해.";
+    }
+
+    saveBtn.addEventListener("click", saveLineup);
+    resetBtn.addEventListener("click", resetInputs);
+
+    onSnapshot(doc(db, "lineup", "main"), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        renderView(data);
+        if (isStaff(currentUser)) fillInputs(data);
+      } else {
+        renderView(null);
+      }
+    }, (error) => {
+      console.error(error);
+      viewBox.innerHTML = `<p class="empty-text">라인업을 불러오지 못했어.</p>`;
+    });
+
+    loadInitialLineup();
+  </script>
+</body>
+</html>
