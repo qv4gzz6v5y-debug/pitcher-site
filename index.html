@@ -1,290 +1,278 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-</script>
+  <meta charset="UTF-8">
+  <title>투수 관리</title>
 
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<title>투수 관리</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
 
-<style>
-body {
-  background:#0f172a;
-  color:#e2e8f0;
-  font-family:'Segoe UI',sans-serif;
-  text-align:center;
-  padding:40px;
-}
+    .container {
+      max-width: 700px;
+      margin: auto;
+    }
 
-.container{
-  max-width:700px;
-  margin:auto;
-}
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+    }
 
-.card{
-  background:#1e293b;
-  padding:20px;
-  border-radius:15px;
-  margin-bottom:20px;
-}
+    input {
+      width: 80%;
+      padding: 10px;
+      margin: 8px;
+      border-radius: 10px;
+      border: none;
+    }
 
-input{
-  width:80%;
-  padding:10px;
-  margin:8px;
-  border-radius:10px;
-  border:none;
-}
+    button {
+      padding: 8px 15px;
+      border-radius: 8px;
+      border: none;
+      margin: 3px;
+      cursor: pointer;
+    }
 
-button{
-  padding:8px 15px;
-  border-radius:8px;
-  border:none;
-  margin:3px;
-  cursor:pointer;
-}
+    .add { background: #3b82f6; color: white; }
+    .delete { background: #ef4444; color: white; }
 
-.add{background:#3b82f6;color:white;}
-.delete{background:#ef4444;color:white;}
+    .team-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 15px;
+      font-weight: bold;
+      justify-content: flex-start;
+    }
 
-.team-title{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-top:15px;
-  font-weight:bold;
-}
+    .logo {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+    }
 
-.logo{
-  width:30px;
-  height:30px;
-}
-
-.list-item{
-  background:#020617;
-  padding:10px;
-  border-radius:10px;
-  margin-top:8px;
-}
-</style>
+    .list-item {
+      background: #020617;
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 8px;
+      text-align: left;
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="container">
-
-<h1>⚾ 투수 관리 시스템</h1>
-
-<div class="card">
-<h2>투수 추가</h2>
-
-<input id="name" placeholder="닉네임"><br>
-<input id="team" placeholder="팀 코드 (KRA 등)"><br>
-<input id="angle" placeholder="팔각도"><br>
-<input id="pitch" placeholder="직구40 슬라이더30"><br>
-
-<button class="add" onclick="savePitcher()">저장</button>
-
-</div>
-
-<div class="card">
-<h2>검색</h2>
-<input id="searchInput" placeholder="🔍 검색" oninput="searchPitchers()">
-</div>
+  <div class="container">
+    <h1>⚾ 투수 관리 시스템</h1>
+
+    <div class="card">
+      <h2>투수 추가</h2>
+
+      <input id="name" placeholder="닉네임"><br>
+      <input id="team" placeholder="팀 코드 (KRA 등)"><br>
+      <input id="angle" placeholder="팔각도"><br>
+      <input id="pitch" placeholder="직구40 슬라이더30"><br>
+
+      <button class="add" onclick="savePitcher()">저장</button>
+    </div>
+
+    <div class="card">
+      <h2>검색</h2>
+      <input id="searchInput" placeholder="🔍 검색" oninput="searchPitchers()">
+    </div>
+
+    <div class="card">
+      <h2>팀별 목록</h2>
+      <button onclick="loadPitchers()">새로고침</button>
+      <div id="list"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      doc
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4vxfTrybnA6fUtV5Ykrz371ZBus-L-RM",
+      authDomain: "pitcher-site.firebaseapp.com",
+      projectId: "pitcher-site",
+      storageBucket: "pitcher-site.firebasestorage.app",
+      messagingSenderId: "522000011066",
+      appId: "1:522000011066:web:1e41439a5a1fef29cbca03"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const teamColors = {
+      "KRA": "#c40000",
+      "RMS": "#c9982c",
+      "NDG": "#120725",
+      "CPX": "#1B65BA",
+      "CLP": "#0cb218",
+      "SLU": "#850000",
+      "IH": "#FEC804",
+      "ODV": "#FF6A00"
+    };
+
+    const teamLogos = {
+      "KRA": "logos/크라켄즈.png",
+      "RMS": "logos/마린스.jpg",
+      "NDG": "logos/드래곤즈.png",
+      "CPX": "logos/청피.png",
+      "CLP": "logos/플랜츠.png",
+      "SLU": "logos/슬러거즈.png",
+      "IH": "logos/호네츠.png",
+      "ODV": "logos/오버드라이브.png"
+    };
+
+    let pitchers = [];
+
+    window.savePitcher = async function () {
+      try {
+        const name = document.getElementById("name").value.trim();
+        const team = document.getElementById("team").value.trim().toUpperCase();
+        const angle = document.getElementById("angle").value.trim();
+        const pitchRaw = document.getElementById("pitch").value.trim();
+
+        if (!name || !team || !angle || !pitchRaw) {
+          alert("모든 칸을 입력해줘.");
+          return;
+        }
+
+        const pitchInput = pitchRaw.split(" ");
+
+        const pitches = pitchInput.map(p => {
+          const pname = p.replace(/[0-9]/g, "");
+          const speed = p.replace(/[^0-9]/g, "");
+
+          if (!pname || !["20", "30", "40"].includes(speed)) {
+            throw new Error(`구종 입력 형식 오류: ${p}`);
+          }
+
+          return `${pname}(${speed})`;
+        });
+
+        const text = `${name}(${angle}) - ${pitches.join(", ")}`;
+
+        await addDoc(collection(db, "pitchers"), {
+          name,
+          team,
+          text
+        });
+
+        document.getElementById("name").value = "";
+        document.getElementById("team").value = "";
+        document.getElementById("angle").value = "";
+        document.getElementById("pitch").value = "";
+
+        await loadPitchers();
+      } catch (error) {
+        console.error("저장 오류:", error);
+        alert("저장 실패: " + error.message);
+      }
+    };
+
+    window.removePitcher = async function (id) {
+      try {
+        await deleteDoc(doc(db, "pitchers", id));
+        await loadPitchers();
+      } catch (error) {
+        console.error("삭제 오류:", error);
+        alert("삭제 실패: " + error.message);
+      }
+    };
+
+    window.loadPitchers = async function () {
+      try {
+        pitchers = [];
+
+        const querySnapshot = await getDocs(collection(db, "pitchers"));
+
+        querySnapshot.forEach((docu) => {
+          pitchers.push({
+            id: docu.id,
+            ...docu.data()
+          });
+        });
+
+        showAll();
+      } catch (error) {
+        console.error("불러오기 오류:", error);
+        alert("불러오기 실패: " + error.message);
+      }
+    };
+
+    function showAll() {
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      const teams = {};
+
+      pitchers.forEach(p => {
+        if (!teams[p.team]) teams[p.team] = [];
+        teams[p.team].push(p);
+      });
+
+      for (const team in teams) {
+        const color = teamColors[team] || "#ffffff";
+        const logo = teamLogos[team] || "";
+
+        list.innerHTML += `
+          <div class="team-title" style="color:${color}">
+            ${logo ? `<img src="${logo}" class="logo" alt="${team} 로고">` : ""}
+            ${team}
+          </div>
+        `;
+
+        teams[team].forEach(p => {
+          list.innerHTML += `
+            <div class="list-item" style="border-left:5px solid ${color}">
+              ${p.text}<br>
+              <button class="delete" onclick="removePitcher('${p.id}')">삭제</button>
+            </div>
+          `;
+        });
+      }
+    }
+
+    window.searchPitchers = function () {
+      const keyword = document.getElementById("searchInput").value.toLowerCase();
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      pitchers.forEach(p => {
+        if (p.name.toLowerCase().includes(keyword)) {
+          const color = teamColors[p.team] || "#ffffff";
+          const logo = teamLogos[p.team] || "";
+
+          list.innerHTML += `
+            <div class="list-item" style="border-left:5px solid ${color}">
+              ${logo ? `<img src="${logo}" class="logo" alt="${p.team} 로고">` : ""}
+              [${p.team}] ${p.text}
+            </div>
+          `;
+        }
+      });
+    };
+
+    loadPitchers();
+  </script>
 
-<div class="card">
-<h2>팀별 목록</h2>
-<button onclick="loadPitchers()">새로고침</button>
-<div id="list"></div>
-</div>
-
-</div>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-getFirestore,
-collection,
-addDoc,
-getDocs,
-deleteDoc,
-doc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-apiKey:"여기에넣기",
-authDomain:"여기에넣기",
-projectId:"여기에넣기",
-storageBucket:"여기에넣기",
-messagingSenderId:"여기에넣기",
-appId:"여기에넣기"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const teamColors={
-"KRA":"#c40000",
-"RMS":"#c9982c",
-"NDG":"#120725",
-"CPX":"#1B65BA",
-"CLP":"#0cb218",
-"SLU":"#850000",
-"IH":"#FEC804",
-"ODV":"#FF6A00"
-};
-
-const teamLogos={
-"KRA":"logos/크라켄즈.png",
-"RMS":"logos/마린스.png",
-"NDG":"logos/드래곤즈.png",
-"CPX":"logos/청피.png",
-"CLP":"logos/플랜츠.png",
-"SLU":"logos/슬러거즈.png",
-"IH":"logos/호네츠.png",
-"ODV":"logos/오버드라이브.png"
-};
-
-let pitchers=[];
-
-// 저장
-window.savePitcher=async function(){
-
-const name=document.getElementById("name").value;
-const team=document.getElementById("team").value.toUpperCase();
-const angle=document.getElementById("angle").value;
-
-const pitchInput=document.getElementById("pitch").value.split(" ");
-
-const pitches=pitchInput.map(p=>{
-const pname=p.replace(/[0-9]/g,'');
-const speed=p.replace(/[^0-9]/g,'');
-return `${pname}(${speed})`;
-});
-
-const text=`${name}(${angle}) - ${pitches.join(", ")}`;
-
-await addDoc(collection(db,"pitchers"),{
-name,
-team,
-text
-});
-
-loadPitchers();
-
-}
-
-// 삭제
-window.removePitcher=async function(id){
-
-await deleteDoc(doc(db,"pitchers",id));
-
-loadPitchers();
-
-}
-
-// 불러오기
-window.loadPitchers=async function(){
-
-pitchers=[];
-
-const querySnapshot=await getDocs(collection(db,"pitchers"));
-
-querySnapshot.forEach((docu)=>{
-
-pitchers.push({
-id:docu.id,
-...docu.data()
-});
-
-});
-
-showAll();
-
-}
-
-// 출력
-function showAll(){
-
-const list=document.getElementById("list");
-
-list.innerHTML="";
-
-const teams={};
-
-pitchers.forEach(p=>{
-
-if(!teams[p.team])teams[p.team]=[];
-
-teams[p.team].push(p);
-
-});
-
-for(let team in teams){
-
-const color=teamColors[team]||"#fff";
-const logo=teamLogos[team]||"";
-
-list.innerHTML+=`
-<div class="team-title" style="color:${color}">
-<img src="${logo}" class="logo">
-${team}
-</div>
-`;
-
-teams[team].forEach(p=>{
-
-list.innerHTML+=`
-<div class="list-item" style="border-left:5px solid ${color}">
-${p.text}<br>
-<button class="delete" onclick="removePitcher('${p.id}')">삭제</button>
-</div>
-`;
-
-});
-
-}
-
-}
-
-// 검색
-window.searchPitchers=function(){
-
-const keyword=document.getElementById("searchInput").value.toLowerCase();
-
-const list=document.getElementById("list");
-
-list.innerHTML="";
-
-pitchers.forEach(p=>{
-
-if(p.name.toLowerCase().includes(keyword)){
-
-const color=teamColors[p.team]||"#fff";
-const logo=teamLogos[p.team]||"";
-
-list.innerHTML+=`
-<div class="list-item" style="border-left:5px solid ${color}">
-<img src="${logo}" class="logo">
-[${p.team}] ${p.text}
-</div>
-`;
-
-}
-
-});
-
-}
-
-loadPitchers();
-
-</script>
-
-</body>
-</html>
 </body>
 </html>
