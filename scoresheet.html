@@ -127,6 +127,10 @@
       margin-bottom: 10px;
     }
 
+    .section-actions {
+      margin-bottom: 10px;
+    }
+
     .sheet-box {
       background: #f8f8f8;
       border-radius: 14px;
@@ -269,7 +273,7 @@
               <th>타점</th>
               <th>득점</th>
               <th>삼진</th>
-              <th>교체</th>
+              <th>기능</th>
             </tr>
           </thead>
           <tbody id="battersBody"></tbody>
@@ -277,6 +281,9 @@
       </div>
 
       <div class="section-title">투수 기록</div>
+      <div class="section-actions">
+        <button type="button" id="addPitcherBtn" class="sheet-btn sub">투수 추가</button>
+      </div>
       <div class="sheet-table-wrap">
         <table class="sheet-table">
           <thead>
@@ -291,6 +298,7 @@
               <th>탈삼진</th>
               <th>사사구</th>
               <th>ERA</th>
+              <th>교체</th>
             </tr>
           </thead>
           <tbody id="pitchersBody"></tbody>
@@ -349,6 +357,7 @@
     const resetBtn = document.getElementById("resetBtn");
     const addInningBtn = document.getElementById("addInningBtn");
     const removeInningBtn = document.getElementById("removeInningBtn");
+    const addPitcherBtn = document.getElementById("addPitcherBtn");
     const sheetList = document.getElementById("sheetList");
     const battersBody = document.getElementById("battersBody");
     const pitchersBody = document.getElementById("pitchersBody");
@@ -358,6 +367,7 @@
     let currentEditId = null;
     let sheets = [];
     let batterRowCounter = 0;
+    let pitcherRowCounter = 0;
     let inningCount = 9;
 
     function getDefaultDate() {
@@ -387,83 +397,6 @@
       awayHtml += `</tr>`;
       homeHtml += `</tr>`;
       inningBody.innerHTML = awayHtml + homeHtml;
-    }
-
-    function createBatterRow(data = {}) {
-      batterRowCounter += 1;
-      const rowId = batterRowCounter;
-      const row = document.createElement("tr");
-      if (data.isSub) row.classList.add("sub-row");
-      row.dataset.rowId = rowId;
-
-      row.innerHTML = `
-        <td><input id="b_order_${rowId}" class="cell-input" value="${data.order ?? ""}"></td>
-        <td><input id="b_name_${rowId}" class="cell-input" value="${data.name ?? ""}"></td>
-        <td><input id="b_pos_${rowId}" class="cell-input" value="${data.position ?? ""}"></td>
-        <td><input id="b_record_${rowId}" class="cell-input" value="${data.record ?? ""}"></td>
-        <td class="stat-cell" id="b_ab_${rowId}">0</td>
-        <td class="stat-cell" id="b_h_${rowId}">0</td>
-        <td class="stat-cell" id="b_2b_${rowId}">0</td>
-        <td class="stat-cell" id="b_3b_${rowId}">0</td>
-        <td class="stat-cell" id="b_hr_${rowId}">0</td>
-        <td class="stat-cell" id="b_rbi_${rowId}">0</td>
-        <td class="stat-cell" id="b_r_${rowId}">0</td>
-        <td class="stat-cell" id="b_so_${rowId}">0</td>
-        <td>
-          <button type="button" class="sheet-btn small sub" onclick="window.addSubRow(${rowId})">교체</button>
-          <button type="button" class="sheet-btn small delete" onclick="window.removeBatterRow(${rowId})">삭제</button>
-        </td>
-      `;
-
-      const recordInput = row.querySelector(`#b_record_${rowId}`);
-      recordInput.addEventListener("input", () => updateBatterStats(rowId));
-
-      if (data.record) {
-        setTimeout(() => updateBatterStats(rowId), 0);
-      }
-
-      return row;
-    }
-
-    function createBattersRows() {
-      battersBody.innerHTML = "";
-      batterRowCounter = 0;
-      for (let i = 1; i <= 9; i++) {
-        battersBody.appendChild(createBatterRow({ order: i }));
-      }
-    }
-
-    function createPitchersRows() {
-      pitchersBody.innerHTML = "";
-      for (let i = 1; i <= 8; i++) {
-        pitchersBody.innerHTML += `
-          <tr>
-            <td><input id="p_name_${i}" class="cell-input"></td>
-            <td><input id="p_decision_${i}" class="cell-input"></td>
-            <td><input id="p_inning_${i}" class="cell-input"></td>
-            <td><input id="p_runs_${i}" class="cell-input"></td>
-            <td><input id="p_er_${i}" class="cell-input"></td>
-            <td><input id="p_hits_${i}" class="cell-input"></td>
-            <td><input id="p_hr_${i}" class="cell-input"></td>
-            <td><input id="p_so_${i}" class="cell-input"></td>
-            <td><input id="p_bb_${i}" class="cell-input"></td>
-            <td class="stat-cell" id="p_era_${i}">0.00</td>
-          </tr>
-        `;
-      }
-    }
-
-    function attachPitcherAutoCalcEvents() {
-      for (let i = 1; i <= 8; i++) {
-        ["p_inning_", "p_er_"].forEach(prefix => {
-          document.getElementById(`${prefix}${i}`).addEventListener("input", () => {
-            document.getElementById(`p_era_${i}`).textContent = calculateEra(
-              document.getElementById(`p_inning_${i}`).value,
-              document.getElementById(`p_er_${i}`).value
-            );
-          });
-        });
-      }
     }
 
     function calculateBatterStats(text) {
@@ -521,6 +454,97 @@
       return ((er * 9) / innings).toFixed(2);
     }
 
+    function updatePitcherEra(rowId) {
+      const era = calculateEra(
+        document.getElementById(`p_inning_${rowId}`).value,
+        document.getElementById(`p_er_${rowId}`).value
+      );
+      document.getElementById(`p_era_${rowId}`).textContent = era;
+    }
+
+    function createBatterRow(data = {}) {
+      batterRowCounter += 1;
+      const rowId = batterRowCounter;
+      const row = document.createElement("tr");
+      if (data.isSub) row.classList.add("sub-row");
+      row.dataset.rowId = rowId;
+
+      row.innerHTML = `
+        <td><input id="b_order_${rowId}" class="cell-input" value="${data.order ?? ""}"></td>
+        <td><input id="b_name_${rowId}" class="cell-input" value="${data.name ?? ""}"></td>
+        <td><input id="b_pos_${rowId}" class="cell-input" value="${data.position ?? ""}"></td>
+        <td><input id="b_record_${rowId}" class="cell-input" value="${data.record ?? ""}"></td>
+        <td class="stat-cell" id="b_ab_${rowId}">0</td>
+        <td class="stat-cell" id="b_h_${rowId}">0</td>
+        <td class="stat-cell" id="b_2b_${rowId}">0</td>
+        <td class="stat-cell" id="b_3b_${rowId}">0</td>
+        <td class="stat-cell" id="b_hr_${rowId}">0</td>
+        <td class="stat-cell" id="b_rbi_${rowId}">0</td>
+        <td class="stat-cell" id="b_r_${rowId}">0</td>
+        <td class="stat-cell" id="b_so_${rowId}">0</td>
+        <td>
+          <button type="button" class="sheet-btn small sub" onclick="window.addSubRow(${rowId})">교체</button>
+          <button type="button" class="sheet-btn small delete" onclick="window.removeBatterRow(${rowId})">삭제</button>
+        </td>
+      `;
+
+      row.querySelector(`#b_record_${rowId}`).addEventListener("input", () => updateBatterStats(rowId));
+
+      if (data.record) {
+        setTimeout(() => updateBatterStats(rowId), 0);
+      }
+
+      return row;
+    }
+
+    function createPitcherRow(data = {}) {
+      pitcherRowCounter += 1;
+      const rowId = pitcherRowCounter;
+      const row = document.createElement("tr");
+      row.dataset.pitcherRowId = rowId;
+
+      row.innerHTML = `
+        <td><input id="p_name_${rowId}" class="cell-input" value="${data.name ?? ""}"></td>
+        <td><input id="p_decision_${rowId}" class="cell-input" value="${data.decision ?? ""}"></td>
+        <td><input id="p_inning_${rowId}" class="cell-input" value="${data.inning ?? ""}"></td>
+        <td><input id="p_runs_${rowId}" class="cell-input" value="${data.runs ?? ""}"></td>
+        <td><input id="p_er_${rowId}" class="cell-input" value="${data.er ?? ""}"></td>
+        <td><input id="p_hits_${rowId}" class="cell-input" value="${data.hits ?? ""}"></td>
+        <td><input id="p_hr_${rowId}" class="cell-input" value="${data.hr ?? ""}"></td>
+        <td><input id="p_so_${rowId}" class="cell-input" value="${data.so ?? ""}"></td>
+        <td><input id="p_bb_${rowId}" class="cell-input" value="${data.bb ?? ""}"></td>
+        <td class="stat-cell" id="p_era_${rowId}">0.00</td>
+        <td>
+          <button type="button" class="sheet-btn small delete" onclick="window.removePitcherRow(${rowId})">삭제</button>
+        </td>
+      `;
+
+      row.querySelector(`#p_inning_${rowId}`).addEventListener("input", () => updatePitcherEra(rowId));
+      row.querySelector(`#p_er_${rowId}`).addEventListener("input", () => updatePitcherEra(rowId));
+
+      if (data.inning || data.er) {
+        setTimeout(() => updatePitcherEra(rowId), 0);
+      }
+
+      return row;
+    }
+
+    function createBattersRows() {
+      battersBody.innerHTML = "";
+      batterRowCounter = 0;
+      for (let i = 1; i <= 9; i++) {
+        battersBody.appendChild(createBatterRow({ order: i }));
+      }
+    }
+
+    function createPitchersRows() {
+      pitchersBody.innerHTML = "";
+      pitcherRowCounter = 0;
+      for (let i = 1; i <= 4; i++) {
+        pitchersBody.appendChild(createPitcherRow());
+      }
+    }
+
     function getInningRow(prefix) {
       const arr = [];
       for (let i = 1; i <= inningCount; i++) {
@@ -564,24 +588,25 @@
 
     function getPitchers() {
       const arr = [];
-      for (let i = 1; i <= 8; i++) {
+      const rows = [...pitchersBody.querySelectorAll("tr")];
+
+      rows.forEach(row => {
+        const rowId = row.dataset.pitcherRowId;
         const item = {
-          name: document.getElementById(`p_name_${i}`).value.trim(),
-          decision: document.getElementById(`p_decision_${i}`).value.trim(),
-          inning: document.getElementById(`p_inning_${i}`).value.trim(),
-          runs: document.getElementById(`p_runs_${i}`).value.trim(),
-          er: document.getElementById(`p_er_${i}`).value.trim(),
-          hits: document.getElementById(`p_hits_${i}`).value.trim(),
-          hr: document.getElementById(`p_hr_${i}`).value.trim(),
-          so: document.getElementById(`p_so_${i}`).value.trim(),
-          bb: document.getElementById(`p_bb_${i}`).value.trim(),
-          era: calculateEra(
-            document.getElementById(`p_inning_${i}`).value.trim(),
-            document.getElementById(`p_er_${i}`).value.trim()
-          )
+          name: document.getElementById(`p_name_${rowId}`).value.trim(),
+          decision: document.getElementById(`p_decision_${rowId}`).value.trim(),
+          inning: document.getElementById(`p_inning_${rowId}`).value.trim(),
+          runs: document.getElementById(`p_runs_${rowId}`).value.trim(),
+          er: document.getElementById(`p_er_${rowId}`).value.trim(),
+          hits: document.getElementById(`p_hits_${rowId}`).value.trim(),
+          hr: document.getElementById(`p_hr_${rowId}`).value.trim(),
+          so: document.getElementById(`p_so_${rowId}`).value.trim(),
+          bb: document.getElementById(`p_bb_${rowId}`).value.trim(),
+          era: document.getElementById(`p_era_${rowId}`).textContent
         };
         if (item.name) arr.push(item);
-      }
+      });
+
       return arr;
     }
 
@@ -595,10 +620,8 @@
       gameResultInput.value = "";
       inningCount = 9;
       renderInningTable();
-
       createBattersRows();
       createPitchersRows();
-      attachPitcherAutoCalcEvents();
       saveBtn.textContent = "저장";
     }
 
@@ -628,7 +651,11 @@
       });
 
       if (lineup.pitcher) {
-        document.getElementById("p_name_1").value = lineup.pitcher;
+        const firstPitcherRow = pitchersBody.querySelector("tr");
+        if (firstPitcherRow) {
+          const rowId = firstPitcherRow.dataset.pitcherRowId;
+          document.getElementById(`p_name_${rowId}`).value = lineup.pitcher;
+        }
       }
     }
 
@@ -843,9 +870,6 @@
       renderInningTable(away, home);
 
       createBattersRows();
-      createPitchersRows();
-      attachPitcherAutoCalcEvents();
-
       battersBody.innerHTML = "";
       batterRowCounter = 0;
       (sheet.batters || []).forEach((b) => {
@@ -858,20 +882,28 @@
         }));
       });
 
-      (sheet.pitchers || []).forEach((p, idx) => {
-        const i = idx + 1;
-        if (i > 8) return;
-        document.getElementById(`p_name_${i}`).value = p.name || "";
-        document.getElementById(`p_decision_${i}`).value = p.decision || "";
-        document.getElementById(`p_inning_${i}`).value = p.inning || "";
-        document.getElementById(`p_runs_${i}`).value = p.runs || "";
-        document.getElementById(`p_er_${i}`).value = p.er || "";
-        document.getElementById(`p_hits_${i}`).value = p.hits || "";
-        document.getElementById(`p_hr_${i}`).value = p.hr || "";
-        document.getElementById(`p_so_${i}`).value = p.so || "";
-        document.getElementById(`p_bb_${i}`).value = p.bb || "";
-        document.getElementById(`p_era_${i}`).textContent = p.era || "0.00";
-      });
+      createPitchersRows();
+      pitchersBody.innerHTML = "";
+      pitcherRowCounter = 0;
+      if (sheet.pitchers && sheet.pitchers.length > 0) {
+        sheet.pitchers.forEach((p) => {
+          pitchersBody.appendChild(createPitcherRow({
+            name: p.name || "",
+            decision: p.decision || "",
+            inning: p.inning || "",
+            runs: p.runs || "",
+            er: p.er || "",
+            hits: p.hits || "",
+            hr: p.hr || "",
+            so: p.so || "",
+            bb: p.bb || ""
+          }));
+        });
+      } else {
+        for (let i = 1; i <= 4; i++) {
+          pitchersBody.appendChild(createPitcherRow());
+        }
+      }
     }
 
     function editSheet(id) {
@@ -885,7 +917,7 @@
     }
 
     async function deleteSheet(id) {
-      const ok = confirm("이 기록지를 삭제할까?");
+      const ok = confirm("이 기록지를 삭제할까요?");
       if (!ok) return;
 
       try {
@@ -920,6 +952,14 @@
       row.remove();
     };
 
+    window.removePitcherRow = function(rowId) {
+      const row = pitchersBody.querySelector(`tr[data-pitcher-row-id="${rowId}"]`);
+      if (!row) return;
+
+      if (pitchersBody.querySelectorAll("tr").length <= 1) return;
+      row.remove();
+    };
+
     window.editSheet = editSheet;
     window.deleteSheet = deleteSheet;
 
@@ -938,6 +978,10 @@
       renderInningTable(away, home);
     });
 
+    addPitcherBtn.addEventListener("click", () => {
+      pitchersBody.appendChild(createPitcherRow());
+    });
+
     saveBtn.addEventListener("click", saveSheet);
     resetBtn.addEventListener("click", resetForm);
 
@@ -949,7 +993,6 @@
 
     createBattersRows();
     createPitchersRows();
-    attachPitcherAutoCalcEvents();
     renderInningTable();
     gameDateInput.value = getDefaultDate();
 
