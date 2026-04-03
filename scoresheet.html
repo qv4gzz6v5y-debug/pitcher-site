@@ -8,7 +8,7 @@
   <style>
     .sheet-wrap {
       width: 95%;
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 34px auto;
     }
 
@@ -33,6 +33,13 @@
       line-height: 1.6;
     }
 
+    .sheet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
     .sheet-input,
     .sheet-select,
     .sheet-textarea {
@@ -49,12 +56,8 @@
     .sheet-textarea {
       min-height: 120px;
       resize: vertical;
-    }
-
-    .sheet-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
+      font-family: inherit;
+      line-height: 1.6;
     }
 
     .sheet-btn {
@@ -82,59 +85,52 @@
       cursor: not-allowed;
     }
 
-    .record-box {
+    .sheet-box {
       background: #f8f8f8;
       border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 14px;
-      border-left: 6px solid #999;
+      padding: 18px;
+      margin-bottom: 16px;
+      border-left: 6px solid #1b65ba;
     }
 
-    .record-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
+    .sheet-top {
+      font-size: 22px;
+      font-weight: 800;
       margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-
-    .record-date {
-      font-weight: 700;
-      font-size: 18px;
-    }
-
-    .record-result {
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 700;
-      color: white;
-    }
-
-    .record-result.win {
-      background: #0a7a2f;
-    }
-
-    .record-result.lose {
-      background: #b00020;
-    }
-
-    .record-result.draw {
-      background: #666;
-    }
-
-    .record-line {
-      margin: 6px 0;
       line-height: 1.6;
+      white-space: pre-line;
     }
 
-    .record-actions {
-      margin-top: 12px;
+    .sheet-score {
+      font-size: 18px;
+      margin-bottom: 14px;
+      white-space: pre-line;
+      line-height: 1.7;
+    }
+
+    .sheet-section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-top: 14px;
+      margin-bottom: 8px;
+    }
+
+    .sheet-section-text {
+      white-space: pre-line;
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    .sheet-actions {
+      margin-top: 14px;
     }
 
     .empty-text {
       color: #666;
+    }
+
+    .hidden {
+      display: none !important;
     }
   </style>
 </head>
@@ -162,49 +158,82 @@
       <div class="card-title">기록지</div>
     </div>
 
-    <div class="sheet-card">
-      <div class="card-title">기록 추가 / 수정</div>
+    <div id="editCard" class="sheet-card hidden">
+      <div class="card-title">기록지 작성 / 수정</div>
 
       <div class="sheet-grid">
         <div>
           <label for="gameDate">경기 날짜</label>
-          <input id="gameDate" type="date" class="sheet-input">
+          <input id="gameDate" class="sheet-input" placeholder="예: 2026/4/2 (목)">
+        </div>
+
+        <div>
+          <label for="gameTime">경기 시간</label>
+          <input id="gameTime" class="sheet-input" placeholder="예: 20시">
         </div>
 
         <div>
           <label for="opponent">상대팀</label>
-          <input id="opponent" class="sheet-input" placeholder="예: KRA">
+          <input id="opponent" class="sheet-input" placeholder="예: 오버드라이브">
         </div>
 
         <div>
-          <label for="result">결과</label>
-          <select id="result" class="sheet-select">
+          <label for="homeAway">홈 / 원정</label>
+          <select id="homeAway" class="sheet-select">
             <option value="">선택</option>
-            <option value="승">승</option>
-            <option value="패">패</option>
-            <option value="무">무</option>
+            <option value="홈">홈</option>
+            <option value="원정">원정</option>
           </select>
         </div>
 
         <div>
-          <label for="score">스코어</label>
-          <input id="score" class="sheet-input" placeholder="예: 5:3">
+          <label for="finalScore">최종 스코어</label>
+          <input id="finalScore" class="sheet-input" placeholder="예: 5:2">
+        </div>
+
+        <div>
+          <label for="gameResult">결과</label>
+          <select id="gameResult" class="sheet-select">
+            <option value="">선택</option>
+            <option value="승리">승리</option>
+            <option value="패배">패배</option>
+            <option value="무승부">무승부</option>
+          </select>
         </div>
       </div>
 
-      <div>
-        <label for="memo">메모</label>
-        <textarea id="memo" class="sheet-textarea" placeholder="경기 내용, 특이사항, 주요 기록 등을 적어주세요"></textarea>
-      </div>
+      <label for="inningHeader">이닝 표시</label>
+      <textarea id="inningHeader" class="sheet-textarea" placeholder="예:
+1 2 3 4 5 6 7 8 9
+--------------------"></textarea>
+
+      <label for="inningAway">상대팀 점수줄</label>
+      <textarea id="inningAway" class="sheet-textarea" placeholder="예:
+0 2 0 2 0 0 1 0 0"></textarea>
+
+      <label for="inningHome">우리팀 점수줄</label>
+      <textarea id="inningHome" class="sheet-textarea" placeholder="예:
+1 0 0 0 0 0 0 0 0"></textarea>
+
+      <label for="battingRecord">타자 기록</label>
+      <textarea id="battingRecord" class="sheet-textarea" placeholder="예:
+1. SJ_Chicken CF,RP,CF / 1점홈런(1타점1득점) 뜬공 2루타(1타점) 뜬공 안타
+2. DiceIm SS / 안타 2루타 뜬공
+-> FlaneY2111 PH,RP / 삼진 뜬공"></textarea>
+
+      <label for="pitchingRecord">투수 기록</label>
+      <textarea id="pitchingRecord" class="sheet-textarea" placeholder="예:
+ANG_JJam(패) / 6이닝 4실점 1자책 5피안타 0피홈런 6탈삼진 0사사구
+Hyojung_0501 / 1이닝 1실점 0자책 1피안타 0피홈런 2탈삼진 0사사구"></textarea>
 
       <button id="saveBtn" class="sheet-btn">저장</button>
       <button id="resetBtn" class="sheet-btn sub">초기화</button>
     </div>
 
     <div class="sheet-card">
-      <div class="card-title">저장된 기록</div>
-      <div id="recordList">
-        <p class="empty-text">기록을 불러오는 중...</p>
+      <div class="card-title">저장된 기록지</div>
+      <div id="sheetList">
+        <p class="empty-text">기록지를 불러오는 중...</p>
       </div>
     </div>
 
@@ -217,6 +246,7 @@
       addDoc,
       updateDoc,
       deleteDoc,
+      setDoc,
       doc,
       onSnapshot,
       query,
@@ -230,173 +260,301 @@
       return user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
     }
 
-    if (!isStaff(currentUser)) {
-      alert("접근 권한이 없어.");
+    const editCard = document.getElementById("editCard");
+    if (isStaff(currentUser)) {
+      editCard.classList.remove("hidden");
+    } else {
+      alert("접근 권한이 없습니다.");
       location.href = "record.html";
     }
 
     const gameDateInput = document.getElementById("gameDate");
+    const gameTimeInput = document.getElementById("gameTime");
     const opponentInput = document.getElementById("opponent");
-    const resultInput = document.getElementById("result");
-    const scoreInput = document.getElementById("score");
-    const memoInput = document.getElementById("memo");
+    const homeAwayInput = document.getElementById("homeAway");
+    const finalScoreInput = document.getElementById("finalScore");
+    const gameResultInput = document.getElementById("gameResult");
+    const inningHeaderInput = document.getElementById("inningHeader");
+    const inningAwayInput = document.getElementById("inningAway");
+    const inningHomeInput = document.getElementById("inningHome");
+    const battingRecordInput = document.getElementById("battingRecord");
+    const pitchingRecordInput = document.getElementById("pitchingRecord");
     const saveBtn = document.getElementById("saveBtn");
     const resetBtn = document.getElementById("resetBtn");
-    const recordList = document.getElementById("recordList");
+    const sheetList = document.getElementById("sheetList");
 
     let currentEditId = null;
-    let records = [];
+    let sheets = [];
 
     function resetForm() {
       currentEditId = null;
       gameDateInput.value = "";
+      gameTimeInput.value = "";
       opponentInput.value = "";
-      resultInput.value = "";
-      scoreInput.value = "";
-      memoInput.value = "";
+      homeAwayInput.value = "";
+      finalScoreInput.value = "";
+      gameResultInput.value = "";
+      inningHeaderInput.value = "";
+      inningAwayInput.value = "";
+      inningHomeInput.value = "";
+      battingRecordInput.value = "";
+      pitchingRecordInput.value = "";
       saveBtn.textContent = "저장";
     }
 
-    function getResultClass(result) {
-      if (result === "승") return "win";
-      if (result === "패") return "lose";
-      return "draw";
+    function parseBattingRecord(text) {
+      const lines = text
+        .split("\n")
+        .map(v => v.trim())
+        .filter(Boolean);
+
+      const result = [];
+      let currentMain = null;
+
+      for (const line of lines) {
+        if (/^\d+\./.test(line)) {
+          const match = line.match(/^(\d+)\.\s+(.+?)\s+([^/]+)\s*\/\s*(.+)$/);
+          if (match) {
+            currentMain = {
+              order: Number(match[1]),
+              name: match[2].trim(),
+              positions: match[3].split(",").map(v => v.trim()).filter(Boolean),
+              plays: match[4].trim()
+            };
+            result.push(currentMain);
+          } else {
+            currentMain = {
+              order: null,
+              name: line,
+              positions: [],
+              plays: ""
+            };
+            result.push(currentMain);
+          }
+        } else if (line.startsWith("->")) {
+          const sub = line.replace("->", "").trim();
+          const match = sub.match(/^(.+?)\s+([^/]+)\s*\/\s*(.+)$/);
+          if (match) {
+            result.push({
+              order: currentMain ? currentMain.order : null,
+              substitute: true,
+              name: match[1].trim(),
+              positions: match[2].split(",").map(v => v.trim()).filter(Boolean),
+              plays: match[3].trim()
+            });
+          } else {
+            result.push({
+              order: currentMain ? currentMain.order : null,
+              substitute: true,
+              name: sub,
+              positions: [],
+              plays: ""
+            });
+          }
+        }
+      }
+
+      return result;
     }
 
-    function renderRecords() {
-      recordList.innerHTML = "";
+    function parsePitchingRecord(text) {
+      const lines = text
+        .split("\n")
+        .map(v => v.trim())
+        .filter(Boolean);
 
-      if (records.length === 0) {
-        recordList.innerHTML = `<p class="empty-text">아직 저장된 기록이 없습니다.</p>`;
+      const result = [];
+
+      for (const line of lines) {
+        const [left, right] = line.split("/").map(v => v.trim());
+
+        if (!left || !right) continue;
+
+        const leftMatch = left.match(/^(.+?)(?:\((.+?)\))?$/);
+
+        result.push({
+          name: leftMatch ? leftMatch[1].trim() : left,
+          decision: leftMatch && leftMatch[2] ? leftMatch[2].trim() : "",
+          summary: right
+        });
+      }
+
+      return result;
+    }
+
+    function buildRecordSummary(data) {
+      return `${data.homeAway || "-"} ${data.finalScore || "-"} ${data.gameResult || "-"}`;
+    }
+
+    function renderSheets() {
+      sheetList.innerHTML = "";
+
+      if (sheets.length === 0) {
+        sheetList.innerHTML = `<p class="empty-text">아직 저장된 기록지가 없습니다.</p>`;
         return;
       }
 
-      records.forEach((record) => {
-        const resultClass = getResultClass(record.result);
-
+      sheets.forEach((sheet) => {
         const box = document.createElement("div");
-        box.className = "record-box";
+        box.className = "sheet-box";
 
         box.innerHTML = `
-          <div class="record-top">
-            <div class="record-date">${record.date || "-"}</div>
-            <div class="record-result ${resultClass}">${record.result || "-"}</div>
-          </div>
+          <div class="sheet-top">${sheet.gameDate || "-"}  ${sheet.gameTime || ""} vs ${sheet.opponent || "-"}
+(${sheet.homeAway || "-"}) ${sheet.finalScore || "-"} ${sheet.gameResult || "-"}</div>
 
-          <div class="record-line"><strong>상대팀:</strong> ${record.opponent || "-"}</div>
-          <div class="record-line"><strong>스코어:</strong> ${record.score || "-"}</div>
-          <div class="record-line"><strong>메모:</strong> ${record.memo || "-"}</div>
+          <div class="sheet-score">${sheet.inningHeader || ""}\n${sheet.inningAway || ""}\n${sheet.inningHome || ""}</div>
 
-          <div class="record-actions">
-            <button class="sheet-btn" onclick="window.editRecord('${record.id}')">수정</button>
-            <button class="sheet-btn delete" onclick="window.deleteRecord('${record.id}')">삭제</button>
+          <div class="sheet-section-title">타자 기록</div>
+          <div class="sheet-section-text">${sheet.battingRecord || "-"}</div>
+
+          <div class="sheet-section-title">투수 기록</div>
+          <div class="sheet-section-text">${sheet.pitchingRecord || "-"}</div>
+
+          <div class="sheet-actions">
+            <button class="sheet-btn" onclick="window.editSheet('${sheet.id}')">수정</button>
+            <button class="sheet-btn delete" onclick="window.deleteSheet('${sheet.id}')">삭제</button>
           </div>
         `;
 
-        recordList.appendChild(box);
+        sheetList.appendChild(box);
       });
     }
 
-    async function saveRecord() {
-      const date = gameDateInput.value;
-      const opponent = opponentInput.value.trim();
-      const result = resultInput.value;
-      const score = scoreInput.value.trim();
-      const memo = memoInput.value.trim();
+    async function syncRecordSummary(sheetId, data) {
+      await setDoc(doc(db, "records", sheetId), {
+        date: data.gameDate,
+        opponent: data.opponent,
+        result: data.gameResult === "승리" ? "승" : data.gameResult === "패배" ? "패" : "무",
+        score: data.finalScore,
+        memo: buildRecordSummary(data),
+        updatedAt: Date.now(),
+        createdAt: data.createdAt
+      });
+    }
 
-      if (!date || !opponent || !result || !score) {
-        alert("경기 날짜, 상대팀, 결과, 스코어는 꼭 입력해주세요.");
+    async function saveSheet() {
+      const rawData = {
+        gameDate: gameDateInput.value.trim(),
+        gameTime: gameTimeInput.value.trim(),
+        opponent: opponentInput.value.trim(),
+        homeAway: homeAwayInput.value,
+        finalScore: finalScoreInput.value.trim(),
+        gameResult: gameResultInput.value,
+        inningHeader: inningHeaderInput.value.trim(),
+        inningAway: inningAwayInput.value.trim(),
+        inningHome: inningHomeInput.value.trim(),
+        battingRecord: battingRecordInput.value.trim(),
+        pitchingRecord: pitchingRecordInput.value.trim()
+      };
+
+      if (!rawData.gameDate || !rawData.opponent || !rawData.finalScore || !rawData.gameResult) {
+        alert("경기 날짜, 상대팀, 최종 스코어, 결과는 꼭 입력해줘.");
         return;
       }
+
+      const parsedBatters = parseBattingRecord(rawData.battingRecord);
+      const parsedPitchers = parsePitchingRecord(rawData.pitchingRecord);
+
+      const now = Date.now();
+
+      const saveData = {
+        ...rawData,
+        batters: parsedBatters,
+        pitchers: parsedPitchers,
+        updatedAt: now
+      };
 
       saveBtn.disabled = true;
       saveBtn.textContent = currentEditId ? "수정 중..." : "저장 중...";
 
       try {
-        const data = {
-          date,
-          opponent,
-          result,
-          score,
-          memo,
-          createdAt: Date.now(),
-          updatedAt: Date.now()
-        };
-
         if (currentEditId) {
-          await updateDoc(doc(db, "records", currentEditId), {
-            date,
-            opponent,
-            result,
-            score,
-            memo,
-            updatedAt: Date.now()
+          await updateDoc(doc(db, "scoresheets", currentEditId), saveData);
+          await syncRecordSummary(currentEditId, {
+            ...saveData,
+            createdAt: now
           });
-          alert("기록 수정 완료!");
+          alert("기록지 수정 완료!");
         } else {
-          await addDoc(collection(db, "records"), data);
-          alert("기록 저장 완료!");
+          const added = await addDoc(collection(db, "scoresheets"), {
+            ...saveData,
+            createdAt: now
+          });
+
+          await syncRecordSummary(added.id, {
+            ...saveData,
+            createdAt: now
+          });
+
+          alert("기록지 저장 완료!");
         }
 
         resetForm();
       } catch (error) {
         console.error(error);
-        alert("기록 저장 중 오류가 발생했습니다.");
+        alert("기록지 저장 중 오류가 발생했습니다.");
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = "저장";
       }
     }
 
-    function editRecord(id) {
-      const target = records.find(r => r.id === id);
+    function editSheet(id) {
+      const target = sheets.find(s => s.id === id);
       if (!target) return;
 
       currentEditId = id;
-      gameDateInput.value = target.date || "";
+      gameDateInput.value = target.gameDate || "";
+      gameTimeInput.value = target.gameTime || "";
       opponentInput.value = target.opponent || "";
-      resultInput.value = target.result || "";
-      scoreInput.value = target.score || "";
-      memoInput.value = target.memo || "";
+      homeAwayInput.value = target.homeAway || "";
+      finalScoreInput.value = target.finalScore || "";
+      gameResultInput.value = target.gameResult || "";
+      inningHeaderInput.value = target.inningHeader || "";
+      inningAwayInput.value = target.inningAway || "";
+      inningHomeInput.value = target.inningHome || "";
+      battingRecordInput.value = target.battingRecord || "";
+      pitchingRecordInput.value = target.pitchingRecord || "";
 
       saveBtn.textContent = "수정 저장";
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    async function deleteRecord(id) {
-      const ok = confirm("이 기록을 삭제할까요?");
+    async function deleteSheet(id) {
+      const ok = confirm("이 기록지를 삭제할까요?");
       if (!ok) return;
 
       try {
+        await deleteDoc(doc(db, "scoresheets", id));
         await deleteDoc(doc(db, "records", id));
-        alert("기록 삭제 완료!");
+        alert("기록지 삭제 완료!");
         if (currentEditId === id) resetForm();
       } catch (error) {
         console.error(error);
-        alert("기록 삭제 중 오류가 발생했습니다.");
+        alert("기록지 삭제 중 오류가 발생했습니다.");
       }
     }
 
-    window.editRecord = editRecord;
-    window.deleteRecord = deleteRecord;
+    window.editSheet = editSheet;
+    window.deleteSheet = deleteSheet;
 
-    saveBtn.addEventListener("click", saveRecord);
+    saveBtn.addEventListener("click", saveSheet);
     resetBtn.addEventListener("click", resetForm);
 
-    const recordQuery = query(collection(db, "records"), orderBy("createdAt", "desc"));
+    const sheetQuery = query(collection(db, "scoresheets"), orderBy("createdAt", "desc"));
 
-    onSnapshot(recordQuery, (snapshot) => {
-      records = [];
+    onSnapshot(sheetQuery, (snapshot) => {
+      sheets = [];
       snapshot.forEach((docu) => {
-        records.push({
+        sheets.push({
           id: docu.id,
           ...docu.data()
         });
       });
-      renderRecords();
+      renderSheets();
     }, (error) => {
       console.error(error);
-      recordList.innerHTML = `<p class="empty-text">기록을 불러오지 못했습니다.</p>`;
+      sheetList.innerHTML = `<p class="empty-text">기록지를 불러오지 못했습니다.</p>`;
     });
   </script>
 
