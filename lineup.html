@@ -33,7 +33,8 @@
       line-height: 1.6;
     }
 
-    .lineup-input {
+    .lineup-input,
+    .lineup-select {
       width: 100%;
       padding: 12px 14px;
       margin: 8px 0;
@@ -132,6 +133,13 @@
     .hidden {
       display: none !important;
     }
+
+    @media (max-width: 900px) {
+      .lineup-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -165,9 +173,11 @@
     <!-- 라인업 수정 -->
     <div id="editCard" class="lineup-card hidden">
       <div class="card-title">라인업 수정</div>
-
+      
       <label for="pitcher">선발투수</label>
-      <input id="pitcher" class="lineup-input" placeholder="선발투수 이름">
+      <select id="pitcher" class="lineup-select">
+        <option value="">선발투수 선택</option>
+      </select>
 
       <table class="lineup-table">
         <thead>
@@ -175,6 +185,7 @@
             <th class="lineup-order">타순</th>
             <th>선수 이름</th>
             <th>포지션</th>
+            <th>타석</th>
           </tr>
         </thead>
         <tbody id="lineupBody"></tbody>
@@ -192,7 +203,10 @@
       doc,
       setDoc,
       getDoc,
-      onSnapshot
+      onSnapshot,
+      collection,
+      query,
+      where
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
@@ -200,12 +214,20 @@
     const lineupBody = document.getElementById("lineupBody");
     const saveBtn = document.getElementById("saveBtn");
     const resetBtn = document.getElementById("resetBtn");
-    const pitcherInput = document.getElementById("pitcher");
+    const pitcherSelect = document.getElementById("pitcher");
     const viewBox = document.getElementById("viewBox");
+
+    let rosterPlayers = [];
 
     function isStaff(user) {
       if (!user) return false;
       return user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
+    }
+
+    function getDisplayName(user) {
+      return user.rosterNick && user.rosterNick.trim()
+        ? user.rosterNick.trim()
+        : user.mcNick;
     }
 
     function createLineupInputs() {
@@ -215,10 +237,53 @@
         const row = document.createElement("tr");
         row.innerHTML = `
           <td class="lineup-order">${i}</td>
-          <td><input id="name-${i}" class="lineup-input" placeholder="${i}번 타자 이름"></td>
-          <td><input id="pos-${i}" class="lineup-input" placeholder="포지션"></td>
+          <td>
+            <select id="name-${i}" class="lineup-select">
+              <option value="">선수 선택</option>
+            </select>
+          </td>
+          <td>
+            <input id="pos-${i}" class="lineup-input" placeholder="포지션">
+          </td>
+          <td>
+            <select id="bat-${i}" class="lineup-select">
+              <option value="">선택</option>
+              <option value="우타">우타</option>
+              <option value="좌타">좌타</option>
+              <option value="양타">양타</option>
+            </select>
+          </td>
         `;
         lineupBody.appendChild(row);
+      }
+    }
+
+    function fillRosterOptions() {
+      const sortedPlayers = [...rosterPlayers].sort((a, b) =>
+        getDisplayName(a).localeCompare(getDisplayName(b), "ko")
+      );
+
+      // 선발투수 선택
+      pitcherSelect.innerHTML = `<option value="">선발투수 선택</option>`;
+      sortedPlayers.forEach(player => {
+        const option = document.createElement("option");
+        option.value = getDisplayName(player);
+        option.textContent = getDisplayName(player);
+        pitcherSelect.appendChild(option);
+      });
+
+      // 타자 선택
+      for (let i = 1; i <= 9; i++) {
+        const select = document.getElementById(`name-${i}`);
+        if (!select) continue;
+
+        select.innerHTML = `<option value="">선수 선택</option>`;
+        sortedPlayers.forEach(player => {
+          const option = document.createElement("option");
+          option.value = getDisplayName(player);
+          option.textContent = getDisplayName(player);
+          select.appendChild(option);
+        });
       }
     }
 
@@ -229,29 +294,31 @@
         players.push({
           order: i,
           name: document.getElementById(`name-${i}`).value.trim(),
-          position: document.getElementById(`pos-${i}`).value.trim()
+          position: document.getElementById(`pos-${i}`).value.trim(),
+          batting: document.getElementById(`bat-${i}`).value.trim()
         });
       }
 
       return {
-        pitcher: pitcherInput.value.trim(),
+        pitcher: pitcherSelect.value.trim(),
         players,
         updatedAt: Date.now()
       };
     }
 
     function fillInputs(data) {
-      pitcherInput.value = data?.pitcher || "";
+      pitcherSelect.value = data?.pitcher || "";
 
       for (let i = 1; i <= 9; i++) {
         const player = data?.players?.find(p => p.order === i);
         document.getElementById(`name-${i}`).value = player?.name || "";
         document.getElementById(`pos-${i}`).value = player?.position || "";
+        document.getElementById(`bat-${i}`).value = player?.batting || "";
       }
     }
 
     function renderView(data) {
-      if (!data || (!data.pitcher && (!data.players || data.players.every(p => !p.name && !p.position)))) {
+      if (!data || (!data.pitcher && (!data.players || data.players.every(p => !p.name && !p.position && !p.batting)))) {
         viewBox.innerHTML = `<p class="empty-text">아직 저장된 라인업이 없습니다.</p>`;
         return;
       }
@@ -265,10 +332,11 @@
       `;
 
       (data.players || []).forEach(player => {
+        const battingText = player.batting ? ` (${player.batting})` : "";
         html += `
           <div class="view-row">
             <div class="view-left">${player.order}</div>
-            <div class="view-mid">${player.name || "-"}</div>
+            <div class="view-mid">${player.name || "-"}${battingText}</div>
             <div class="view-right">${player.position || "-"}</div>
           </div>
         `;
@@ -309,10 +377,11 @@
     }
 
     function resetInputs() {
-      pitcherInput.value = "";
+      pitcherSelect.value = "";
       for (let i = 1; i <= 9; i++) {
         document.getElementById(`name-${i}`).value = "";
         document.getElementById(`pos-${i}`).value = "";
+        document.getElementById(`bat-${i}`).value = "";
       }
     }
 
@@ -325,6 +394,27 @@
     saveBtn.addEventListener("click", saveLineup);
     resetBtn.addEventListener("click", resetInputs);
 
+    // 로스터 불러오기
+    const rosterQuery = query(
+      collection(db, "users"),
+      where("approved", "==", true)
+    );
+
+    onSnapshot(rosterQuery, (snapshot) => {
+      rosterPlayers = [];
+      snapshot.forEach((docu) => {
+        rosterPlayers.push({
+          id: docu.id,
+          ...docu.data()
+        });
+      });
+      fillRosterOptions();
+      loadInitialLineup();
+    }, (error) => {
+      console.error(error);
+    });
+
+    // 현재 라인업 실시간 반영
     onSnapshot(doc(db, "lineup", "main"), (snap) => {
       if (snap.exists()) {
         const data = snap.data();
@@ -337,8 +427,6 @@
       console.error(error);
       viewBox.innerHTML = `<p class="empty-text">라인업을 불러오지 못했습니다.</p>`;
     });
-
-    loadInitialLineup();
   </script>
 
 </body>
