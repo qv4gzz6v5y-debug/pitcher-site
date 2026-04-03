@@ -17,51 +17,61 @@
   </div>
 
   <script type="module">
-    import { db } from "./firebase-config.js";
-    import {
-      collection,
-      getDocs,
-      query,
-      where,
-      addDoc
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { db } from "./firebase-config.js";
+  import {
+    collection,
+    getDocs,
+    query,
+    where,
+    addDoc
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const msg = document.getElementById("msg");
-    const signupBtn = document.getElementById("signupBtn");
+  const msg = document.getElementById("msg");
+  const signupBtn = document.getElementById("signupBtn");
 
-    async function signup() {
-      const mcNick = document.getElementById("mcNick").value.trim();
-      const discordTag = document.getElementById("discordTag").value.trim();
-      const password = document.getElementById("password").value.trim();
+  async function signup() {
+    const mcNick = document.getElementById("mcNick").value.trim();
+    const discordTag = document.getElementById("discordTag").value.trim();
+    const password = document.getElementById("password").value.trim();
 
-      if (!mcNick || !discordTag || !password) {
-        msg.textContent = "모든 칸을 입력해줘.";
+    if (!mcNick || !discordTag || !password) {
+      msg.textContent = "모든 칸을 입력해줘.";
+      return;
+    }
+
+    signupBtn.disabled = true;
+    signupBtn.textContent = "처리 중...";
+    msg.textContent = "연결 확인 중...";
+
+    try {
+      console.log("1. 회원가입 시작");
+
+      const userRef = collection(db, "users");
+      msg.textContent = "중복 검사 중...";
+
+      const dupQ = query(userRef, where("mcNick", "==", mcNick));
+      const dupSnap = await getDocs(dupQ);
+
+      console.log("2. 중복 검사 완료", dupSnap.size);
+
+      if (!dupSnap.empty) {
+        msg.textContent = "이미 존재하는 마인크래프트 닉네임이야.";
         return;
       }
 
-      signupBtn.disabled = true;
-      signupBtn.textContent = "처리 중...";
+      msg.textContent = "첫 가입자인지 확인 중...";
+      const allUsers = await getDocs(userRef);
+      const isFirstUser = allUsers.empty;
 
-      try {
-        const userRef = collection(db, "users");
+      console.log("3. 전체 사용자 확인 완료", allUsers.size);
 
-        const dupQ = query(userRef, where("mcNick", "==", mcNick));
-        const dupSnap = await getDocs(dupQ);
+      const role = isFirstUser ? "super_admin" : "member";
+      const approved = isFirstUser ? true : false;
 
-        if (!dupSnap.empty) {
-          msg.textContent = "이미 존재하는 마인크래프트 닉네임이야.";
-          signupBtn.disabled = false;
-          signupBtn.textContent = "회원가입";
-          return;
-        }
+      msg.textContent = "데이터 저장 중...";
 
-        const allUsers = await getDocs(userRef);
-        const isFirstUser = allUsers.empty;
-
-        const role = isFirstUser ? "super_admin" : "member";
-        const approved = isFirstUser ? true : false;
-
-        await addDoc(userRef, {
+      const added = await Promise.race([
+        addDoc(userRef, {
           mcNick,
           discordTag,
           password,
@@ -70,36 +80,44 @@
           rosterNick: "",
           backNumber: "",
           createdAt: Date.now()
-        });
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("저장 시간이 너무 오래 걸려. Firebase 설정이나 규칙을 확인해줘.")), 10000)
+        )
+      ]);
 
-        if (isFirstUser) {
-          alert("회원가입 완료! 첫 가입자라 최고관리자로 등록됐어.");
-          msg.textContent = "회원가입 완료. 이제 로그인하면 돼.";
-        } else {
-          alert("회원가입 완료! 관리자 승인 후 로그인할 수 있어.");
-          msg.textContent = "회원가입 신청 완료. 관리자 승인 후 로그인 가능.";
-        }
+      console.log("4. 저장 성공", added.id);
 
-        msg.className = "msg ok";
-
-        document.getElementById("mcNick").value = "";
-        document.getElementById("discordTag").value = "";
-        document.getElementById("password").value = "";
-
-      } catch (error) {
-        console.error(error);
-        msg.textContent = "회원가입 중 오류가 발생했어.";
-      } finally {
-        signupBtn.disabled = false;
-        signupBtn.textContent = "회원가입";
+      if (isFirstUser) {
+        alert("회원가입 완료! 첫 가입자라 최고관리자로 등록됐어.");
+        msg.textContent = "회원가입 완료. 이제 로그인하면 돼.";
+      } else {
+        alert("회원가입 완료! 관리자 승인 후 로그인할 수 있어.");
+        msg.textContent = "회원가입 신청 완료. 관리자 승인 후 로그인 가능.";
       }
+
+      msg.className = "msg ok";
+
+      document.getElementById("mcNick").value = "";
+      document.getElementById("discordTag").value = "";
+      document.getElementById("password").value = "";
+
+    } catch (error) {
+      console.error("회원가입 오류:", error);
+      alert("오류: " + error.message);
+      msg.textContent = "회원가입 실패: " + error.message;
+      msg.className = "msg";
+    } finally {
+      signupBtn.disabled = false;
+      signupBtn.textContent = "회원가입";
     }
+  }
 
-    signupBtn.addEventListener("click", signup);
+  signupBtn.addEventListener("click", signup);
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") signup();
-    });
-  </script>
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") signup();
+  });
+</script>
 </body>
 </html>
