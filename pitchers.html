@@ -117,7 +117,7 @@
 
       <input id="name" class="pitcher-input" placeholder="닉네임">
       <input id="team" class="pitcher-input" placeholder="팀 코드 (KRA, RMS, NDG, CPX, CLP, SLU, IH, ODV)">
-      <input id="angle" class="pitcher-input" placeholder="팔각도 (오버핸드 / 쓰리쿼터 / 사이드암 / 언더)">
+      <input id="angle" class="pitcher-input" placeholder="팔각도 (오버핸드 / 쓰리쿼터 / 사이드암 / 언더핸드)">
       <input id="pitch" class="pitcher-input" placeholder="직구40 슬라이더30 커브20">
 
       <button class="pitcher-btn" onclick="savePitcher()">저장</button>
@@ -174,7 +174,7 @@
       const pitchRaw = document.getElementById("pitch").value.trim();
 
       if (!name || !team || !angle || !pitchRaw) {
-        alert("모든 값을 입력해줘.");
+        alert("모든 값을 입력해주세요.");
         return;
       }
 
@@ -224,7 +224,7 @@
     }
 
     function removePitcher(name) {
-      if (!confirm(`${name} 선수를 삭제할까?`)) return;
+      if (!confirm(`${name} 선수를 삭제하시겠습니까?`)) return;
       delete pitchers[name];
       saveData();
       showAll();
