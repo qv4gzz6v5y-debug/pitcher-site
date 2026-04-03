@@ -133,13 +133,6 @@
     .hidden {
       display: none !important;
     }
-
-    @media (max-width: 900px) {
-      .lineup-table {
-        display: block;
-        overflow-x: auto;
-      }
-    }
   </style>
 </head>
 <body>
@@ -162,17 +155,24 @@
 
   <div class="lineup-wrap">
 
-    <!-- 현재 라인업 -->
     <div class="lineup-card">
       <div class="card-title">현재 라인업</div>
+
+      <label for="gameDateView">날짜</label>
+      <input id="gameDateView" type="date" class="lineup-input">
+
+      <button id="loadBtn" class="lineup-btn sub">불러오기</button>
+
       <div id="viewBox" class="view-box">
         <p class="empty-text">라인업을 불러오는 중...</p>
       </div>
     </div>
 
-    <!-- 라인업 수정 -->
     <div id="editCard" class="lineup-card hidden">
       <div class="card-title">라인업 수정</div>
+    
+      <label for="gameDateEdit">날짜</label>
+      <input id="gameDateEdit" type="date" class="lineup-input">
 
       <label for="pitcher">선발투수</label>
       <select id="pitcher" class="lineup-select">
@@ -216,6 +216,9 @@
     const resetBtn = document.getElementById("resetBtn");
     const pitcherSelect = document.getElementById("pitcher");
     const viewBox = document.getElementById("viewBox");
+    const gameDateEdit = document.getElementById("gameDateEdit");
+    const gameDateView = document.getElementById("gameDateView");
+    const loadBtn = document.getElementById("loadBtn");
 
     let rosterPlayers = [];
 
@@ -224,22 +227,33 @@
       { name: "포수", value: "C" },
       { name: "1루", value: "1B" },
       { name: "2루", value: "2B" },
-      { name: "유격수", value: "SS" },
       { name: "3루", value: "3B" },
+      { name: "유격수", value: "SS" },
       { name: "좌익수", value: "LF" },
       { name: "중견수", value: "CF" },
       { name: "우익수", value: "RF" }
     ];
 
     function isStaff(user) {
-      if (!user) return false;
-      return user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
+      return !!user && (
+        user.role === "super_admin" ||
+        user.role === "admin" ||
+        user.role === "scorer"
+      );
     }
 
     function getDisplayName(user) {
       return user.rosterNick && user.rosterNick.trim()
         ? user.rosterNick.trim()
         : user.mcNick;
+    }
+
+    function getDefaultDate() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const dd = String(now.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
     }
 
     function createLineupInputs() {
@@ -305,7 +319,6 @@
         if (!select) continue;
 
         select.innerHTML = `<option value="">포지션 선택</option>`;
-
         positionList.forEach(pos => {
           const option = document.createElement("option");
           option.value = pos.value;
@@ -328,6 +341,7 @@
       }
 
       return {
+        gameDate: gameDateEdit.value,
         pitcher: pitcherSelect.value.trim(),
         players,
         updatedAt: Date.now()
@@ -336,7 +350,6 @@
 
     function fillInputs(data) {
       pitcherSelect.value = data?.pitcher || "";
-
       for (let i = 1; i <= 9; i++) {
         const player = data?.players?.find(p => p.order === i);
         document.getElementById(`name-${i}`).value = player?.name || "";
@@ -373,28 +386,40 @@
       viewBox.innerHTML = html;
     }
 
-    async function loadInitialLineup() {
-      const docRef = doc(db, "lineup", "main");
-      const snap = await getDoc(docRef);
+    async function loadLineupByDate(dateStr, fillEdit = false) {
+      if (!dateStr) {
+        renderView(null);
+        return;
+      }
+
+      const snap = await getDoc(doc(db, "lineups", dateStr));
 
       if (snap.exists()) {
         const data = snap.data();
         renderView(data);
-        if (isStaff(currentUser)) fillInputs(data);
+        if (fillEdit && isStaff(currentUser)) fillInputs(data);
       } else {
         renderView(null);
+        if (fillEdit && isStaff(currentUser)) resetInputsOnly();
       }
     }
 
     async function saveLineup() {
       const data = getLineupData();
 
+      if (!data.gameDate) {
+        alert("날짜를 선택해줘.");
+        return;
+      }
+
       saveBtn.disabled = true;
       saveBtn.textContent = "저장 중...";
 
       try {
-        await setDoc(doc(db, "lineup", "main"), data);
+        await setDoc(doc(db, "lineups", data.gameDate), data);
         alert("라인업 저장 완료!");
+        gameDateView.value = data.gameDate;
+        await loadLineupByDate(data.gameDate, true);
       } catch (error) {
         console.error(error);
         alert("라인업 저장 중 오류가 발생했습니다.");
@@ -404,13 +429,19 @@
       }
     }
 
-    function resetInputs() {
+    function resetInputsOnly() {
       pitcherSelect.value = "";
       for (let i = 1; i <= 9; i++) {
         document.getElementById(`name-${i}`).value = "";
         document.getElementById(`pos-${i}`).value = "";
         document.getElementById(`bat-${i}`).value = "";
       }
+    }
+
+    function resetAll() {
+      gameDateEdit.value = getDefaultDate();
+      gameDateView.value = gameDateEdit.value;
+      resetInputsOnly();
     }
 
     createLineupInputs();
@@ -420,8 +451,14 @@
       editCard.classList.remove("hidden");
     }
 
+    const defaultDate = getDefaultDate();
+    gameDateEdit.value = defaultDate;
+    gameDateView.value = defaultDate;
+
     saveBtn.addEventListener("click", saveLineup);
-    resetBtn.addEventListener("click", resetInputs);
+    resetBtn.addEventListener("click", resetAll);
+    loadBtn.addEventListener("click", () => loadLineupByDate(gameDateView.value, false));
+    gameDateEdit.addEventListener("change", () => loadLineupByDate(gameDateEdit.value, true));
 
     const rosterQuery = query(
       collection(db, "users"),
@@ -437,22 +474,7 @@
         });
       });
       fillRosterOptions();
-      loadInitialLineup();
-    }, (error) => {
-      console.error(error);
-    });
-
-    onSnapshot(doc(db, "lineup", "main"), (snap) => {
-      if (snap.exists()) {
-        const data = snap.data();
-        renderView(data);
-        if (isStaff(currentUser)) fillInputs(data);
-      } else {
-        renderView(null);
-      }
-    }, (error) => {
-      console.error(error);
-      viewBox.innerHTML = `<p class="empty-text">라인업을 불러오지 못했습니다.</p>`;
+      loadLineupByDate(gameDateView.value, true);
     });
   </script>
 
