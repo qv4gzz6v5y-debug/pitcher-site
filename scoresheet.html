@@ -59,6 +59,7 @@
       border-radius: 8px;
       font-size: 14px;
       text-align: center;
+      min-width: 52px;
     }
 
     .sheet-btn {
@@ -164,6 +165,10 @@
     .sub-row {
       background: #fcfcfc;
     }
+
+    .inning-actions {
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -236,40 +241,14 @@
       </div>
 
       <div class="section-title">이닝 점수</div>
+      <div class="inning-actions">
+        <button type="button" id="addInningBtn" class="sheet-btn sub">연장 이닝 추가</button>
+        <button type="button" id="removeInningBtn" class="sheet-btn sub">마지막 이닝 삭제</button>
+      </div>
       <div class="sheet-table-wrap">
         <table class="sheet-table">
-          <thead>
-            <tr>
-              <th>팀</th>
-              <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>상대팀</th>
-              <td><input id="away1" class="cell-input"></td>
-              <td><input id="away2" class="cell-input"></td>
-              <td><input id="away3" class="cell-input"></td>
-              <td><input id="away4" class="cell-input"></td>
-              <td><input id="away5" class="cell-input"></td>
-              <td><input id="away6" class="cell-input"></td>
-              <td><input id="away7" class="cell-input"></td>
-              <td><input id="away8" class="cell-input"></td>
-              <td><input id="away9" class="cell-input"></td>
-            </tr>
-            <tr>
-              <th>우리팀</th>
-              <td><input id="home1" class="cell-input"></td>
-              <td><input id="home2" class="cell-input"></td>
-              <td><input id="home3" class="cell-input"></td>
-              <td><input id="home4" class="cell-input"></td>
-              <td><input id="home5" class="cell-input"></td>
-              <td><input id="home6" class="cell-input"></td>
-              <td><input id="home7" class="cell-input"></td>
-              <td><input id="home8" class="cell-input"></td>
-              <td><input id="home9" class="cell-input"></td>
-            </tr>
-          </tbody>
+          <thead id="inningHead"></thead>
+          <tbody id="inningBody"></tbody>
         </table>
       </div>
 
@@ -356,7 +335,7 @@
     if (isStaff(currentUser)) {
       editCard.classList.remove("hidden");
     } else {
-      alert("접근 권한이 없어.");
+      alert("접근 권한이 없습니다.");
       location.href = "record.html";
     }
 
@@ -368,13 +347,18 @@
     const gameResultInput = document.getElementById("gameResult");
     const saveBtn = document.getElementById("saveBtn");
     const resetBtn = document.getElementById("resetBtn");
+    const addInningBtn = document.getElementById("addInningBtn");
+    const removeInningBtn = document.getElementById("removeInningBtn");
     const sheetList = document.getElementById("sheetList");
     const battersBody = document.getElementById("battersBody");
     const pitchersBody = document.getElementById("pitchersBody");
+    const inningHead = document.getElementById("inningHead");
+    const inningBody = document.getElementById("inningBody");
 
     let currentEditId = null;
     let sheets = [];
     let batterRowCounter = 0;
+    let inningCount = 9;
 
     function getDefaultDate() {
       const now = new Date();
@@ -382,6 +366,27 @@
       const mm = String(now.getMonth() + 1).padStart(2, "0");
       const dd = String(now.getDate()).padStart(2, "0");
       return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function renderInningTable(awayValues = [], homeValues = []) {
+      let headHtml = `<tr><th>팀</th>`;
+      for (let i = 1; i <= inningCount; i++) {
+        headHtml += `<th>${i}</th>`;
+      }
+      headHtml += `</tr>`;
+      inningHead.innerHTML = headHtml;
+
+      let awayHtml = `<tr><th>상대팀</th>`;
+      let homeHtml = `<tr><th>우리팀</th>`;
+
+      for (let i = 1; i <= inningCount; i++) {
+        awayHtml += `<td><input id="away${i}" class="cell-input" value="${awayValues[i - 1] || ""}"></td>`;
+        homeHtml += `<td><input id="home${i}" class="cell-input" value="${homeValues[i - 1] || ""}"></td>`;
+      }
+
+      awayHtml += `</tr>`;
+      homeHtml += `</tr>`;
+      inningBody.innerHTML = awayHtml + homeHtml;
     }
 
     function createBatterRow(data = {}) {
@@ -395,7 +400,7 @@
         <td><input id="b_order_${rowId}" class="cell-input" value="${data.order ?? ""}"></td>
         <td><input id="b_name_${rowId}" class="cell-input" value="${data.name ?? ""}"></td>
         <td><input id="b_pos_${rowId}" class="cell-input" value="${data.position ?? ""}"></td>
-        <td><input id="b_record_${rowId}" class="cell-input" placeholder="예: 안타 삼진 2루타(1타점)" value="${data.record ?? ""}"></td>
+        <td><input id="b_record_${rowId}" class="cell-input" value="${data.record ?? ""}"></td>
         <td class="stat-cell" id="b_ab_${rowId}">0</td>
         <td class="stat-cell" id="b_h_${rowId}">0</td>
         <td class="stat-cell" id="b_2b_${rowId}">0</td>
@@ -405,7 +410,7 @@
         <td class="stat-cell" id="b_r_${rowId}">0</td>
         <td class="stat-cell" id="b_so_${rowId}">0</td>
         <td>
-          <button type="button" class="sheet-btn small sub" onclick="window.addSubRow(${rowId})">교체 추가</button>
+          <button type="button" class="sheet-btn small sub" onclick="window.addSubRow(${rowId})">교체</button>
           <button type="button" class="sheet-btn small delete" onclick="window.removeBatterRow(${rowId})">삭제</button>
         </td>
       `;
@@ -434,8 +439,8 @@
         pitchersBody.innerHTML += `
           <tr>
             <td><input id="p_name_${i}" class="cell-input"></td>
-            <td><input id="p_decision_${i}" class="cell-input" placeholder="승/패/세"></td>
-            <td><input id="p_inning_${i}" class="cell-input" placeholder="예: 6, 1.2"></td>
+            <td><input id="p_decision_${i}" class="cell-input"></td>
+            <td><input id="p_inning_${i}" class="cell-input"></td>
             <td><input id="p_runs_${i}" class="cell-input"></td>
             <td><input id="p_er_${i}" class="cell-input"></td>
             <td><input id="p_hits_${i}" class="cell-input"></td>
@@ -518,7 +523,7 @@
 
     function getInningRow(prefix) {
       const arr = [];
-      for (let i = 1; i <= 9; i++) {
+      for (let i = 1; i <= inningCount; i++) {
         arr.push(document.getElementById(`${prefix}${i}`).value.trim());
       }
       return arr;
@@ -588,11 +593,8 @@
       homeAwayInput.value = "";
       finalScoreInput.value = "";
       gameResultInput.value = "";
-
-      for (let i = 1; i <= 9; i++) {
-        document.getElementById(`away${i}`).value = "";
-        document.getElementById(`home${i}`).value = "";
-      }
+      inningCount = 9;
+      renderInningTable();
 
       createBattersRows();
       createPitchersRows();
@@ -657,17 +659,17 @@
               <thead>
                 <tr>
                   <th>팀</th>
-                  ${innings.header.map(v => `<th>${v}</th>`).join("")}
+                  ${(innings.header || []).map(v => `<th>${v}</th>`).join("")}
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <th>상대팀</th>
-                  ${innings.away.map(v => `<td>${v || ""}</td>`).join("")}
+                  ${(innings.away || []).map(v => `<td>${v || ""}</td>`).join("")}
                 </tr>
                 <tr>
                   <th>우리팀</th>
-                  ${innings.home.map(v => `<td>${v || ""}</td>`).join("")}
+                  ${(innings.home || []).map(v => `<td>${v || ""}</td>`).join("")}
                 </tr>
               </tbody>
             </table>
@@ -774,6 +776,8 @@
     async function saveSheet() {
       const now = Date.now();
 
+      const inningsHeader = Array.from({ length: inningCount }, (_, i) => String(i + 1));
+
       const data = {
         gameDate: gameDateInput.value.trim(),
         gameTime: gameTimeInput.value.trim(),
@@ -782,7 +786,7 @@
         finalScore: finalScoreInput.value.trim(),
         gameResult: gameResultInput.value,
         innings: {
-          header: ["1","2","3","4","5","6","7","8","9"],
+          header: inningsHeader,
           away: getInningRow("away"),
           home: getInningRow("home")
         },
@@ -833,11 +837,10 @@
 
       const away = sheet.innings?.away || [];
       const home = sheet.innings?.home || [];
+      const header = sheet.innings?.header || ["1","2","3","4","5","6","7","8","9"];
 
-      for (let i = 1; i <= 9; i++) {
-        document.getElementById(`away${i}`).value = away[i - 1] || "";
-        document.getElementById(`home${i}`).value = home[i - 1] || "";
-      }
+      inningCount = header.length;
+      renderInningTable(away, home);
 
       createBattersRows();
       createPitchersRows();
@@ -882,7 +885,7 @@
     }
 
     async function deleteSheet(id) {
-      const ok = confirm("이 기록지를 삭제할까요?");
+      const ok = confirm("이 기록지를 삭제할까?");
       if (!ok) return;
 
       try {
@@ -920,6 +923,21 @@
     window.editSheet = editSheet;
     window.deleteSheet = deleteSheet;
 
+    addInningBtn.addEventListener("click", () => {
+      const away = getInningRow("away");
+      const home = getInningRow("home");
+      inningCount += 1;
+      renderInningTable(away, home);
+    });
+
+    removeInningBtn.addEventListener("click", () => {
+      if (inningCount <= 9) return;
+      const away = getInningRow("away").slice(0, -1);
+      const home = getInningRow("home").slice(0, -1);
+      inningCount -= 1;
+      renderInningTable(away, home);
+    });
+
     saveBtn.addEventListener("click", saveSheet);
     resetBtn.addEventListener("click", resetForm);
 
@@ -932,6 +950,7 @@
     createBattersRows();
     createPitchersRows();
     attachPitcherAutoCalcEvents();
+    renderInningTable();
     gameDateInput.value = getDefaultDate();
 
     const sheetQuery = query(collection(db, "scoresheets"), orderBy("createdAt", "desc"));
