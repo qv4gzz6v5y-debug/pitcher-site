@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>라인업</title>
   <link rel="stylesheet" href="styles.css">
+
   <style>
     .lineup-wrap {
       width: 95%;
@@ -14,52 +15,45 @@
     .lineup-card {
       background: white;
       border-radius: 18px;
-      padding: 20px;
+      padding: 24px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-      margin-bottom: 18px;
+      margin-bottom: 22px;
     }
 
-    .lineup-card h2 {
-      margin-top: 0;
-      margin-bottom: 14px;
+    .card-title {
       font-size: 34px;
-    }
-
-    .lineup-subtitle {
-      margin-top: 24px;
-      margin-bottom: 12px;
-      font-size: 24px;
-      font-weight: 700;
+      font-weight: 800;
+      margin-bottom: 16px;
     }
 
     .lineup-note {
       color: #666;
       font-size: 15px;
+      margin-bottom: 14px;
       line-height: 1.6;
-      margin-bottom: 12px;
     }
 
     .lineup-input {
       width: 100%;
-      box-sizing: border-box;
-      margin: 8px 0;
       padding: 12px 14px;
-      border: 1px solid #ccc;
+      margin: 8px 0;
       border-radius: 12px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
       font-size: 16px;
       background: #fff;
     }
 
     .lineup-btn {
-      padding: 12px 18px;
+      padding: 11px 18px;
+      border-radius: 10px;
       border: none;
-      border-radius: 12px;
       background: #111;
       color: white;
-      font-size: 16px;
       cursor: pointer;
       margin-right: 8px;
-      margin-top: 10px;
+      margin-top: 12px;
+      font-size: 15px;
     }
 
     .lineup-btn.sub {
@@ -86,20 +80,21 @@
     }
 
     .lineup-table th {
+      background: #f7f7f7;
       font-size: 16px;
-      background: #f8f8f8;
+      font-weight: 700;
     }
 
     .lineup-order {
       width: 60px;
-      font-weight: bold;
       text-align: center;
+      font-weight: bold;
     }
 
     .view-box {
       background: #f8f8f8;
-      border-radius: 14px;
       padding: 16px;
+      border-radius: 14px;
     }
 
     .view-row {
@@ -108,6 +103,7 @@
       gap: 20px;
       padding: 10px 0;
       border-bottom: 1px solid #ddd;
+      font-size: 16px;
     }
 
     .view-row:last-child {
@@ -115,8 +111,8 @@
     }
 
     .view-left {
-      font-weight: 700;
       min-width: 50px;
+      font-weight: 700;
     }
 
     .view-mid {
@@ -124,9 +120,9 @@
     }
 
     .view-right {
-      color: #555;
-      min-width: 80px;
+      min-width: 90px;
       text-align: right;
+      color: #555;
     }
 
     .empty-text {
@@ -139,6 +135,7 @@
   </style>
 </head>
 <body>
+
   <div class="wrap">
     <div class="top-title">
       <h1>레이 마린스</h1>
@@ -156,40 +153,38 @@
   </div>
 
   <div class="lineup-wrap">
+
+    <!-- 현재 라인업 -->
     <div class="lineup-card">
-      <h2>라인업</h2>
-      <p id="roleText" class="lineup-note">권한 확인 중...</p>
-
-      <!-- 현재 라인업 -->
-      <div>
-        <div class="lineup-subtitle">현재 라인업</div>
-        <div id="viewBox" class="view-box">
-          <p class="empty-text">라인업을 불러오는 중...</p>
-        </div>
-      </div>
-
-      <!-- 수정 영역 -->
-      <div id="editSection" class="hidden">
-        <div class="lineup-subtitle">라인업 수정</div>
-        
-        <label for="pitcher">선발투수</label>
-        <input id="pitcher" class="lineup-input" placeholder="선발투수 이름">
-
-        <table class="lineup-table">
-          <thead>
-            <tr>
-              <th class="lineup-order">타순</th>
-              <th>선수 이름</th>
-              <th>포지션</th>
-            </tr>
-          </thead>
-          <tbody id="lineupBody"></tbody>
-        </table>
-
-        <button id="saveBtn" class="lineup-btn">저장</button>
-        <button id="resetBtn" class="lineup-btn sub">초기화</button>
+      <div class="card-title">현재 라인업</div>
+      <div id="viewBox" class="view-box">
+        <p class="empty-text">라인업을 불러오는 중...</p>
       </div>
     </div>
+
+    <!-- 라인업 수정 -->
+    <div id="editCard" class="lineup-card hidden">
+      <div class="card-title">라인업 수정</div>
+      <p class="lineup-note">관리자 / 기록원 / 최고관리자만 수정할 수 있어.</p>
+
+      <label for="pitcher">선발투수</label>
+      <input id="pitcher" class="lineup-input" placeholder="선발투수 이름">
+
+      <table class="lineup-table">
+        <thead>
+          <tr>
+            <th class="lineup-order">타순</th>
+            <th>선수 이름</th>
+            <th>포지션</th>
+          </tr>
+        </thead>
+        <tbody id="lineupBody"></tbody>
+      </table>
+
+      <button id="saveBtn" class="lineup-btn">저장</button>
+      <button id="resetBtn" class="lineup-btn sub">초기화</button>
+    </div>
+
   </div>
 
   <script type="module">
@@ -202,8 +197,7 @@
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
-    const roleText = document.getElementById("roleText");
-    const editSection = document.getElementById("editSection");
+    const editCard = document.getElementById("editCard");
     const lineupBody = document.getElementById("lineupBody");
     const saveBtn = document.getElementById("saveBtn");
     const resetBtn = document.getElementById("resetBtn");
@@ -259,7 +253,7 @@
 
     function renderView(data) {
       if (!data || (!data.pitcher && (!data.players || data.players.every(p => !p.name && !p.position)))) {
-        viewBox.innerHTML = `<p class="empty-text">아직 저장된 라인업이 없습니다.</p>`;
+        viewBox.innerHTML = `<p class="empty-text">아직 저장된 라인업이 없어.</p>`;
         return;
       }
 
@@ -308,7 +302,7 @@
         alert("라인업 저장 완료!");
       } catch (error) {
         console.error(error);
-        alert("라인업 저장 중 오류가 발생했습니다.");
+        alert("라인업 저장 중 오류가 발생했어.");
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = "저장";
@@ -326,10 +320,7 @@
     createLineupInputs();
 
     if (isStaff(currentUser)) {
-      roleText.textContent = "현재 라인업을 확인하고 수정할 수 있습니다.";
-      editSection.classList.remove("hidden");
-    } else {
-      roleText.textContent = "현재 라인업을 확인할 수 있습니다.";
+      editCard.classList.remove("hidden");
     }
 
     saveBtn.addEventListener("click", saveLineup);
@@ -345,10 +336,11 @@
       }
     }, (error) => {
       console.error(error);
-      viewBox.innerHTML = `<p class="empty-text">라인업을 불러오지 못했습니다.</p>`;
+      viewBox.innerHTML = `<p class="empty-text">라인업을 불러오지 못했어.</p>`;
     });
 
     loadInitialLineup();
   </script>
+
 </body>
 </html>
