@@ -23,37 +23,31 @@
     import { db } from "./firebase-config.js";
     import {
       collection,
-      getDocs,
       query,
       where,
+      onSnapshot,
       updateDoc,
       deleteDoc,
       doc
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+    const pendingList = document.getElementById("pendingList");
 
     if (!currentUser || currentUser.role !== "super_admin") {
       alert("접근 권한이 없어.");
       location.href = "index.html";
     }
 
-    const pendingList = document.getElementById("pendingList");
-
-    async function loadPending() {
+    function renderPending(users) {
       pendingList.innerHTML = "";
 
-      const q = query(collection(db, "users"), where("approved", "==", false));
-      const snap = await getDocs(q);
-
-      if (snap.empty) {
+      if (users.length === 0) {
         pendingList.innerHTML = "<p>대기 중인 회원이 없어.</p>";
         return;
       }
 
-      snap.forEach((d) => {
-        const user = { id: d.id, ...d.data() };
-
+      users.forEach((user) => {
         const row = document.createElement("div");
         row.className = "user-row";
         row.innerHTML = `
@@ -72,14 +66,13 @@
           </label>
 
           <br>
-          <button class="small-btn" data-id="${user.id}">승인</button>
-          <button class="small-btn red" data-del="${user.id}">거절</button>
+          <button class="small-btn approve-btn" data-id="${user.id}">승인</button>
+          <button class="small-btn red reject-btn" data-id="${user.id}">거절</button>
         `;
-
         pendingList.appendChild(row);
       });
 
-      document.querySelectorAll("[data-id]").forEach(btn => {
+      document.querySelectorAll(".approve-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
           const id = btn.dataset.id;
           const rosterNick = document.getElementById(`rosterNick-${id}`).value.trim();
@@ -91,27 +84,57 @@
           if (isAdmin) role = "admin";
           else if (isScorer) role = "scorer";
 
-          await updateDoc(doc(db, "users", id), {
-            approved: true,
-            rosterNick,
-            backNumber,
-            role
-          });
+          btn.disabled = true;
+          btn.textContent = "승인 중...";
 
-          await loadPending();
+          try {
+            await updateDoc(doc(db, "users", id), {
+              approved: true,
+              rosterNick,
+              backNumber,
+              role
+            });
+            alert("승인 완료!");
+          } catch (error) {
+            console.error(error);
+            alert("승인 중 오류가 발생했어.");
+            btn.disabled = false;
+            btn.textContent = "승인";
+          }
         });
       });
 
-      document.querySelectorAll("[data-del]").forEach(btn => {
+      document.querySelectorAll(".reject-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
-          const id = btn.dataset.del;
-          await deleteDoc(doc(db, "users", id));
-          await loadPending();
+          const id = btn.dataset.id;
+
+          if (!confirm("이 가입 신청을 거절할까?")) return;
+
+          btn.disabled = true;
+          btn.textContent = "거절 중...";
+
+          try {
+            await deleteDoc(doc(db, "users", id));
+            alert("거절 완료!");
+          } catch (error) {
+            console.error(error);
+            alert("거절 중 오류가 발생했어.");
+            btn.disabled = false;
+            btn.textContent = "거절";
+          }
         });
       });
     }
 
-    loadPending();
+    const q = query(collection(db, "users"), where("approved", "==", false));
+
+    onSnapshot(q, (snap) => {
+      const users = [];
+      snap.forEach((d) => {
+        users.push({ id: d.id, ...d.data() });
+      });
+      renderPending(users);
+    });
   </script>
 </body>
 </html>

@@ -27,8 +27,9 @@
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const msg = document.getElementById("msg");
+    const signupBtn = document.getElementById("signupBtn");
 
-    document.getElementById("signupBtn").addEventListener("click", async () => {
+    async function signup() {
       const mcNick = document.getElementById("mcNick").value.trim();
       const discordTag = document.getElementById("discordTag").value.trim();
       const password = document.getElementById("password").value.trim();
@@ -38,39 +39,66 @@
         return;
       }
 
-      const userRef = collection(db, "users");
+      signupBtn.disabled = true;
+      signupBtn.textContent = "처리 중...";
 
-      const dupQ = query(userRef, where("mcNick", "==", mcNick));
-      const dupSnap = await getDocs(dupQ);
-      if (!dupSnap.empty) {
-        msg.textContent = "이미 존재하는 마인크래프트 닉네임이야.";
-        return;
-      }
+      try {
+        const userRef = collection(db, "users");
 
-      const allUsers = await getDocs(userRef);
-      const isFirstUser = allUsers.empty;
+        const dupQ = query(userRef, where("mcNick", "==", mcNick));
+        const dupSnap = await getDocs(dupQ);
 
-      const role = isFirstUser ? "super_admin" : "member";
-      const approved = isFirstUser ? true : false;
+        if (!dupSnap.empty) {
+          msg.textContent = "이미 존재하는 마인크래프트 닉네임이야.";
+          signupBtn.disabled = false;
+          signupBtn.textContent = "회원가입";
+          return;
+        }
 
-      await addDoc(userRef, {
-        mcNick,
-        discordTag,
-        password,
-        approved,
-        role,
-        rosterNick: "",
-        backNumber: "",
-        createdAt: Date.now()
-      });
+        const allUsers = await getDocs(userRef);
+        const isFirstUser = allUsers.empty;
 
-      if (isFirstUser) {
-        msg.textContent = "첫 가입자라서 최고관리자로 등록됐어. 이제 로그인하면 돼.";
+        const role = isFirstUser ? "super_admin" : "member";
+        const approved = isFirstUser ? true : false;
+
+        await addDoc(userRef, {
+          mcNick,
+          discordTag,
+          password,
+          approved,
+          role,
+          rosterNick: "",
+          backNumber: "",
+          createdAt: Date.now()
+        });
+
+        if (isFirstUser) {
+          alert("회원가입 완료! 첫 가입자라 최고관리자로 등록됐어.");
+          msg.textContent = "회원가입 완료. 이제 로그인하면 돼.";
+        } else {
+          alert("회원가입 완료! 관리자 승인 후 로그인할 수 있어.");
+          msg.textContent = "회원가입 신청 완료. 관리자 승인 후 로그인 가능.";
+        }
+
         msg.className = "msg ok";
-      } else {
-        msg.textContent = "회원가입 신청 완료. 관리자 승인 후 로그인할 수 있어.";
-        msg.className = "msg ok";
+
+        document.getElementById("mcNick").value = "";
+        document.getElementById("discordTag").value = "";
+        document.getElementById("password").value = "";
+
+      } catch (error) {
+        console.error(error);
+        msg.textContent = "회원가입 중 오류가 발생했어.";
+      } finally {
+        signupBtn.disabled = false;
+        signupBtn.textContent = "회원가입";
       }
+    }
+
+    signupBtn.addEventListener("click", signup);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") signup();
     });
   </script>
 </body>
