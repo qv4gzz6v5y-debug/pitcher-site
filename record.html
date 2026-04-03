@@ -165,7 +165,7 @@
     <!-- 목록 -->
     <div class="record-card">
       <div class="card-title">기록실</div>
-      <p class="record-note">경기 기록을 확인할 수 있어.</p>
+      <p class="record-note">경기 기록을 확인할 수 있습니다.</p>
       <div id="recordList">
         <p class="empty-text">기록을 불러오는 중...</p>
       </div>
@@ -174,8 +174,7 @@
     <!-- 수정/추가 -->
     <div id="editCard" class="record-card hidden">
       <div class="card-title">기록 추가 / 수정</div>
-      <p class="record-note">관리자 / 기록원 / 최고관리자만 기록을 추가하거나 수정할 수 있어.</p>
-
+      
       <div class="record-grid">
         <div>
           <label for="gameDate">경기 날짜</label>
@@ -205,7 +204,7 @@
 
       <div>
         <label for="memo">메모</label>
-        <textarea id="memo" class="record-textarea" placeholder="경기 내용, 특이사항, 주요 기록 등을 적어줘"></textarea>
+        <textarea id="memo" class="record-textarea" placeholder="경기 내용, 특이사항, 주요 기록 등을 적어주세요"></textarea>
       </div>
 
       <button id="saveBtn" class="record-btn">저장</button>
@@ -271,7 +270,7 @@
       recordList.innerHTML = "";
 
       if (records.length === 0) {
-        recordList.innerHTML = `<p class="empty-text">아직 저장된 기록이 없어.</p>`;
+        recordList.innerHTML = `<p class="empty-text">아직 저장된 기록이 없습니다.</p>`;
         return;
       }
 
@@ -309,7 +308,7 @@
       const memo = memoInput.value.trim();
 
       if (!date || !opponent || !result || !score) {
-        alert("경기 날짜, 상대팀, 결과, 스코어는 꼭 입력해줘.");
+        alert("경기 날짜, 상대팀, 결과, 스코어는 꼭 입력해주세요.");
         return;
       }
 
@@ -345,7 +344,7 @@
         resetForm();
       } catch (error) {
         console.error(error);
-        alert("기록 저장 중 오류가 발생했어.");
+        alert("기록 저장 중 오류가 발생했습니다.");
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = "저장";
@@ -368,7 +367,7 @@
     }
 
     async function deleteRecord(id) {
-      const ok = confirm("이 기록을 삭제할까?");
+      const ok = confirm("이 기록을 삭제할까요?");
       if (!ok) return;
 
       try {
@@ -379,7 +378,7 @@
         }
       } catch (error) {
         console.error(error);
-        alert("기록 삭제 중 오류가 발생했어.");
+        alert("기록 삭제 중 오류가 발생했습니다.");
       }
     }
 
