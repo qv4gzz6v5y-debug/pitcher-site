@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>기록실</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    .record-wrap {
+      width: 95%;
+      max-width: 1100px;
+      margin: 34px auto;
+    }
+
+    .record-card {
+      background: white;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      margin-bottom: 22px;
+    }
+
+    .card-title {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .record-note {
+      color: #666;
+      font-size: 15px;
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+
+    .record-input,
+    .record-select,
+    .record-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      margin: 8px 0;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 16px;
+      background: #fff;
+    }
+
+    .record-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .record-btn {
+      padding: 11px 18px;
+      border-radius: 10px;
+      border: none;
+      background: #111;
+      color: white;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 12px;
+      font-size: 15px;
+    }
+
+    .record-btn.sub {
+      background: #666;
+    }
+
+    .record-btn.delete {
+      background: #b00020;
+    }
+
+    .record-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .record-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .record-box {
+      background: #f8f8f8;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      border-left: 6px solid #999;
+    }
+
+    .record-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .record-date {
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .record-result {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .record-result.win {
+      background: #0a7a2f;
+    }
+
+    .record-result.lose {
+      background: #b00020;
+    }
+
+    .record-result.draw {
+      background: #666;
+    }
+
+    .record-line {
+      margin: 6px 0;
+      line-height: 1.6;
+    }
+
+    .record-actions {
+      margin-top: 12px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .empty-text {
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    <div class="top-title">
+      <h1>레이 마린스</h1>
+      <a class="top-link" href="index.html">메인으로</a>
+    </div>
+
+    <div class="menu">
+      <a href="roster.html">로스터</a>
+      <a href="pitchers.html">투수 정보</a>
+      <a href="lineup.html">라인업</a>
+      <a href="record.html">기록실</a>
+      <a href="scoresheet.html">기록지</a>
+      <a href="mypage.html">마이페이지</a>
+    </div>
+  </div>
+
+  <div class="record-wrap">
+
+    <!-- 목록 -->
+    <div class="record-card">
+      <div class="card-title">기록실</div>
+      <p class="record-note">경기 기록을 확인할 수 있어.</p>
+      <div id="recordList">
+        <p class="empty-text">기록을 불러오는 중...</p>
+      </div>
+    </div>
+
+    <!-- 수정/추가 -->
+    <div id="editCard" class="record-card hidden">
+      <div class="card-title">기록 추가 / 수정</div>
+      <p class="record-note">관리자 / 기록원 / 최고관리자만 기록을 추가하거나 수정할 수 있어.</p>
+
+      <div class="record-grid">
+        <div>
+          <label for="gameDate">경기 날짜</label>
+          <input id="gameDate" type="date" class="record-input">
+        </div>
+
+        <div>
+          <label for="opponent">상대팀</label>
+          <input id="opponent" class="record-input" placeholder="예: KRA">
+        </div>
+
+        <div>
+          <label for="result">결과</label>
+          <select id="result" class="record-select">
+            <option value="">선택</option>
+            <option value="승">승</option>
+            <option value="패">패</option>
+            <option value="무">무</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="score">스코어</label>
+          <input id="score" class="record-input" placeholder="예: 5:3">
+        </div>
+      </div>
+
+      <div>
+        <label for="memo">메모</label>
+        <textarea id="memo" class="record-textarea" placeholder="경기 내용, 특이사항, 주요 기록 등을 적어줘"></textarea>
+      </div>
+
+      <button id="saveBtn" class="record-btn">저장</button>
+      <button id="resetBtn" class="record-btn sub">초기화</button>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+    function isStaff(user) {
+      if (!user) return false;
+      return user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
+    }
+
+    const editCard = document.getElementById("editCard");
+    if (isStaff(currentUser)) {
+      editCard.classList.remove("hidden");
+    }
+
+    const gameDateInput = document.getElementById("gameDate");
+    const opponentInput = document.getElementById("opponent");
+    const resultInput = document.getElementById("result");
+    const scoreInput = document.getElementById("score");
+    const memoInput = document.getElementById("memo");
+    const saveBtn = document.getElementById("saveBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const recordList = document.getElementById("recordList");
+
+    let currentEditId = null;
+    let records = [];
+
+    function resetForm() {
+      currentEditId = null;
+      gameDateInput.value = "";
+      opponentInput.value = "";
+      resultInput.value = "";
+      scoreInput.value = "";
+      memoInput.value = "";
+      saveBtn.textContent = "저장";
+    }
+
+    function getResultClass(result) {
+      if (result === "승") return "win";
+      if (result === "패") return "lose";
+      return "draw";
+    }
+
+    function renderRecords() {
+      recordList.innerHTML = "";
+
+      if (records.length === 0) {
+        recordList.innerHTML = `<p class="empty-text">아직 저장된 기록이 없어.</p>`;
+        return;
+      }
+
+      records.forEach((record) => {
+        const resultClass = getResultClass(record.result);
+
+        const box = document.createElement("div");
+        box.className = "record-box";
+
+        box.innerHTML = `
+          <div class="record-top">
+            <div class="record-date">${record.date || "-"}</div>
+            <div class="record-result ${resultClass}">${record.result || "-"}</div>
+          </div>
+
+          <div class="record-line"><strong>상대팀:</strong> ${record.opponent || "-"}</div>
+          <div class="record-line"><strong>스코어:</strong> ${record.score || "-"}</div>
+          <div class="record-line"><strong>메모:</strong> ${record.memo || "-"}</div>
+
+          <div class="record-actions ${isStaff(currentUser) ? "" : "hidden"}">
+            <button class="record-btn" onclick="window.editRecord('${record.id}')">수정</button>
+            <button class="record-btn delete" onclick="window.deleteRecord('${record.id}')">삭제</button>
+          </div>
+        `;
+
+        recordList.appendChild(box);
+      });
+    }
+
+    async function saveRecord() {
+      const date = gameDateInput.value;
+      const opponent = opponentInput.value.trim();
+      const result = resultInput.value;
+      const score = scoreInput.value.trim();
+      const memo = memoInput.value.trim();
+
+      if (!date || !opponent || !result || !score) {
+        alert("경기 날짜, 상대팀, 결과, 스코어는 꼭 입력해줘.");
+        return;
+      }
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = currentEditId ? "수정 중..." : "저장 중...";
+
+      try {
+        const data = {
+          date,
+          opponent,
+          result,
+          score,
+          memo,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        };
+
+        if (currentEditId) {
+          await updateDoc(doc(db, "records", currentEditId), {
+            date,
+            opponent,
+            result,
+            score,
+            memo,
+            updatedAt: Date.now()
+          });
+          alert("기록 수정 완료!");
+        } else {
+          await addDoc(collection(db, "records"), data);
+          alert("기록 저장 완료!");
+        }
+
+        resetForm();
+      } catch (error) {
+        console.error(error);
+        alert("기록 저장 중 오류가 발생했어.");
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "저장";
+      }
+    }
+
+    function editRecord(id) {
+      const target = records.find(r => r.id === id);
+      if (!target) return;
+
+      currentEditId = id;
+      gameDateInput.value = target.date || "";
+      opponentInput.value = target.opponent || "";
+      resultInput.value = target.result || "";
+      scoreInput.value = target.score || "";
+      memoInput.value = target.memo || "";
+
+      saveBtn.textContent = "수정 저장";
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    }
+
+    async function deleteRecord(id) {
+      const ok = confirm("이 기록을 삭제할까?");
+      if (!ok) return;
+
+      try {
+        await deleteDoc(doc(db, "records", id));
+        alert("기록 삭제 완료!");
+        if (currentEditId === id) {
+          resetForm();
+        }
+      } catch (error) {
+        console.error(error);
+        alert("기록 삭제 중 오류가 발생했어.");
+      }
+    }
+
+    window.editRecord = editRecord;
+    window.deleteRecord = deleteRecord;
+
+    saveBtn.addEventListener("click", saveRecord);
+    resetBtn.addEventListener("click", resetForm);
+
+    const recordQuery = query(collection(db, "records"), orderBy("createdAt", "desc"));
+
+    onSnapshot(recordQuery, (snapshot) => {
+      records = [];
+      snapshot.forEach((docu) => {
+        records.push({
+          id: docu.id,
+          ...docu.data()
+        });
+      });
+      renderRecords();
+    }, (error) => {
+      console.error(error);
+      recordList.innerHTML = `<p class="empty-text">기록을 불러오지 못했어.</p>`;
+    });
+  </script>
+
+</body>
+</html>
