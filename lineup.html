@@ -25,6 +25,13 @@
       font-size: 34px;
     }
 
+    .lineup-subtitle {
+      margin-top: 24px;
+      margin-bottom: 12px;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
     .lineup-note {
       color: #666;
       font-size: 15px;
@@ -125,6 +132,10 @@
     .empty-text {
       color: #666;
     }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
@@ -148,34 +159,36 @@
     <div class="lineup-card">
       <h2>라인업</h2>
       <p id="roleText" class="lineup-note">권한 확인 중...</p>
-    </div>
 
-    <div id="editCard" class="lineup-card" style="display:none;">
-      <h2>라인업 수정</h2>
-      <p class="lineup-note">관리자 / 기록원 / 최고관리자만 수정할 수 있어.</p>
+      <!-- 현재 라인업 -->
+      <div>
+        <div class="lineup-subtitle">현재 라인업</div>
+        <div id="viewBox" class="view-box">
+          <p class="empty-text">라인업을 불러오는 중...</p>
+        </div>
+      </div>
 
-      <label>선발투수</label>
-      <input id="pitcher" class="lineup-input" placeholder="선발투수 이름">
+      <!-- 수정 영역 -->
+      <div id="editSection" class="hidden">
+        <div class="lineup-subtitle">라인업 수정</div>
+        <p class="lineup-note">관리자 / 기록원 / 최고관리자만 수정할 수 있어.</p>
 
-      <table class="lineup-table">
-        <thead>
-          <tr>
-            <th class="lineup-order">타순</th>
-            <th>선수 이름</th>
-            <th>포지션</th>
-          </tr>
-        </thead>
-        <tbody id="lineupBody"></tbody>
-      </table>
+        <label for="pitcher">선발투수</label>
+        <input id="pitcher" class="lineup-input" placeholder="선발투수 이름">
 
-      <button id="saveBtn" class="lineup-btn">저장</button>
-      <button id="resetBtn" class="lineup-btn sub">초기화</button>
-    </div>
+        <table class="lineup-table">
+          <thead>
+            <tr>
+              <th class="lineup-order">타순</th>
+              <th>선수 이름</th>
+              <th>포지션</th>
+            </tr>
+          </thead>
+          <tbody id="lineupBody"></tbody>
+        </table>
 
-    <div class="lineup-card">
-      <h2>현재 라인업</h2>
-      <div id="viewBox" class="view-box">
-        <p class="empty-text">라인업을 불러오는 중...</p>
+        <button id="saveBtn" class="lineup-btn">저장</button>
+        <button id="resetBtn" class="lineup-btn sub">초기화</button>
       </div>
     </div>
   </div>
@@ -183,7 +196,6 @@
   <script type="module">
     import { db } from "./firebase-config.js";
     import {
-      collection,
       doc,
       setDoc,
       getDoc,
@@ -192,7 +204,7 @@
 
     const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
     const roleText = document.getElementById("roleText");
-    const editCard = document.getElementById("editCard");
+    const editSection = document.getElementById("editSection");
     const lineupBody = document.getElementById("lineupBody");
     const saveBtn = document.getElementById("saveBtn");
     const resetBtn = document.getElementById("resetBtn");
@@ -279,8 +291,8 @@
 
       if (snap.exists()) {
         const data = snap.data();
-        fillInputs(data);
         renderView(data);
+        if (isStaff(currentUser)) fillInputs(data);
       } else {
         renderView(null);
       }
@@ -315,10 +327,10 @@
     createLineupInputs();
 
     if (isStaff(currentUser)) {
-      roleText.textContent = "현재 권한으로 라인업을 수정할 수 있어.";
-      editCard.style.display = "block";
+      roleText.textContent = "현재 라인업을 확인하고 수정할 수 있어.";
+      editSection.classList.remove("hidden");
     } else {
-      roleText.textContent = "현재 라인업 조회만 가능해.";
+      roleText.textContent = "현재 라인업을 확인할 수 있어.";
     }
 
     saveBtn.addEventListener("click", saveLineup);
