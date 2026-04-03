@@ -165,7 +165,6 @@
     <!-- 라인업 수정 -->
     <div id="editCard" class="lineup-card hidden">
       <div class="card-title">라인업 수정</div>
-      <p class="lineup-note">관리자 / 기록원 / 최고관리자만 수정할 수 있어.</p>
 
       <label for="pitcher">선발투수</label>
       <input id="pitcher" class="lineup-input" placeholder="선발투수 이름">
@@ -253,7 +252,7 @@
 
     function renderView(data) {
       if (!data || (!data.pitcher && (!data.players || data.players.every(p => !p.name && !p.position)))) {
-        viewBox.innerHTML = `<p class="empty-text">아직 저장된 라인업이 없어.</p>`;
+        viewBox.innerHTML = `<p class="empty-text">아직 저장된 라인업이 없습니다.</p>`;
         return;
       }
 
@@ -302,7 +301,7 @@
         alert("라인업 저장 완료!");
       } catch (error) {
         console.error(error);
-        alert("라인업 저장 중 오류가 발생했어.");
+        alert("라인업 저장 중 오류가 발생했습니다.");
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = "저장";
@@ -336,7 +335,7 @@
       }
     }, (error) => {
       console.error(error);
-      viewBox.innerHTML = `<p class="empty-text">라인업을 불러오지 못했어.</p>`;
+      viewBox.innerHTML = `<p class="empty-text">라인업을 불러오지 못했습니다.</p>`;
     });
 
     loadInitialLineup();
