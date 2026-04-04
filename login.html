@@ -2,39 +2,20 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>로그인 | 레이 마린스</title>
+  <title>로그인</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="page">
-    <header class="top-title">
-      <h1>레이 마린스</h1>
-      <a class="top-link" href="index.html">메인으로</a>
-    </header>
-
-    <main>
-      <section class="card-box">
-        <h2>로그인</h2>
-        <p class="main-box-desc">일반 선수와 관리자 공용 로그인 페이지</p>
-        <div class="form-card">
-          <label for="mcNick">마인크래프트 닉네임</label>
-          <input id="mcNick" class="input" placeholder="마인크래프트 닉네임">
-          <label for="password">비밀번호</label>
-          <input id="password" type="password" class="input" placeholder="비밀번호">
-          <div class="button-row">
-            <button class="primary-button" id="loginBtn">로그인</button>
-            <button class="secondary-button" type="button" onclick="location.href='signup.html'">회원가입</button>
-            <a class="secondary-button" href="admin.html">관리자 페이지</a>
-          </div>
-          <div id="msg" class="msg"></div>
-        </div>
-      </section>
-    </main>
+  <div class="card-box">
+    <h2>로그인</h2>
+    <input id="mcNick" class="input" placeholder="마인크래프트 닉네임">
+    <input id="password" type="password" class="input" placeholder="비밀번호">
+    <button class="btn" id="loginBtn">로그인</button>
+    <button class="btn sub" onclick="location.href='signup.html'">회원가입</button>
+    <div id="msg" class="msg"></div>
   </div>
 
   <script type="module">
-
     import { db } from "./firebase-config.js";
     import {
       collection,
@@ -101,7 +82,6 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter") login();
     });
-  
   </script>
 </body>
 </html>
