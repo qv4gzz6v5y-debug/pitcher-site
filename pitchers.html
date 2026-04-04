@@ -85,6 +85,12 @@
     .hidden {
       display: none !important;
     }
+
+    .empty-state {
+      color: #777;
+      font-size: 16px;
+      line-height: 1.7;
+    }
   </style>
 </head>
 <body>
@@ -107,19 +113,26 @@
   <div class="pitcher-wrap">
     <div class="pitcher-card">
       <h2>투수 정보</h2>
-      <p class="page-note">검색해서 투수 정보를 확인할 수 있습니다.</p>
+      <p class="page-note">투수 닉네임을 검색하면 아래 검색 결과 박스에 정보가 표시됩니다.</p>
       <input
         id="searchInput"
         class="pitcher-input"
-        placeholder="닉네임 검색"
+        list="pitcherSuggestions"
+        placeholder="투수 닉네임 검색"
+        autocomplete="off"
         oninput="searchPitchers()"
       >
+      <datalist id="pitcherSuggestions"></datalist>
       <a id="manageLink" class="staff-link hidden" href="pitchers-manage.html">투수 정보 관리 페이지로 이동</a>
     </div>
 
     <div class="pitcher-card">
       <h2>검색 결과</h2>
-      <div id="list"></div>
+      <div id="list">
+        <div class="list-item empty-state">
+          <p>아직 검색한 내용이 없습니다. 위 검색창에 투수 닉네임을 입력해 주세요.</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -133,6 +146,8 @@
     const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
     const manageLink = document.getElementById("manageLink");
     const list = document.getElementById("list");
+    const searchInput = document.getElementById("searchInput");
+    const suggestionList = document.getElementById("pitcherSuggestions");
 
     const teamColors = {
       "KRA": "#c40000",
@@ -167,7 +182,37 @@
       manageLink.classList.remove("hidden");
     }
 
+    function escapeHtml(value = "") {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function renderInitialState() {
+      list.innerHTML = `
+        <div class="list-item empty-state">
+          <p>아직 검색한 내용이 없습니다. 위 검색창에 투수 닉네임을 입력해 주세요.</p>
+        </div>
+      `;
+    }
+
+    function updateSuggestions() {
+      const names = [...new Set(
+        pitchers
+          .map(p => (p.name || "").trim())
+          .filter(Boolean)
+      )].sort((a, b) => a.localeCompare(b, 'ko'));
+
+      suggestionList.innerHTML = names
+        .map(name => `<option value="${escapeHtml(name)}"></option>`)
+        .join("");
+    }
+
     function renderPitchers(keyword = "") {
+      const normalizedKeyword = keyword.trim().toLowerCase();
       list.innerHTML = "";
 
       if (pitchers.length === 0) {
@@ -175,8 +220,13 @@
         return;
       }
 
+      if (!normalizedKeyword) {
+        renderInitialState();
+        return;
+      }
+
       const filtered = pitchers.filter(p =>
-        (p.name || "").toLowerCase().includes(keyword.toLowerCase())
+        (p.name || "").toLowerCase().includes(normalizedKeyword)
       );
 
       if (filtered.length === 0) {
@@ -197,14 +247,14 @@
         list.innerHTML += `
           <div class="team-title" style="color:${color}">
             ${logo ? `<img src="${logo}" class="team-logo" alt="${team} 로고">` : ""}
-            ${team}
+            ${escapeHtml(team)}
           </div>
         `;
 
         grouped[team].forEach(p => {
           list.innerHTML += `
             <div class="list-item" style="border-left:6px solid ${color}">
-              <p>${p.text}</p>
+              <p>${escapeHtml(p.text || "정보가 없습니다.")}</p>
             </div>
           `;
         });
@@ -212,8 +262,7 @@
     }
 
     window.searchPitchers = function () {
-      const keyword = document.getElementById("searchInput").value.trim();
-      renderPitchers(keyword);
+      renderPitchers(searchInput.value);
     };
 
     onSnapshot(
@@ -226,7 +275,8 @@
             ...doc.data()
           });
         });
-        searchPitchers();
+        updateSuggestions();
+        renderInitialState();
       },
       (error) => {
         console.error(error);
