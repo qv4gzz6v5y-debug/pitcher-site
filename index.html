@@ -16,7 +16,7 @@
     <main>
       <section class="home-box">
         <h2>레이 마린스</h2>
-        <p id="welcomeText">선수용 메인 페이지입니다. 필요한 메뉴를 선택해 주세요.</p>
+        <p id="welcomeText">환영합니다.</p>
 
         <div class="home-links">
           <a href="roster.html" class="menu-card">
@@ -92,7 +92,7 @@
       else if (user.role === "scorer") roleText = "기록원";
       else if (user.role === "super_admin") roleText = "선수";
 
-      welcomeText.textContent = `${user.mcNick}님 선수용 메인 페이지입니다. 필요한 메뉴를 선택해 주세요. 현재 역할: ${roleText}`;
+      welcomeText.textContent = `${user.mcNick}님 환영합니다. 현재 역할: ${roleText}`;
 
       if (isStaff(user)) {
         document.getElementById("homeLineup").classList.remove("hidden");

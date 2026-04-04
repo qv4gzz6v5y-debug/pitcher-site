@@ -2,29 +2,10 @@
   box-sizing: border-box;
 }
 
-:root {
-  --bg: #f3f3f3;
-  --panel: #f8f8f8;
-  --card: #ffffff;
-  --line: #dcdcdc;
-  --line-strong: #222222;
-  --text: #111111;
-  --muted: #666666;
-  --subtle: #7a7a7a;
-  --shadow: 0 0 0 1px rgba(0, 0, 0, 0.03);
-  --radius-xl: 24px;
-  --radius-lg: 18px;
-  --radius-md: 14px;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
+  background: #f3f3f3;
+  color: #111111;
   font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 }
 
@@ -34,20 +15,14 @@ a {
 
 .wrap,
 .section,
-.page,
-.lineup-wrap,
-.pitcher-wrap,
-.record-wrap,
-.roster-wrap,
-.mypage-wrap,
-.sheet-wrap {
+.page {
   width: min(1200px, calc(100% - 32px));
   margin: 0 auto;
 }
 
 .page {
   min-height: 100vh;
-  padding: 40px 0 56px;
+  padding: 40px 0;
 }
 
 .top-title,
@@ -57,7 +32,7 @@ a {
   align-items: center;
   gap: 16px;
   padding: 0 0 24px;
-  border-bottom: 1px solid var(--line-strong);
+  border-bottom: 1px solid #222222;
 }
 
 .top-title h1,
@@ -66,22 +41,20 @@ a {
   font-size: 72px;
   font-weight: 300;
   letter-spacing: 0.08em;
-  line-height: 1;
 }
 
 .top-link,
-.home-link,
-.back-link {
-  font-size: 18px;
+.home-link {
+  font-size: 20px;
   text-decoration: none;
   color: #444444;
 }
 
 .top-link:hover,
 .home-link:hover,
-.back-link:hover,
-.menu a:hover {
-  opacity: 0.72;
+.menu a:hover,
+.back-link:hover {
+  opacity: 0.7;
 }
 
 .menu {
@@ -95,15 +68,9 @@ a {
   text-decoration: none;
   padding: 10px 14px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid var(--line);
-  font-size: 16px;
-  transition: border-color 0.2s ease, transform 0.2s ease;
-}
-
-.menu a:hover {
-  transform: translateY(-1px);
-  border-color: var(--line-strong);
+  background: #ffffff;
+  border: 1px solid #d6d6d6;
+  font-size: 18px;
 }
 
 .hidden {
@@ -123,23 +90,27 @@ a {
 .sheet-card,
 .user-row,
 .empty-box {
-  background: var(--panel);
+  background: #f8f8f8;
   border: 1px solid #e5e5e5;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow);
+  border-radius: 24px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.02);
 }
 
 .main-box,
 .home-box {
-  max-width: 920px;
+  max-width: 900px;
   margin: 48px auto 0;
   padding: 32px;
 }
 
 .card-box {
-  max-width: 760px;
+  max-width: 720px;
   margin: 48px auto 0;
   padding: 32px;
+}
+
+.home-box {
+  text-align: left;
 }
 
 .main-box-title,
@@ -163,17 +134,16 @@ a {
 .info-text,
 .msg {
   margin-top: 16px;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 300;
-  color: var(--muted);
+  color: #666666;
   line-height: 1.6;
 }
 
 .home-links,
 .info-grid,
 .menu-grid,
-.bottom-grid,
-.stats-grid {
+.bottom-grid {
   margin-top: 32px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -184,13 +154,12 @@ a {
 .info-card,
 .menu-card,
 .bottom-grid a,
-.action-card,
-.stat-box {
+.action-card {
   display: block;
   text-decoration: none;
-  background: var(--card);
+  background: #ffffff;
   border: 1px solid #d6d6d6;
-  border-radius: var(--radius-lg);
+  border-radius: 18px;
   padding: 28px 24px;
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
@@ -200,7 +169,7 @@ a {
 .menu-card:hover,
 .bottom-grid a:hover,
 .action-card:hover {
-  border-color: var(--line-strong);
+  border-color: #111111;
   transform: translateY(-1px);
 }
 
@@ -223,7 +192,7 @@ a {
   font-size: 16px;
   font-weight: 300;
   letter-spacing: 0.08em;
-  color: var(--subtle);
+  color: #7a7a7a;
   text-transform: uppercase;
 }
 
@@ -231,25 +200,23 @@ a {
 .info-card p {
   margin-top: 12px;
   font-size: 15px;
-  color: var(--muted);
+  color: #666666;
   line-height: 1.6;
 }
 
-.form-card,
-.table-card,
-.sheet-table-wrap,
-.view-box,
-.list-item,
-.record-box,
-.sheet-box,
-.stat-box {
-  background: var(--card);
-  border: 1px solid #e5e5e5;
-  border-radius: var(--radius-lg);
+.back-link {
+  display: inline-block;
+  margin-top: 24px;
+  text-decoration: none;
+  color: #444444;
+  font-size: 18px;
 }
 
 .form-card {
   margin-top: 32px;
+  background: #ffffff;
+  border: 1px solid #d6d6d6;
+  border-radius: 18px;
   padding: 24px;
 }
 
@@ -257,8 +224,8 @@ label {
   display: block;
   margin-top: 14px;
   margin-bottom: 8px;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .input,
@@ -281,7 +248,7 @@ input {
   border: 1px solid #cccccc;
   border-radius: 14px;
   font-size: 16px;
-  background: var(--card);
+  background: #ffffff;
   font-family: inherit;
 }
 
@@ -292,8 +259,7 @@ textarea {
 .button-row,
 .page-actions,
 .action-row,
-.section-actions,
-.inning-actions {
+.section-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -314,10 +280,10 @@ textarea {
   min-height: 48px;
   padding: 12px 18px;
   border-radius: 14px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid #111111;
   cursor: pointer;
   text-decoration: none;
-  font-size: 15px;
+  font-size: 16px;
   font-family: inherit;
   transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
@@ -329,7 +295,7 @@ textarea {
 .sheet-btn,
 .mypage-btn,
 .primary-button {
-  background: var(--text);
+  background: #111111;
   color: #ffffff;
 }
 
@@ -340,8 +306,8 @@ textarea {
 .sheet-btn.sub,
 .mypage-btn.sub,
 .secondary-button {
-  background: var(--card);
-  color: var(--text);
+  background: #ffffff;
+  color: #111111;
   border-color: #d0d0d0;
 }
 
@@ -362,7 +328,6 @@ textarea {
 .primary-button:hover,
 .secondary-button:hover {
   opacity: 0.92;
-  transform: translateY(-1px);
 }
 
 .btn:disabled,
@@ -370,8 +335,7 @@ textarea {
 .lineup-btn:disabled,
 .pitcher-btn:disabled,
 .sheet-btn:disabled,
-.mypage-btn:disabled,
-.primary-button:disabled {
+.mypage-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -383,6 +347,7 @@ textarea {
 .roster-wrap,
 .mypage-wrap,
 .sheet-wrap {
+  width: min(1100px, calc(100% - 32px));
   margin: 34px auto;
 }
 
@@ -410,6 +375,33 @@ textarea {
   font-size: 40px;
 }
 
+.home-links a,
+.roster-card,
+.user-row,
+.list-item,
+.view-box,
+.record-box,
+.stat-box {
+  background: #ffffff;
+}
+
+.list-item,
+.view-box,
+.record-box,
+.stat-box {
+  border: 1px solid #ececec;
+  border-radius: 16px;
+}
+
+.table-card,
+.sheet-table-wrap {
+  margin-top: 24px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 18px;
+  overflow-x: auto;
+}
+
 table,
 .sheet-table {
   width: 100%;
@@ -425,8 +417,7 @@ thead th,
   color: #333333;
 }
 
-th,
-td,
+th, td,
 .sheet-table th,
 .sheet-table td {
   padding: 14px 12px;
@@ -466,49 +457,19 @@ tr:last-child td {
 .role-scorer { background: #1b65ba; color: white; }
 .status-approved { background: #e8f7ec; color: #0a7a2f; }
 
-.inline-check {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-  font-size: 14px;
-}
-
-.team-logo {
-  width: 34px;
-  height: 34px;
-  object-fit: contain;
-}
-
-.empty-text {
-  color: var(--muted);
-}
-
-.msg.ok {
-  color: #0a7a2f;
-}
-
 @media (max-width: 1024px) {
   .top-title h1,
   .top-header h1,
   .main-box-title,
   .home-box h2,
-  .card-box h2 {
-    font-size: 56px;
-  }
-
+  .card-box h2 { font-size: 56px; }
   .main-box-desc,
-  .home-box p {
-    font-size: 20px;
-  }
-
+  .home-box p { font-size: 20px; }
   .home-links .title,
   .info-card .title,
   .menu-card .title,
   .bottom-grid .title,
-  .action-card .title {
-    font-size: 34px;
-  }
+  .action-card .title { font-size: 34px; }
 }
 
 @media (max-width: 768px) {
@@ -520,34 +481,18 @@ tr:last-child td {
   .record-wrap,
   .roster-wrap,
   .mypage-wrap,
-  .sheet-wrap {
-    width: min(100%, calc(100% - 24px));
-  }
-
-  .page {
-    padding: 24px 0 40px;
-  }
-
+  .sheet-wrap { width: min(100%, calc(100% - 24px)); }
+  .page { padding: 24px 0; }
   .top-title,
-  .top-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
+  .top-header { align-items: flex-start; flex-direction: column; }
   .top-title h1,
   .top-header h1,
   .main-box-title,
   .home-box h2,
-  .card-box h2 {
-    font-size: 42px;
-  }
-
+  .card-box h2 { font-size: 42px; }
   .main-box,
   .home-box,
-  .card-box {
-    padding: 24px;
-  }
-
+  .card-box { padding: 24px; }
   .main-box-desc,
   .home-box p,
   .page-note,
@@ -557,22 +502,12 @@ tr:last-child td {
   .mypage-note,
   .roster-header-card p,
   .info-text,
-  .msg {
-    font-size: 17px;
-  }
-
+  .msg { font-size: 17px; }
   .home-links,
   .info-grid,
   .menu-grid,
-  .bottom-grid,
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .menu a {
-    font-size: 15px;
-  }
-
+  .bottom-grid { grid-template-columns: 1fr; }
+  .menu a { font-size: 16px; }
   .home-links .title,
   .info-card .title,
   .menu-card .title,
@@ -583,12 +518,7 @@ tr:last-child td {
   .pitcher-card h2,
   .roster-header-card h2,
   .sheet-card h2,
-  .card-title {
-    font-size: 28px;
-  }
-
+  .card-title { font-size: 28px; }
   table,
-  .sheet-table {
-    min-width: 560px;
-  }
+  .sheet-table { min-width: 560px; }
 }

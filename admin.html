@@ -16,7 +16,7 @@
     <main>
       <section class="home-box">
         <h2>관리자</h2>
-        <p id="adminWelcome">라인업, 투수 정보, 기록지 수정 기능을 한곳에서 관리하는 관리자 페이지</p>
+        <p>라인업, 투수 정보, 기록지 수정 기능을 한곳에서 관리하는 페이지</p>
 
         <div class="home-links">
           <a href="admin-lineup.html" class="menu-card">
@@ -31,7 +31,7 @@
             <div class="title">기록지 관리</div>
             <div class="sub">SCORESHEET</div>
           </a>
-          <a id="approvalCard" href="super-admin.html" class="menu-card hidden">
+          <a href="super-admin.html" class="menu-card">
             <div class="title">권한 승인</div>
             <div class="sub">APPROVAL</div>
           </a>
@@ -42,7 +42,7 @@
             <div class="title">일반 선수용</div>
             <div class="sub">PLAYER PAGE</div>
           </a>
-          <a href="login.html" class="menu-card" id="adminAuthCard">
+          <a href="login.html" class="menu-card">
             <div class="title">로그인</div>
             <div class="sub">LOGIN</div>
           </a>
@@ -50,32 +50,5 @@
       </section>
     </main>
   </div>
-
-  <script>
-    const user = JSON.parse(sessionStorage.getItem('currentUser'));
-    const allowed = user && ['super_admin', 'admin', 'scorer'].includes(user.role);
-    const adminWelcome = document.getElementById('adminWelcome');
-    const approvalCard = document.getElementById('approvalCard');
-    const adminAuthCard = document.getElementById('adminAuthCard');
-
-    if (!allowed) {
-      alert('관리자 권한이 필요합니다.');
-      location.href = 'login.html';
-    } else {
-      let roleText = '관리자';
-      if (user.role === 'super_admin') roleText = '최고관리자';
-      else if (user.role === 'scorer') roleText = '기록원';
-      adminWelcome.textContent = `${user.mcNick}님, ${roleText} 페이지입니다.`;
-      adminAuthCard.querySelector('.title').textContent = '로그아웃';
-      adminAuthCard.querySelector('.sub').textContent = 'LOGOUT';
-      adminAuthCard.href = '#';
-      adminAuthCard.onclick = (e) => {
-        e.preventDefault();
-        sessionStorage.removeItem('currentUser');
-        location.href = 'login.html';
-      };
-      if (user.role === 'super_admin') approvalCard.classList.remove('hidden');
-    }
-  </script>
 </body>
 </html>
