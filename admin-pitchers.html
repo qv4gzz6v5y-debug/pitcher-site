@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>투수 정보 관리</title>
+  <title>투수정보관리</title>
   <link rel="stylesheet" href="styles.css">
   <style>
     .pitcher-wrap {
@@ -149,22 +149,21 @@
   <div class="wrap">
     <div class="top-title">
       <h1>레이 마린스</h1>
-      <a class="top-link" href="index.html">메인으로</a>
+      <a class="top-link" href="admin.html">관리자 홈</a>
     </div>
 
     <div class="menu">
-      <a href="roster.html">로스터</a>
-      <a href="pitchers.html">투수 정보</a>
-      <a href="lineup.html">라인업</a>
-      <a href="record.html">기록실</a>
-      <a href="scoresheet.html">기록지</a>
-      <a href="mypage.html">마이페이지</a>
+      <a href="admin.html">관리자 홈</a>
+      <a href="admin-lineup.html">라인업 관리</a>
+      <a href="admin-pitchers.html">투수정보관리</a>
+      <a href="admin-scoresheet.html">기록지 관리</a>
     </div>
   </div>
 
   <div class="pitcher-wrap">
     <div class="pitcher-card">
       <h2>투수 정보 관리</h2>
+      <p class="page-note">최고관리자 / 관리자 / 기록원만 수정할 수 있어.</p>
 
       <input id="name" class="pitcher-input" placeholder="닉네임">
 
@@ -265,15 +264,15 @@
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+    const isStaff = currentUser && (
+      currentUser.role === "super_admin" ||
+      currentUser.role === "admin" ||
+      currentUser.role === "scorer"
+    );
 
-    function isStaff(user) {
-      if (!user) return false;
-      return user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
-    }
-
-    if (!isStaff(currentUser)) {
-      alert("접근 권한이 없습니다.");
-      location.href = "pitchers.html";
+    if (!isStaff) {
+      alert("접근 권한이 없어.");
+      location.href = "index.html";
     }
 
     const teamColors = {
@@ -318,7 +317,7 @@
       pitchList.innerHTML = "";
 
       if (selectedPitches.length === 0) {
-        pitchList.innerHTML = `<span class="page-note">추가된 구종이 없습니다.</span>`;
+        pitchList.innerHTML = `<span class="page-note">추가된 구종이 없어.</span>`;
         return;
       }
 
@@ -374,7 +373,7 @@
       const pitchSpeed = pitchSpeedInput.value.trim();
 
       if (!pitchType || !pitchSpeed) {
-        alert("구종과 구속 단계를 선택해주세요.");
+        alert("구종과 구속 단계를 선택해줘.");
         return;
       }
 
@@ -394,7 +393,7 @@
       const angle = angleInput.value.trim();
 
       if (!name || !team || !angle || selectedPitches.length === 0) {
-        alert("모든 값을 입력해주세요.");
+        alert("모든 값을 입력해줘.");
         return;
       }
 
@@ -432,7 +431,7 @@
         resetForm();
       } catch (error) {
         console.error(error);
-        alert("저장 중 오류가 발생했습니다.");
+        alert("저장 중 오류가 발생했어.");
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = "저장";
@@ -459,7 +458,7 @@
       const target = pitchers.find(p => p.id === id);
       if (!target) return;
 
-      if (!confirm(`${target.name} 투수 정보를 삭제할까요?`)) return;
+      if (!confirm(`${target.name} 투수 정보를 삭제할까?`)) return;
 
       try {
         await deleteDoc(doc(db, "pitchers", id));
@@ -467,7 +466,7 @@
         if (editId === id) resetForm();
       } catch (error) {
         console.error(error);
-        alert("삭제 중 오류가 발생했습니다.");
+        alert("삭제 중 오류가 발생했어.");
       }
     }
 
@@ -475,7 +474,7 @@
       list.innerHTML = "";
 
       if (pitchers.length === 0) {
-        list.innerHTML = `<div class="list-item"><p>등록된 투수 정보가 없습니다.</p></div>`;
+        list.innerHTML = `<div class="list-item"><p>등록된 투수 정보가 없어.</p></div>`;
         return;
       }
 
@@ -484,7 +483,7 @@
       );
 
       if (filtered.length === 0) {
-        list.innerHTML = `<div class="list-item"><p>검색 결과가 없습니다.</p></div>`;
+        list.innerHTML = `<div class="list-item"><p>검색 결과가 없어.</p></div>`;
         return;
       }
 
@@ -542,7 +541,7 @@
       renderPitchers(document.getElementById("searchInput").value.trim());
     }, (error) => {
       console.error(error);
-      list.innerHTML = `<div class="list-item"><p>투수 정보를 불러오지 못했습니다.</p></div>`;
+      list.innerHTML = `<div class="list-item"><p>투수 정보를 불러오지 못했어.</p></div>`;
     });
 
     renderPitchList();

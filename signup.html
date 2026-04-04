@@ -2,24 +2,40 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>회원가입</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입 | 레이 마린스</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="card-box">
-    <h2>회원가입</h2>
+  <div class="page">
+    <header class="top-title">
+      <h1>레이 마린스</h1>
+      <a class="top-link" href="login.html">로그인으로</a>
+    </header>
 
-    <input id="mcNick" class="input" placeholder="마인크래프트 닉네임">
-    <input id="discordTag" class="input" placeholder="디스코드 태그">
-    <input id="password" type="password" class="input" placeholder="비밀번호">
-
-    <button class="btn" id="signupBtn">회원가입</button>
-    <button class="btn sub" onclick="location.href='login.html'">로그인으로 이동</button>
-
-    <div id="msg" class="msg"></div>
+    <main>
+      <section class="card-box">
+        <h2>회원가입</h2>
+        <p class="main-box-desc">가입 후 관리자 승인까지 완료되면 로그인할 수 있어.</p>
+        <div class="form-card">
+          <label for="mcNick">마인크래프트 닉네임</label>
+          <input id="mcNick" class="input" placeholder="마인크래프트 닉네임">
+          <label for="discordTag">디스코드 닉네임</label>
+          <input id="discordTag" class="input" placeholder="예: name#1234 또는 name">
+          <label for="password">비밀번호</label>
+          <input id="password" type="password" class="input" placeholder="비밀번호">
+          <div class="button-row">
+            <button class="primary-button" id="signupBtn">회원가입</button>
+            <a class="secondary-button" href="login.html">로그인</a>
+          </div>
+          <div id="msg" class="msg"></div>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script type="module">
+
     import { db } from "./firebase-config.js";
     import {
       collection,
@@ -119,6 +135,7 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter") signup();
     });
+  
   </script>
 </body>
 </html>

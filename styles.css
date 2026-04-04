@@ -1,397 +1,594 @@
-body {
-  margin: 0;
-  background: #f5f5f5;
-  color: #111;
-  font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+* {
+  box-sizing: border-box;
 }
 
-.wrap {
-  width: 95%;
+:root {
+  --bg: #f3f3f3;
+  --panel: #f8f8f8;
+  --card: #ffffff;
+  --line: #dcdcdc;
+  --line-strong: #222222;
+  --text: #111111;
+  --muted: #666666;
+  --subtle: #7a7a7a;
+  --shadow: 0 0 0 1px rgba(0, 0, 0, 0.03);
+  --radius-xl: 24px;
+  --radius-lg: 18px;
+  --radius-md: 14px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+.wrap,
+.section,
+.page,
+.lineup-wrap,
+.pitcher-wrap,
+.record-wrap,
+.roster-wrap,
+.mypage-wrap,
+.sheet-wrap {
+  width: min(1200px, calc(100% - 32px));
   margin: 0 auto;
 }
 
-.top-title {
+.page {
+  min-height: 100vh;
+  padding: 40px 0 56px;
+}
+
+.top-title,
+.top-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 28px 0 18px;
-  border-bottom: 2px solid #222;
+  gap: 16px;
+  padding: 0 0 24px;
+  border-bottom: 1px solid var(--line-strong);
 }
 
-.top-title h1 {
+.top-title h1,
+.top-header h1 {
   margin: 0;
-  font-size: 68px;
+  font-size: 72px;
   font-weight: 300;
-  letter-spacing: 4px;
+  letter-spacing: 0.08em;
+  line-height: 1;
 }
 
-.top-title .top-link {
-  font-size: 24px;
+.top-link,
+.home-link,
+.back-link {
+  font-size: 18px;
   text-decoration: none;
-  color: #222;
+  color: #444444;
 }
 
-.top-title .top-link:hover {
-  opacity: 0.7;
+.top-link:hover,
+.home-link:hover,
+.back-link:hover,
+.menu a:hover {
+  opacity: 0.72;
 }
 
 .menu {
   display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border-bottom: 2px solid #222;
-  padding: 14px 0;
-  font-size: 38px;
-  font-weight: 300;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 0 0;
 }
 
 .menu a {
   text-decoration: none;
-  color: #111;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--line);
+  font-size: 16px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
 .menu a:hover {
-  opacity: 0.7;
-}
-
-.card-box {
-  max-width: 520px;
-  margin: 70px auto;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 18px;
-  padding: 28px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-}
-
-.card-box h2 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 34px;
-}
-
-.input {
-  width: 100%;
-  box-sizing: border-box;
-  margin: 10px 0;
-  padding: 14px 16px;
-  border: 1px solid #ccc;
-  border-radius: 12px;
-  font-size: 18px;
-  background: #fff;
-}
-
-.input:focus {
-  outline: none;
-  border-color: #888;
-}
-
-.btn {
-  width: 100%;
-  padding: 14px;
-  border: none;
-  border-radius: 12px;
-  background: #111;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-  margin-top: 12px;
-  transition: 0.2s ease;
-}
-
-.btn:hover {
-  opacity: 0.9;
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btn.sub {
-  background: #666;
-}
-
-.msg {
-  margin-top: 14px;
-  font-size: 16px;
-  color: #b00020;
-  line-height: 1.5;
-}
-
-.ok {
-  color: #0a7a2f;
-}
-
-.section {
-  width: 95%;
-  max-width: 1100px;
-  margin: 34px auto;
-}
-
-.section h2 {
-  font-size: 34px;
-  margin-bottom: 16px;
-}
-
-.section h3 {
-  font-size: 26px;
-  margin-top: 0;
-  margin-bottom: 14px;
-}
-
-.panel {
-  background: white;
-  border-radius: 18px;
-  padding: 20px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-  margin-bottom: 18px;
-}
-
-.user-row {
-  border: 1px solid #ddd;
-  border-radius: 14px;
-  padding: 16px;
-  margin-bottom: 14px;
-  background: #fafafa;
-}
-
-.user-row p {
-  margin: 6px 0;
-  line-height: 1.5;
-}
-
-.inline-input {
-  width: 180px;
-  padding: 10px 12px;
-  margin-right: 8px;
-  margin-top: 8px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 15px;
-  box-sizing: border-box;
-}
-
-.inline-input:focus {
-  outline: none;
-  border-color: #888;
-}
-
-.inline-check {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 10px 16px 0 0;
-  font-size: 16px;
-}
-
-.small-btn {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-top: 10px;
-  margin-right: 8px;
-  background: #111;
-  color: white;
-  transition: 0.2s ease;
-}
-
-.small-btn:hover {
-  opacity: 0.9;
-}
-
-.small-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.small-btn.red {
-  background: #b00020;
+  transform: translateY(-1px);
+  border-color: var(--line-strong);
 }
 
 .hidden {
   display: none !important;
 }
 
-.home-box {
-  max-width: 900px;
-  margin: 70px auto;
-  text-align: center;
-}
-
-.home-box h2 {
-  font-size: 46px;
-  font-weight: 300;
-  margin-bottom: 14px;
-}
-
-.home-box p {
-  font-size: 18px;
-  color: #555;
-}
-
-.home-links {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-  margin-top: 28px;
-}
-
-.home-links a {
-  display: block;
-  background: white;
-  border-radius: 18px;
-  padding: 30px;
-  text-decoration: none;
-  color: #111;
-  font-size: 28px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.home-links a:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-}
-
-.badge {
-  display: inline-block;
-  padding: 7px 12px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.badge.owner {
-  background: #ff6a00;
-  color: white;
-}
-
-.badge.admin {
-  background: #8b0000;
-  color: white;
-}
-
-.badge.scorer {
-  background: #1b65ba;
-  color: white;
-}
-
-.badge.member {
-  background: #e9ecef;
-  color: #222;
-}
-
+.main-box,
+.home-box,
+.card-box,
+.panel,
+.lineup-card,
+.pitcher-card,
+.record-card,
+.roster-header-card,
+.roster-card,
+.mypage-card,
+.sheet-card,
+.user-row,
 .empty-box {
-  background: white;
-  border-radius: 18px;
-  padding: 30px;
-  text-align: center;
-  color: #666;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  background: var(--panel);
+  border: 1px solid #e5e5e5;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
 }
 
-.info-text {
-  color: #666;
-  font-size: 15px;
+.main-box,
+.home-box {
+  max-width: 920px;
+  margin: 48px auto 0;
+  padding: 32px;
+}
+
+.card-box {
+  max-width: 760px;
+  margin: 48px auto 0;
+  padding: 32px;
+}
+
+.main-box-title,
+.home-box h2,
+.card-box h2 {
+  margin: 0;
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.main-box-desc,
+.home-box p,
+.page-note,
+.lineup-note,
+.sheet-note,
+.record-note,
+.mypage-note,
+.roster-header-card p,
+.info-text,
+.msg {
+  margin-top: 16px;
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--muted);
   line-height: 1.6;
 }
 
-.page-actions {
+.home-links,
+.info-grid,
+.menu-grid,
+.bottom-grid,
+.stats-grid {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.home-links a,
+.info-card,
+.menu-card,
+.bottom-grid a,
+.action-card,
+.stat-box {
+  display: block;
+  text-decoration: none;
+  background: var(--card);
+  border: 1px solid #d6d6d6;
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.home-links a:hover,
+.info-card:hover,
+.menu-card:hover,
+.bottom-grid a:hover,
+.action-card:hover {
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+
+.home-links .title,
+.info-card .title,
+.menu-card .title,
+.bottom-grid .title,
+.action-card .title {
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.home-links .sub,
+.info-card .sub,
+.menu-card .sub,
+.bottom-grid .sub,
+.action-card .sub {
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: var(--subtle);
+  text-transform: uppercase;
+}
+
+.notice,
+.info-card p {
+  margin-top: 12px;
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.form-card,
+.table-card,
+.sheet-table-wrap,
+.view-box,
+.list-item,
+.record-box,
+.sheet-box,
+.stat-box {
+  background: var(--card);
+  border: 1px solid #e5e5e5;
+  border-radius: var(--radius-lg);
+}
+
+.form-card {
+  margin-top: 32px;
+  padding: 24px;
+}
+
+label {
+  display: block;
+  margin-top: 14px;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.input,
+.inline-input,
+.lineup-input,
+.lineup-select,
+.pitcher-input,
+.pitcher-select,
+.sheet-input,
+.sheet-select,
+.cell-input,
+.mypage-input,
+select,
+textarea,
+input {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid #cccccc;
+  border-radius: 14px;
+  font-size: 16px;
+  background: var(--card);
+  font-family: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.button-row,
+.page-actions,
+.action-row,
+.section-actions,
+.inning-actions {
   display: flex;
-  gap: 10px;
   flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
 }
 
-.page-actions .small-btn,
-.page-actions .btn {
-  width: auto;
+.btn,
+.small-btn,
+.lineup-btn,
+.pitcher-btn,
+.sheet-btn,
+.mypage-btn,
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--line-strong);
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 15px;
+  font-family: inherit;
+  transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
-@media (max-width: 900px) {
-  .top-title {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+.btn,
+.small-btn,
+.lineup-btn,
+.pitcher-btn,
+.sheet-btn,
+.mypage-btn,
+.primary-button {
+  background: var(--text);
+  color: #ffffff;
+}
+
+.btn.sub,
+.small-btn.sub,
+.lineup-btn.sub,
+.pitcher-btn.sub,
+.sheet-btn.sub,
+.mypage-btn.sub,
+.secondary-button {
+  background: var(--card);
+  color: var(--text);
+  border-color: #d0d0d0;
+}
+
+.small-btn.red,
+.pitcher-btn.delete,
+.sheet-btn.delete {
+  background: #b00020;
+  color: #ffffff;
+  border-color: #b00020;
+}
+
+.btn:hover,
+.small-btn:hover,
+.lineup-btn:hover,
+.pitcher-btn:hover,
+.sheet-btn:hover,
+.mypage-btn:hover,
+.primary-button:hover,
+.secondary-button:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.btn:disabled,
+.small-btn:disabled,
+.lineup-btn:disabled,
+.pitcher-btn:disabled,
+.sheet-btn:disabled,
+.mypage-btn:disabled,
+.primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.section,
+.lineup-wrap,
+.pitcher-wrap,
+.record-wrap,
+.roster-wrap,
+.mypage-wrap,
+.sheet-wrap {
+  margin: 34px auto;
+}
+
+.panel,
+.lineup-card,
+.pitcher-card,
+.record-card,
+.roster-header-card,
+.roster-card,
+.mypage-card,
+.sheet-card,
+.user-row,
+.empty-box {
+  padding: 24px;
+  margin-bottom: 18px;
+}
+
+.section h2,
+.lineup-card h2,
+.pitcher-card h2,
+.roster-header-card h2,
+.sheet-card h2,
+.card-title {
+  margin: 0 0 14px;
+  font-size: 40px;
+}
+
+table,
+.sheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+thead th,
+.sheet-table th {
+  background: #f5f5f5;
+  font-size: 15px;
+  font-weight: 700;
+  color: #333333;
+}
+
+th,
+td,
+.sheet-table th,
+.sheet-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #eeeeee;
+  text-align: left;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.badge,
+.status-badge,
+.role-badge,
+.pitch-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.badge.member,
+.status-pending,
+.role-member {
+  background: #e9ecef;
+  color: #222222;
+}
+
+.badge.owner,
+.role-owner { background: #ff6a00; color: white; }
+.badge.admin,
+.role-admin { background: #8b0000; color: white; }
+.badge.scorer,
+.role-scorer { background: #1b65ba; color: white; }
+.status-approved { background: #e8f7ec; color: #0a7a2f; }
+
+.inline-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.team-logo {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.empty-text {
+  color: var(--muted);
+}
+
+.msg.ok {
+  color: #0a7a2f;
+}
+
+@media (max-width: 1024px) {
+  .top-title h1,
+  .top-header h1,
+  .main-box-title,
+  .home-box h2,
+  .card-box h2 {
+    font-size: 56px;
   }
 
-  .top-title h1 {
-    font-size: 46px;
-  }
-
-  .top-title .top-link {
+  .main-box-desc,
+  .home-box p {
     font-size: 20px;
   }
 
-  .menu {
-    font-size: 24px;
-    justify-content: flex-start;
-    padding: 12px 0;
+  .home-links .title,
+  .info-card .title,
+  .menu-card .title,
+  .bottom-grid .title,
+  .action-card .title {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 768px) {
+  .wrap,
+  .section,
+  .page,
+  .lineup-wrap,
+  .pitcher-wrap,
+  .record-wrap,
+  .roster-wrap,
+  .mypage-wrap,
+  .sheet-wrap {
+    width: min(100%, calc(100% - 24px));
   }
 
-  .home-links {
+  .page {
+    padding: 24px 0 40px;
+  }
+
+  .top-title,
+  .top-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .top-title h1,
+  .top-header h1,
+  .main-box-title,
+  .home-box h2,
+  .card-box h2 {
+    font-size: 42px;
+  }
+
+  .main-box,
+  .home-box,
+  .card-box {
+    padding: 24px;
+  }
+
+  .main-box-desc,
+  .home-box p,
+  .page-note,
+  .lineup-note,
+  .sheet-note,
+  .record-note,
+  .mypage-note,
+  .roster-header-card p,
+  .info-text,
+  .msg {
+    font-size: 17px;
+  }
+
+  .home-links,
+  .info-grid,
+  .menu-grid,
+  .bottom-grid,
+  .stats-grid {
     grid-template-columns: 1fr;
   }
 
+  .menu a {
+    font-size: 15px;
+  }
+
+  .home-links .title,
+  .info-card .title,
+  .menu-card .title,
+  .bottom-grid .title,
+  .action-card .title,
   .section h2,
-  .card-box h2 {
+  .lineup-card h2,
+  .pitcher-card h2,
+  .roster-header-card h2,
+  .sheet-card h2,
+  .card-title {
     font-size: 28px;
   }
-}
 
-@media (max-width: 600px) {
-  body {
-    background: #f3f3f3;
-  }
-
-  .wrap,
-  .section {
-    width: 92%;
-  }
-
-  .top-title h1 {
-    font-size: 36px;
-    letter-spacing: 2px;
-  }
-
-  .menu {
-    font-size: 20px;
-    gap: 10px;
-  }
-
-  .card-box {
-    margin: 30px auto;
-    padding: 20px;
-  }
-
-  .input {
-    font-size: 16px;
-    padding: 12px 14px;
-  }
-
-  .btn {
-    font-size: 16px;
-    padding: 12px;
-  }
-
-  .inline-input {
-    width: 100%;
-    margin-right: 0;
-  }
-
-  .user-row {
-    padding: 14px;
-  }
-
-  .home-box h2 {
-    font-size: 34px;
-  }
-
-  .home-links a {
-    font-size: 22px;
-    padding: 22px;
+  table,
+  .sheet-table {
+    min-width: 560px;
   }
 }
