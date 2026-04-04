@@ -26,7 +26,6 @@
     <h2>비공개 관리 페이지</h2>
 
     <div class="panel">
-      <p><strong>주의:</strong> 이 페이지는 최고관리자만 볼 수 있습니다.</p>
       <p id="adminMsg">회원가입 대기 명단을 불러오는 중...</p>
     </div>
 
@@ -53,7 +52,7 @@
     const adminMsg = document.getElementById("adminMsg");
 
     if (!currentUser || currentUser.role !== "super_admin") {
-      alert("접근 권한이 없어.");
+      alert("접근 권한이 없습니다.");
       location.href = "index.html";
     }
 
