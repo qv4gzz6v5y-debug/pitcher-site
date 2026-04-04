@@ -2,42 +2,69 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>레이 마린스</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="wrap">
-    <div class="top-title">
+  <div class="page">
+    <header class="top-title">
       <h1>레이 마린스</h1>
-      <a id="topAccount" class="top-link hidden-link" href="login.html">로그인/회원가입</a>
-    </div>
+      <a id="topAccount" class="top-link" href="login.html">로그인/회원가입</a>
+    </header>
 
-    <div class="menu">
-      <a href="roster.html">로스터</a>
-      <a href="pitchers.html">투수 정보</a>
-      <a id="menuLineup" class="hidden" href="lineup.html">라인업</a>
-      <a href="record.html">기록실</a>
-      <a id="menuSheet" class="hidden" href="scoresheet.html">기록지</a>
-      <a href="mypage.html">마이페이지</a>
-    </div>
+    <main>
+      <section class="home-box">
+        <h2>레이 마린스</h2>
+        <p id="welcomeText">선수용 메인 페이지입니다. 필요한 메뉴를 선택해 주세요.</p>
 
-    <div class="home-box">
-      <h2>레이 마린스</h2>
-      <p id="welcomeText">환영합니다.</p>
+        <div class="home-links">
+          <a href="roster.html" class="menu-card">
+            <div class="title">로스터</div>
+            <div class="sub">ROSTER</div>
+          </a>
+          <a href="pitchers.html" class="menu-card">
+            <div class="title">투수 정보</div>
+            <div class="sub">PITCHERS</div>
+          </a>
+          <a id="homeLineup" class="menu-card hidden" href="lineup.html">
+            <div class="title">라인업</div>
+            <div class="sub">LINEUP</div>
+          </a>
+          <a href="record.html" class="menu-card">
+            <div class="title">기록실</div>
+            <div class="sub">STATS</div>
+          </a>
+          <a id="homeSheet" class="menu-card hidden" href="scoresheet.html">
+            <div class="title">기록지</div>
+            <div class="sub">SCORESHEET</div>
+          </a>
+          <a href="mypage.html" class="menu-card">
+            <div class="title">마이페이지</div>
+            <div class="sub">MY PAGE</div>
+          </a>
+          <a id="homePitcherManage" class="menu-card hidden" href="pitchers-manage.html">
+            <div class="title">투수 정보 관리</div>
+            <div class="sub">PITCHER MANAGE</div>
+          </a>
+          <a id="superAdminLink" class="menu-card hidden" href="super-admin.html">
+            <div class="title">비공개 관리 페이지</div>
+            <div class="sub">SUPER ADMIN</div>
+          </a>
+        </div>
 
-      <div class="home-links">
-        <a href="roster.html"><span class="card-title">로스터</span><span class="card-sub">ROSTER</span></a>
-        <a href="pitchers.html"><span class="card-title">투수 정보</span><span class="card-sub">PITCHERS</span></a>
-        <a id="homeLineup" class="hidden" href="lineup.html"><span class="card-title">라인업</span><span class="card-sub">LINEUP</span></a>
-        <a href="record.html"><span class="card-title">기록실</span><span class="card-sub">STATS</span></a>
-        <a id="homeSheet" class="hidden" href="scoresheet.html"><span class="card-title">기록지</span><span class="card-sub">SCORESHEET</span></a>
-        <a href="mypage.html"><span class="card-title">마이페이지</span><span class="card-sub">MY PAGE</span></a>
-        <a id="homePitcherManage" class="hidden" href="pitchers-manage.html"><span class="card-title">투수 정보 관리</span><span class="card-sub">PITCHER MANAGE</span></a>
-        <a id="superAdminLink" class="hidden" href="super-admin.html"><span class="card-title long">비공개 관리 페이지</span><span class="card-sub">SUPER ADMIN</span></a>
-        <a href="login.html"><span class="card-title">로그인</span><span class="card-sub">LOGIN</span></a>
-        <a href="admin.html"><span class="card-title">관리자</span><span class="card-sub">ADMIN</span></a>
-      </div>
-    </div>
+        <div class="bottom-grid">
+          <a href="login.html" class="menu-card">
+            <div class="title">로그인</div>
+            <div class="sub">LOGIN</div>
+          </a>
+          <a href="admin.html" class="menu-card">
+            <div class="title">관리자</div>
+            <div class="sub">ADMIN</div>
+          </a>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script>
@@ -51,7 +78,6 @@
     }
 
     if (user) {
-      topAccount.classList.remove("hidden-link");
       topAccount.textContent = `${user.mcNick} / 로그아웃`;
       topAccount.href = "#";
       topAccount.onclick = (e) => {
@@ -61,18 +87,14 @@
       };
 
       let roleText = "선수";
-
       if (user.role === "owner") roleText = "구단주";
       else if (user.role === "admin") roleText = "관리진";
       else if (user.role === "scorer") roleText = "기록원";
       else if (user.role === "super_admin") roleText = "선수";
 
-      welcomeText.textContent = `${user.mcNick}님 환영합니다. 현재 역할: ${roleText}`;
+      welcomeText.textContent = `${user.mcNick}님 선수용 메인 페이지입니다. 필요한 메뉴를 선택해 주세요. 현재 역할: ${roleText}`;
 
       if (isStaff(user)) {
-        document.getElementById("menuLineup").classList.remove("hidden");
-        document.getElementById("menuSheet").classList.remove("hidden");
-
         document.getElementById("homeLineup").classList.remove("hidden");
         document.getElementById("homeSheet").classList.remove("hidden");
         document.getElementById("homePitcherManage").classList.remove("hidden");
@@ -82,7 +104,6 @@
         document.getElementById("superAdminLink").classList.remove("hidden");
       }
     } else {
-      topAccount.classList.add("hidden-link");
       welcomeText.textContent = "로그인 후 팀 페이지 기능을 이용할 수 있습니다.";
     }
   </script>

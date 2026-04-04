@@ -2,42 +2,79 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>관리자 | 레이 마린스</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="wrap">
-    <div class="top-title">
+  <div class="page">
+    <header class="top-title">
       <h1>레이 마린스</h1>
-      <a class="top-link" href="index.html">관리자 홈</a>
-    </div>
+      <a class="top-link" href="index.html">선수 메인</a>
+    </header>
 
-    <div class="menu">
-      <a href="admin.html">관리자 메인</a>
-      <a href="admin-lineup.html">라인업 관리</a>
-      <a href="admin-pitchers.html">투수 정보 관리</a>
-      <a href="admin-scoresheet.html">기록지 관리</a>
-      <a href="super-admin.html">비공개 관리</a>
-    </div>
+    <main>
+      <section class="home-box">
+        <h2>관리자</h2>
+        <p id="adminWelcome">라인업, 투수 정보, 기록지 수정 기능을 한곳에서 관리하는 관리자 페이지</p>
 
-    <div class="home-box">
-      <h2>관리자 페이지</h2>
-      <p>관리 기능으로 이동할 수 있는 관리자 전용 메인 페이지입니다.</p>
+        <div class="home-links">
+          <a href="admin-lineup.html" class="menu-card">
+            <div class="title">라인업 관리</div>
+            <div class="sub">LINEUP</div>
+          </a>
+          <a href="admin-pitchers.html" class="menu-card">
+            <div class="title">투수 정보 관리</div>
+            <div class="sub">PITCHERS</div>
+          </a>
+          <a href="admin-scoresheet.html" class="menu-card">
+            <div class="title">기록지 관리</div>
+            <div class="sub">SCORESHEET</div>
+          </a>
+          <a id="approvalCard" href="super-admin.html" class="menu-card hidden">
+            <div class="title">권한 승인</div>
+            <div class="sub">APPROVAL</div>
+          </a>
+        </div>
 
-      <div class="home-links">
-        <a href="admin-lineup.html"><span class="card-title">라인업 관리</span><span class="card-sub">LINEUP</span></a>
-        <a href="admin-pitchers.html"><span class="card-title">투수 정보 관리</span><span class="card-sub">PITCHER MANAGE</span></a>
-        <a href="admin-scoresheet.html"><span class="card-title">기록지 관리</span><span class="card-sub">SCORESHEET</span></a>
-        <a href="super-admin.html" id="superAdminLink"><span class="card-title long">비공개 관리 페이지</span><span class="card-sub">SUPER ADMIN</span></a>
-      </div>
-    </div>
+        <div class="bottom-grid">
+          <a href="index.html" class="menu-card">
+            <div class="title">일반 선수용</div>
+            <div class="sub">PLAYER PAGE</div>
+          </a>
+          <a href="login.html" class="menu-card" id="adminAuthCard">
+            <div class="title">로그인</div>
+            <div class="sub">LOGIN</div>
+          </a>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script>
-    const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
-    if (!currentUser || !["admin", "scorer", "super_admin", "owner"].includes(currentUser.role)) {
-      alert("관리자 권한이 필요합니다.");
-      location.href = "index.html";
+    const user = JSON.parse(sessionStorage.getItem('currentUser'));
+    const allowed = user && ['super_admin', 'admin', 'scorer'].includes(user.role);
+    const adminWelcome = document.getElementById('adminWelcome');
+    const approvalCard = document.getElementById('approvalCard');
+    const adminAuthCard = document.getElementById('adminAuthCard');
+
+    if (!allowed) {
+      alert('관리자 권한이 필요합니다.');
+      location.href = 'login.html';
+    } else {
+      let roleText = '관리자';
+      if (user.role === 'super_admin') roleText = '최고관리자';
+      else if (user.role === 'scorer') roleText = '기록원';
+      adminWelcome.textContent = `${user.mcNick}님, ${roleText} 페이지입니다.`;
+      adminAuthCard.querySelector('.title').textContent = '로그아웃';
+      adminAuthCard.querySelector('.sub').textContent = 'LOGOUT';
+      adminAuthCard.href = '#';
+      adminAuthCard.onclick = (e) => {
+        e.preventDefault();
+        sessionStorage.removeItem('currentUser');
+        location.href = 'login.html';
+      };
+      if (user.role === 'super_admin') approvalCard.classList.remove('hidden');
     }
   </script>
 </body>
