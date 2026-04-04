@@ -1,318 +1,549 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>관리자 - 투수 정보 등록</title>
+  <meta charset="UTF-8">
+  <title>투수정보관리</title>
+  <link rel="stylesheet" href="styles.css">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: #f3f3f3;
-      color: #111;
-      font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    .pitcher-wrap {
+      width: 95%;
+      max-width: 1100px;
+      margin: 34px auto;
     }
-    .page {
-      max-width: 1200px;
-      margin: 0 auto;
-      min-height: 100vh;
-      padding: 40px 32px;
-    }
-    .top-header {
-      border-bottom: 1px solid #222;
-      padding-bottom: 24px;
-      margin-bottom: 48px;
-    }
-    .top-header h1 {
-      font-size: 48px;
-      font-weight: 300;
-      letter-spacing: 0.08em;
-    }
-    .main-box {
-      max-width: 900px;
-      margin: 0 auto;
-      background: #f8f8f8;
-      border-radius: 24px;
-      padding: 32px;
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.04);
-    }
-    .main-title {
-      font-size: 48px;
-      font-weight: 700;
-    }
-    .main-desc {
-      margin-top: 14px;
-      font-size: 20px;
-      color: #666;
-      font-weight: 300;
-    }
-    .form-grid {
-      margin-top: 28px;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-    .field {
-      background: #fff;
-      border: 1px solid #d6d6d6;
-      border-radius: 18px;
-      padding: 18px;
-    }
-    .field label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: #555;
-      letter-spacing: 0.04em;
-    }
-    .field input {
-      width: 100%;
-      height: 50px;
-      border: 1px solid #d6d6d6;
-      border-radius: 12px;
-      padding: 0 14px;
-      font-size: 16px;
-      outline: none;
-    }
-    .field input:focus { border-color: #111; }
-    .full { grid-column: 1 / -1; }
-    .actions {
-      margin-top: 20px;
-      display: flex;
-      gap: 12px;
-    }
-    button {
-      height: 52px;
-      padding: 0 20px;
-      border-radius: 14px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .primary {
-      background: #111;
-      color: #fff;
-      border: 1px solid #111;
-    }
-    .secondary {
-      background: #fff;
-      color: #111;
-      border: 1px solid #d6d6d6;
-    }
-    .message {
-      margin-top: 16px;
-      font-size: 15px;
-      color: #555;
-    }
-    .list-box {
-      margin-top: 28px;
-      background: #fff;
-      border: 1px solid #d6d6d6;
+
+    .pitcher-card {
+      background: white;
       border-radius: 18px;
       padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      margin-bottom: 18px;
     }
-    .list-title {
-      font-size: 24px;
-      font-weight: 700;
+
+    .pitcher-card h2 {
+      margin-top: 0;
       margin-bottom: 14px;
+      font-size: 34px;
     }
-    .pitcher-item {
-      border: 1px solid #e5e5e5;
-      border-radius: 14px;
+
+    .pitcher-input,
+    .pitcher-select {
+      width: 100%;
+      box-sizing: border-box;
+      margin: 10px 0;
       padding: 14px 16px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 18px;
+      background: #fff;
+    }
+
+    .pitcher-btn {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 12px;
+      background: #111;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-right: 8px;
       margin-top: 10px;
-      background: #fafafa;
     }
-    .pitcher-item:first-child { margin-top: 0; }
-    .pitcher-name {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 6px;
+
+    .pitcher-btn.delete {
+      background: #b00020;
     }
-    .pitcher-meta {
-      font-size: 15px;
-      color: #666;
+
+    .pitcher-btn.sub {
+      background: #666;
+    }
+
+    .team-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 18px;
+      margin-bottom: 10px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .team-logo {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: white;
+    }
+
+    .list-item {
+      background: #f8f8f8;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .list-item p {
+      margin: 0 0 10px 0;
+      font-size: 18px;
       line-height: 1.6;
     }
-    @media (max-width: 768px) {
-      .page { padding: 24px 16px; }
-      .top-header h1 { font-size: 36px; }
-      .main-title { font-size: 36px; }
-      .form-grid { grid-template-columns: 1fr; }
-      .actions { flex-direction: column; }
+
+    .page-note {
+      color: #666;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pitch-add-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+      margin-top: 8px;
+    }
+
+    .pitch-list {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pitch-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #111827;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .chip-remove {
+      border: none;
+      background: transparent;
+      color: #b00020;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0;
+    }
+
+    @media (max-width: 700px) {
+      .pitch-add-row {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <header class="top-header">
+  <div class="wrap">
+    <div class="top-title">
       <h1>레이 마린스</h1>
-    </header>
+      <a class="top-link" href="admin.html">관리자 홈</a>
+    </div>
 
-    <main class="main-box">
-      <h2 class="main-title">관리자 - 투수 정보 등록</h2>
-      <p class="main-desc">여기서 저장한 투수 정보가 선수용 검색 페이지에 바로 반영됩니다.</p>
+    <div class="menu">
+      <a href="admin.html">관리자 홈</a>
+      <a href="admin-lineup.html">라인업 관리</a>
+      <a href="admin-pitchers.html">투수정보관리</a>
+      <a href="admin-scoresheet.html">기록지 관리</a>
+    </div>
+  </div>
 
-      <div class="form-grid">
-        <div class="field">
-          <label for="nickname">닉네임</label>
-          <input type="text" id="nickname" placeholder="예: 레이투수1" />
+  <div class="pitcher-wrap">
+    <div class="pitcher-card">
+      <h2>투수 정보 관리</h2>
+      
+      <input id="name" class="pitcher-input" placeholder="닉네임">
+
+      <select id="team" class="pitcher-select">
+        <option value="">팀 선택</option>
+        <option value="KRA">KRA</option>
+        <option value="RMS">RMS</option>
+        <option value="NDG">NDG</option>
+        <option value="CPX">CPX</option>
+        <option value="CLP">CLP</option>
+        <option value="SLU">SLU</option>
+        <option value="IH">IH</option>
+        <option value="ODV">ODV</option>
+      </select>
+
+      <select id="angle" class="pitcher-select">
+        <option value="">팔각도 선택</option>
+        <option value="오버핸드">오버핸드</option>
+        <option value="쓰리쿼터">쓰리쿼터</option>
+        <option value="사이드암">사이드암</option>
+        <option value="언더핸드">언더핸드</option>
+      </select>
+
+      <div class="pitch-add-row">
+        <div>
+          <label for="pitchType" class="page-note">구종</label>
+          <select id="pitchType" class="pitcher-select">
+            <option value="">구종 선택</option>
+            <option value="포심">포심</option>
+            <option value="투심">투심</option>
+            <option value="싱커">싱커</option>
+            <option value="커터">커터</option>
+            <option value="슬라이더">슬라이더</option>
+            <option value="자이로 슬라이더">자이로 슬라이더</option>
+            <option value="스위퍼">스위퍼</option>
+            <option value="슬러터">슬러터</option>
+            <option value="슬러브">슬러브</option>
+            <option value="커브볼">커브볼</option>
+            <option value="너클커브">너클커브</option>
+            <option value="이퓨스">이퓨스</option>
+            <option value="너클볼">너클볼</option>
+            <option value="체인지업">체인지업</option>
+            <option value="서클 체인지업">서클 체인지업</option>
+            <option value="벌칸 체인지업">벌칸 체인지업</option>
+            <option value="킥 체인지">킥 체인지</option>
+            <option value="스플리터">스플리터</option>
+            <option value="포크볼">포크볼</option>
+            <option value="팜볼">팜볼</option>
+            <option value="스크류볼">스크류볼</option>
+          </select>
         </div>
 
-        <div class="field">
-          <label for="speed">구속</label>
-          <input type="text" id="speed" placeholder="예: 145km/h" />
+        <div>
+          <label for="pitchSpeed" class="page-note">구속</label>
+          <select id="pitchSpeed" class="pitcher-select">
+            <option value="">선택</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
+          </select>
         </div>
 
-        <div class="field">
-          <label for="throwBat">투타</label>
-          <input type="text" id="throwBat" placeholder="예: 우투우타" />
-        </div>
-
-        <div class="field">
-          <label for="control">제구</label>
-          <input type="text" id="control" placeholder="예: 중상" />
-        </div>
-
-        <div class="field">
-          <label for="stamina">스태미너</label>
-          <input type="text" id="stamina" placeholder="예: 상" />
-        </div>
-
-        <div class="field full">
-          <label for="pitchTypes">구종</label>
-          <input type="text" id="pitchTypes" placeholder="예: 포심, 슬라이더, 체인지업" />
+        <div>
+          <button class="pitcher-btn sub" type="button" id="addPitchBtn">구종 추가</button>
         </div>
       </div>
 
-      <div class="actions">
-        <button class="primary" id="saveBtn">저장</button>
-        <button class="secondary" id="resetBtn" type="button">입력 초기화</button>
+      <div id="pitchList" class="pitch-list"></div>
+
+      <div class="action-row">
+        <button class="pitcher-btn" id="saveBtn">저장</button>
+        <button class="pitcher-btn sub" id="cancelBtn">초기화</button>
       </div>
 
-      <p class="message" id="messageText">아직 저장된 내용이 없습니다.</p>
+      <p id="modeText" class="page-note"></p>
+    </div>
 
-      <div class="list-box">
-        <div class="list-title">등록된 투수 목록</div>
-        <div id="pitcherListBox"></div>
-      </div>
-    </main>
+    <div class="pitcher-card">
+      <h2>검색</h2>
+      <input id="searchInput" class="pitcher-input" placeholder="닉네임 검색" oninput="searchPitchers()">
+    </div>
+
+    <div class="pitcher-card">
+      <h2>목록</h2>
+      <div id="list"></div>
+    </div>
   </div>
 
   <script type="module">
-    import { db, auth } from "./firebase-config.js";
+    import { db } from "./firebase-config.js";
     import {
       collection,
       addDoc,
-      query,
-      orderBy,
-      onSnapshot,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-    import {
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const nicknameEl = document.getElementById("nickname");
-    const speedEl = document.getElementById("speed");
-    const throwBatEl = document.getElementById("throwBat");
-    const controlEl = document.getElementById("control");
-    const staminaEl = document.getElementById("stamina");
-    const pitchTypesEl = document.getElementById("pitchTypes");
-    const saveBtn = document.getElementById("saveBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const messageText = document.getElementById("messageText");
-    const pitcherListBox = document.getElementById("pitcherListBox");
+    const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+    const isStaff = currentUser && (
+      currentUser.role === "super_admin" ||
+      currentUser.role === "admin" ||
+      currentUser.role === "scorer"
+    );
 
-    function resetForm() {
-      nicknameEl.value = "";
-      speedEl.value = "";
-      throwBatEl.value = "";
-      controlEl.value = "";
-      staminaEl.value = "";
-      pitchTypesEl.value = "";
+    if (!isStaff) {
+      alert("접근 권한이 없습니다.");
+      location.href = "index.html";
     }
 
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
+    const teamColors = {
+      "KRA": "#c40000",
+      "RMS": "#c9982c",
+      "NDG": "#120725",
+      "CPX": "#1B65BA",
+      "CLP": "#0cb218",
+      "SLU": "#850000",
+      "IH": "#FEC804",
+      "ODV": "#FF6A00"
+    };
+
+    const teamLogos = {
+      "KRA": "logos/크라켄즈.png",
+      "RMS": "logos/마린스.jpg",
+      "NDG": "logos/드래곤즈.png",
+      "CPX": "logos/청피.png",
+      "CLP": "logos/플랜츠.png",
+      "SLU": "logos/슬러거즈.png",
+      "IH": "logos/호네츠.png",
+      "ODV": "logos/오버드라이브.png"
+    };
+
+    let pitchers = [];
+    let editId = null;
+    let selectedPitches = [];
+
+    const nameInput = document.getElementById("name");
+    const teamInput = document.getElementById("team");
+    const angleInput = document.getElementById("angle");
+    const pitchTypeInput = document.getElementById("pitchType");
+    const pitchSpeedInput = document.getElementById("pitchSpeed");
+    const addPitchBtn = document.getElementById("addPitchBtn");
+    const pitchList = document.getElementById("pitchList");
+    const modeText = document.getElementById("modeText");
+    const saveBtn = document.getElementById("saveBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const list = document.getElementById("list");
+
+    function renderPitchList() {
+      pitchList.innerHTML = "";
+
+      if (selectedPitches.length === 0) {
+        pitchList.innerHTML = `<span class="page-note">추가된 구종이 없습니다.</span>`;
+        return;
+      }
+
+      selectedPitches.forEach((pitch, index) => {
+        const chip = document.createElement("span");
+        chip.className = "pitch-chip";
+        chip.innerHTML = `
+          ${pitch.name}(${pitch.speed})
+          <button type="button" class="chip-remove" onclick="removePitchAt(${index})">✕</button>
+        `;
+        pitchList.appendChild(chip);
+      });
+    }
+
+    window.removePitchAt = function(index) {
+      selectedPitches.splice(index, 1);
+      renderPitchList();
+    };
+
+    function resetForm() {
+      editId = null;
+      nameInput.value = "";
+      teamInput.value = "";
+      angleInput.value = "";
+      pitchTypeInput.value = "";
+      pitchSpeedInput.value = "";
+      selectedPitches = [];
+      renderPitchList();
+      modeText.textContent = "";
+      saveBtn.textContent = "저장";
+    }
+
+    function buildPitchText() {
+      return selectedPitches.map(p => `${p.name}(${p.speed})`).join(", ");
+    }
+
+    function buildPitchRaw() {
+      return selectedPitches.map(p => `${p.name}${p.speed}`).join(" ");
+    }
+
+    function parsePitchRaw(raw) {
+      const arr = String(raw || "").trim().split(" ").filter(Boolean);
+
+      return arr.map(item => {
+        const speed = item.match(/(20|30|40)$/)?.[1] || "";
+        const name = item.replace(/(20|30|40)$/, "").trim();
+        return { name, speed };
+      }).filter(v => v.name && v.speed);
+    }
+
+    function addPitch() {
+      const pitchType = pitchTypeInput.value.trim();
+      const pitchSpeed = pitchSpeedInput.value.trim();
+
+      if (!pitchType || !pitchSpeed) {
+        alert("구종과 구속 단계를 선택해주세요.");
+        return;
+      }
+
+      selectedPitches.push({
+        name: pitchType,
+        speed: pitchSpeed
+      });
+
+      pitchTypeInput.value = "";
+      pitchSpeedInput.value = "";
+      renderPitchList();
     }
 
     async function savePitcher() {
-      const nickname = nicknameEl.value.trim();
-      const speed = speedEl.value.trim();
-      const throwBat = throwBatEl.value.trim();
-      const control = controlEl.value.trim();
-      const stamina = staminaEl.value.trim();
-      const pitchTypes = pitchTypesEl.value
-        .split(",")
-        .map(v => v.trim())
-        .filter(Boolean);
+      const name = nameInput.value.trim();
+      const team = teamInput.value.trim();
+      const angle = angleInput.value.trim();
 
-      if (!nickname) {
-        messageText.textContent = "닉네임은 꼭 입력해야 해.";
+      if (!name || !team || !angle || selectedPitches.length === 0) {
+        alert("모든 값을 입력해주세요.");
         return;
       }
 
       try {
-        await addDoc(collection(db, "pitchers"), {
-          nickname,
-          speed,
-          throwBat,
-          control,
-          stamina,
-          pitchTypes,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        });
+        const pitchRaw = buildPitchRaw();
+        const pitchText = buildPitchText();
+        const text = `${name}(${angle}) - ${pitchText}`;
 
-        messageText.textContent = "투수 정보가 저장됐어.";
+        saveBtn.disabled = true;
+        saveBtn.textContent = editId ? "수정 중..." : "저장 중...";
+
+        if (editId) {
+          await updateDoc(doc(db, "pitchers", editId), {
+            name,
+            team,
+            angle,
+            pitchRaw,
+            text,
+            updatedAt: Date.now()
+          });
+          alert("수정 완료!");
+        } else {
+          await addDoc(collection(db, "pitchers"), {
+            name,
+            team,
+            angle,
+            pitchRaw,
+            text,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          });
+          alert("추가 완료!");
+        }
+
         resetForm();
       } catch (error) {
         console.error(error);
-        messageText.textContent = "저장 중 오류가 발생했어.";
+        alert("저장 중 오류가 발생했습니다.");
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "저장";
       }
     }
 
-    function renderList(snapshot) {
-      pitcherListBox.innerHTML = "";
+    function editPitcher(id) {
+      const target = pitchers.find(p => p.id === id);
+      if (!target) return;
 
-      if (snapshot.empty) {
-        pitcherListBox.innerHTML = `<div class="pitcher-meta">등록된 투수가 아직 없어.</div>`;
+      editId = id;
+      nameInput.value = target.name || "";
+      teamInput.value = target.team || "";
+      angleInput.value = target.angle || "";
+      selectedPitches = parsePitchRaw(target.pitchRaw || "");
+      renderPitchList();
+      modeText.textContent = `수정 중: ${target.name}`;
+      saveBtn.textContent = "수정 저장";
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function removePitcher(id) {
+      const target = pitchers.find(p => p.id === id);
+      if (!target) return;
+
+      if (!confirm(`${target.name} 투수 정보를 삭제할까요?`)) return;
+
+      try {
+        await deleteDoc(doc(db, "pitchers", id));
+        alert("삭제 완료!");
+        if (editId === id) resetForm();
+      } catch (error) {
+        console.error(error);
+        alert("삭제 중 오류가 발생했습니다.");
+      }
+    }
+
+    function renderPitchers(keyword = "") {
+      list.innerHTML = "";
+
+      if (pitchers.length === 0) {
+        list.innerHTML = `<div class="list-item"><p>등록된 투수 정보가 없습니다.</p></div>`;
         return;
       }
 
-      snapshot.forEach((docSnap) => {
-        const p = docSnap.data();
-        const name = escapeHtml(p.nickname || "-");
-        const speed = escapeHtml(p.speed || "-");
-        const throwBat = escapeHtml(p.throwBat || "-");
-        const pitches = Array.isArray(p.pitchTypes) ? p.pitchTypes.map(escapeHtml).join(", ") : "-";
+      const filtered = pitchers.filter(p =>
+        p.name.toLowerCase().includes(keyword.toLowerCase())
+      );
 
-        pitcherListBox.innerHTML += `
-          <div class="pitcher-item">
-            <div class="pitcher-name">${name}</div>
-            <div class="pitcher-meta">
-              구속: ${speed}<br>
-              투타: ${throwBat}<br>
-              구종: ${pitches}
-            </div>
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="list-item"><p>검색 결과가 없습니다.</p></div>`;
+        return;
+      }
+
+      const grouped = {};
+      filtered.forEach(p => {
+        if (!grouped[p.team]) grouped[p.team] = [];
+        grouped[p.team].push(p);
+      });
+
+      Object.keys(grouped).forEach(team => {
+        const color = teamColors[team] || "#999";
+        const logo = teamLogos[team] || "";
+
+        list.innerHTML += `
+          <div class="team-title" style="color:${color}">
+            ${logo ? `<img src="${logo}" class="team-logo" alt="${team} 로고">` : ""}
+            ${team}
           </div>
         `;
+
+        grouped[team].forEach(p => {
+          list.innerHTML += `
+            <div class="list-item" style="border-left:6px solid ${color}">
+              <p>${p.text}</p>
+              <div class="action-row">
+                <button class="pitcher-btn" onclick="window.editPitcher('${p.id}')">수정</button>
+                <button class="pitcher-btn delete" onclick="window.removePitcher('${p.id}')">삭제</button>
+              </div>
+            </div>
+          `;
+        });
       });
     }
 
-    saveBtn.addEventListener("click", savePitcher);
-    resetBtn.addEventListener("click", resetForm);
+    window.searchPitchers = function () {
+      const keyword = document.getElementById("searchInput").value.trim();
+      renderPitchers(keyword);
+    };
 
-    onAuthStateChanged(auth, async () => {
-      const q = query(collection(db, "pitchers"), orderBy("nickname"));
-      onSnapshot(q, renderList);
+    window.editPitcher = editPitcher;
+    window.removePitcher = removePitcher;
+
+    addPitchBtn.addEventListener("click", addPitch);
+    saveBtn.addEventListener("click", savePitcher);
+    cancelBtn.addEventListener("click", resetForm);
+
+    onSnapshot(collection(db, "pitchers"), (snapshot) => {
+      pitchers = [];
+      snapshot.forEach((docu) => {
+        pitchers.push({
+          id: docu.id,
+          ...docu.data()
+        });
+      });
+      renderPitchers(document.getElementById("searchInput").value.trim());
+    }, (error) => {
+      console.error(error);
+      list.innerHTML = `<div class="list-item"><p>투수 정보를 불러오지 못했습니다.</p></div>`;
     });
+
+    renderPitchList();
   </script>
 </body>
 </html>
