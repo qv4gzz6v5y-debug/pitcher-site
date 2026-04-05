@@ -163,7 +163,8 @@
   <div class="pitcher-wrap">
     <div class="pitcher-card">
       <h2>투수 정보 관리</h2>
-      
+      <p class="page-note">최고관리자 / 관리자 / 기록원만 수정할 수 있어.</p>
+
       <input id="name" class="pitcher-input" placeholder="닉네임">
 
       <select id="team" class="pitcher-select">
@@ -216,7 +217,7 @@
         </div>
 
         <div>
-          <label for="pitchSpeed" class="page-note">구속</label>
+          <label for="pitchSpeed" class="page-note">구속 단계</label>
           <select id="pitchSpeed" class="pitcher-select">
             <option value="">선택</option>
             <option value="20">20</option>
@@ -270,7 +271,7 @@
     );
 
     if (!isStaff) {
-      alert("접근 권한이 없습니다.");
+      alert("접근 권한이 없어.");
       location.href = "index.html";
     }
 
@@ -316,7 +317,7 @@
       pitchList.innerHTML = "";
 
       if (selectedPitches.length === 0) {
-        pitchList.innerHTML = `<span class="page-note">추가된 구종이 없습니다.</span>`;
+        pitchList.innerHTML = `<span class="page-note">추가된 구종이 없어.</span>`;
         return;
       }
 
@@ -372,7 +373,7 @@
       const pitchSpeed = pitchSpeedInput.value.trim();
 
       if (!pitchType || !pitchSpeed) {
-        alert("구종과 구속 단계를 선택해주세요.");
+        alert("구종과 구속 단계를 선택해줘.");
         return;
       }
 
@@ -392,7 +393,7 @@
       const angle = angleInput.value.trim();
 
       if (!name || !team || !angle || selectedPitches.length === 0) {
-        alert("모든 값을 입력해주세요.");
+        alert("모든 값을 입력해줘.");
         return;
       }
 
@@ -430,7 +431,7 @@
         resetForm();
       } catch (error) {
         console.error(error);
-        alert("저장 중 오류가 발생했습니다.");
+        alert("저장 중 오류가 발생했어.");
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = "저장";
@@ -457,7 +458,7 @@
       const target = pitchers.find(p => p.id === id);
       if (!target) return;
 
-      if (!confirm(`${target.name} 투수 정보를 삭제할까요?`)) return;
+      if (!confirm(`${target.name} 투수 정보를 삭제할까?`)) return;
 
       try {
         await deleteDoc(doc(db, "pitchers", id));
@@ -465,7 +466,7 @@
         if (editId === id) resetForm();
       } catch (error) {
         console.error(error);
-        alert("삭제 중 오류가 발생했습니다.");
+        alert("삭제 중 오류가 발생했어.");
       }
     }
 
@@ -473,7 +474,7 @@
       list.innerHTML = "";
 
       if (pitchers.length === 0) {
-        list.innerHTML = `<div class="list-item"><p>등록된 투수 정보가 없습니다.</p></div>`;
+        list.innerHTML = `<div class="list-item"><p>등록된 투수 정보가 없어.</p></div>`;
         return;
       }
 
@@ -482,7 +483,7 @@
       );
 
       if (filtered.length === 0) {
-        list.innerHTML = `<div class="list-item"><p>검색 결과가 없습니다.</p></div>`;
+        list.innerHTML = `<div class="list-item"><p>검색 결과가 없어.</p></div>`;
         return;
       }
 
@@ -540,7 +541,7 @@
       renderPitchers(document.getElementById("searchInput").value.trim());
     }, (error) => {
       console.error(error);
-      list.innerHTML = `<div class="list-item"><p>투수 정보를 불러오지 못했습니다.</p></div>`;
+      list.innerHTML = `<div class="list-item"><p>투수 정보를 불러오지 못했어.</p></div>`;
     });
 
     renderPitchList();

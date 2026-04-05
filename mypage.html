@@ -203,6 +203,7 @@
 
     <div class="mypage-card">
       <div class="card-title">마이페이지</div>
+      <p class="mypage-note">내 계정 정보와 팀 등록 정보를 확인할 수 있습니다.</p>
 
       <div class="info-grid">
         <div class="info-label">마인크래프트 닉네임</div>
@@ -216,6 +217,9 @@
 
         <div class="info-label">승인 상태</div>
         <div class="info-value" id="approvedView">-</div>
+
+        <div class="info-label">로스터 이름</div>
+        <div class="info-value" id="rosterNickView">-</div>
 
         <div class="info-label">등번호</div>
         <div class="info-value" id="backNumberView">-</div>
@@ -286,7 +290,7 @@
     const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
 
     if (!currentUser || !currentUser.id) {
-      alert("로그인이 필요합니다.");
+      alert("로그인이 필요해.");
       location.href = "login.html";
     }
 

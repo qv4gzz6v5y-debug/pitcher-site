@@ -191,6 +191,7 @@
 
     <div class="sheet-card">
       <div class="card-title">기록지 관리</div>
+      <p class="sheet-note">날짜가 같은 라인업을 자동으로 불러와서 타자 기록표를 채워줘.</p>
     </div>
 
     <div class="sheet-card">
@@ -204,12 +205,12 @@
 
         <div>
           <label for="gameTime">경기 시간</label>
-          <input id="gameTime" class="sheet-input">
+          <input id="gameTime" class="sheet-input" placeholder="예: 20시">
         </div>
 
         <div>
           <label for="opponent">상대팀</label>
-          <input id="opponent" class="sheet-input">
+          <input id="opponent" class="sheet-input" placeholder="예: 오버드라이브">
         </div>
 
         <div>
@@ -223,7 +224,7 @@
 
         <div>
           <label for="finalScore">최종 스코어</label>
-          <input id="finalScore" class="sheet-input">
+          <input id="finalScore" class="sheet-input" placeholder="예: 5:2">
         </div>
 
         <div>
@@ -239,8 +240,8 @@
 
       <div class="section-title">이닝 점수</div>
       <div class="inning-actions">
-        <button type="button" id="addInningBtn" class="sheet-btn sub">이닝 추가</button>
-        <button type="button" id="removeInningBtn" class="sheet-btn sub">이닝 삭제</button>
+        <button type="button" id="addInningBtn" class="sheet-btn sub">연장 이닝 추가</button>
+        <button type="button" id="removeInningBtn" class="sheet-btn sub">마지막 이닝 삭제</button>
       </div>
       <div class="sheet-table-wrap">
         <table class="sheet-table">
@@ -266,7 +267,7 @@
               <th>타점</th>
               <th>득점</th>
               <th>삼진</th>
-              <th>교체</th>
+              <th>기능</th>
             </tr>
           </thead>
           <tbody id="battersBody"></tbody>
@@ -291,7 +292,7 @@
               <th>탈삼진</th>
               <th>사사구</th>
               <th>ERA</th>
-              <th>교체</th>
+              <th>기능</th>
             </tr>
           </thead>
           <tbody id="pitchersBody"></tbody>
@@ -334,7 +335,7 @@
     );
 
     if (!isStaff) {
-      alert("접근 권한이 없습니다.");
+      alert("접근 권한이 없어.");
       location.href = "index.html";
     }
 
@@ -464,7 +465,7 @@
         <td><input id="b_order_${rowId}" class="cell-input" value="${data.order ?? ""}"></td>
         <td><input id="b_name_${rowId}" class="cell-input" value="${data.name ?? ""}"></td>
         <td><input id="b_pos_${rowId}" class="cell-input" value="${data.position ?? ""}"></td>
-        <td><input id="b_record_${rowId}" class="cell-input" value="${data.record ?? ""}"></td>
+        <td><input id="b_record_${rowId}" class="cell-input" placeholder="예: 안타 삼진 2루타(1타점)" value="${data.record ?? ""}"></td>
         <td class="stat-cell" id="b_ab_${rowId}">0</td>
         <td class="stat-cell" id="b_h_${rowId}">0</td>
         <td class="stat-cell" id="b_2b_${rowId}">0</td>
@@ -474,7 +475,7 @@
         <td class="stat-cell" id="b_r_${rowId}">0</td>
         <td class="stat-cell" id="b_so_${rowId}">0</td>
         <td>
-          <button type="button" class="sheet-btn small sub" onclick="window.addSubRow(${rowId})">추가</button>
+          <button type="button" class="sheet-btn small sub" onclick="window.addSubRow(${rowId})">교체 추가</button>
           <button type="button" class="sheet-btn small delete" onclick="window.removeBatterRow(${rowId})">삭제</button>
         </td>
       `;
@@ -496,8 +497,8 @@
 
       row.innerHTML = `
         <td><input id="p_name_${rowId}" class="cell-input" value="${data.name ?? ""}"></td>
-        <td><input id="p_decision_${rowId}" class="cell-input" value="${data.decision ?? ""}"></td>
-        <td><input id="p_inning_${rowId}" class="cell-input" value="${data.inning ?? ""}"></td>
+        <td><input id="p_decision_${rowId}" class="cell-input" placeholder="승/패/세" value="${data.decision ?? ""}"></td>
+        <td><input id="p_inning_${rowId}" class="cell-input" placeholder="예: 6, 1.2" value="${data.inning ?? ""}"></td>
         <td><input id="p_runs_${rowId}" class="cell-input" value="${data.runs ?? ""}"></td>
         <td><input id="p_er_${rowId}" class="cell-input" value="${data.er ?? ""}"></td>
         <td><input id="p_hits_${rowId}" class="cell-input" value="${data.hits ?? ""}"></td>
@@ -654,7 +655,7 @@
       sheetList.innerHTML = "";
 
       if (sheets.length === 0) {
-        sheetList.innerHTML = `<p class="empty-text">아직 저장된 기록지가 없습니다.</p>`;
+        sheetList.innerHTML = `<p class="empty-text">아직 저장된 기록지가 없어.</p>`;
         return;
       }
 
@@ -814,7 +815,7 @@
       };
 
       if (!data.gameDate || !data.opponent || !data.finalScore || !data.gameResult) {
-        alert("경기 날짜, 상대팀, 최종 스코어, 결과는 꼭 입력해주세요.");
+        alert("경기 날짜, 상대팀, 최종 스코어, 결과는 꼭 입력해줘.");
         return;
       }
 
@@ -838,7 +839,7 @@
         resetForm();
       } catch (error) {
         console.error(error);
-        alert("기록지 저장 중 오류가 발생했습니다.");
+        alert("기록지 저장 중 오류가 발생했어.");
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = "저장";
@@ -907,7 +908,7 @@
     }
 
     async function deleteSheet(id) {
-      const ok = confirm("이 기록지를 삭제할까요?");
+      const ok = confirm("이 기록지를 삭제할까?");
       if (!ok) return;
 
       try {
@@ -917,7 +918,7 @@
         if (currentEditId === id) resetForm();
       } catch (error) {
         console.error(error);
-        alert("기록지 삭제 중 오류가 발생했습니다.");
+        alert("기록지 삭제 중 오류가 발생했어.");
       }
     }
 
@@ -999,7 +1000,7 @@
       renderSheets();
     }, (error) => {
       console.error(error);
-      sheetList.innerHTML = `<p class="empty-text">기록지를 불러오지 못했습니다.</p>`;
+      sheetList.innerHTML = `<p class="empty-text">기록지를 불러오지 못했어.</p>`;
     });
 
     loadLineupToSheet(gameDateInput.value);

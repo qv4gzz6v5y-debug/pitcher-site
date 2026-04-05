@@ -187,7 +187,7 @@
       rosterGrid.innerHTML = "";
 
       if (users.length === 0) {
-        rosterInfo.textContent = "승인된 로스터가 아직 없습니다.";
+        rosterInfo.textContent = "승인된 로스터가 아직 없어.";
         rosterGrid.innerHTML = `
           <div class="empty-box">
             아직 등록된 선수가 없습니다.
@@ -241,7 +241,7 @@
       },
       (error) => {
         console.error("로스터 불러오기 오류:", error);
-        rosterInfo.textContent = "로스터를 불러오지 못했습니다.";
+        rosterInfo.textContent = "로스터를 불러오지 못했어.";
         rosterGrid.innerHTML = `
           <div class="empty-box">
             오류: ${error.message}

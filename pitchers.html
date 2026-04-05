@@ -5,78 +5,141 @@
   <title>투수 정보</title>
   <link rel="stylesheet" href="styles.css">
   <style>
+    .wrap {
+      padding-top: 26px;
+    }
+
+    .top-title {
+      background: #ffffff;
+      padding: 18px 0 22px;
+      border-bottom: 1px solid #bdbdbd;
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.04);
+    }
+
+    .top-title h1 {
+      font-size: 56px;
+    }
+
     .pitcher-wrap {
-      width: 95%;
-      max-width: 1100px;
-      margin: 34px auto;
+      width: min(1240px, calc(100% - 32px));
+      margin: 42px auto 56px;
     }
 
-    .pitcher-card {
-      background: white;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-      margin-bottom: 18px;
+    .pitcher-hero {
+      max-width: 980px;
+      margin: 0 auto 24px;
+      text-align: center;
+      background: #f8f8f8;
+      border: 1px solid #e2e2e2;
+      border-radius: 30px;
+      padding: 44px 40px 34px;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.02);
     }
 
-    .pitcher-card h2 {
-      margin-top: 0;
-      margin-bottom: 14px;
+    .pitcher-hero h2 {
+      margin: 0;
+      font-size: 64px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      text-align: center;
+    }
+
+    .pitcher-hero .page-note {
+      max-width: 720px;
+      margin: 18px auto 0;
+      font-size: 19px;
+    }
+
+    .search-shell,
+    .result-shell {
+      max-width: 980px;
+      margin: 0 auto;
+      background: #f8f8f8;
+      border: 1px solid #e2e2e2;
+      border-radius: 26px;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.02);
+    }
+
+    .search-shell {
+      overflow: visible;
+    }
+
+    .search-head,
+    .result-head {
+      padding: 28px 30px 18px;
+      border-bottom: 1px solid #e4e4e4;
+    }
+
+    .search-head h3,
+    .result-head h3 {
+      margin: 0;
       font-size: 34px;
     }
 
-    .pitcher-input {
-      width: 100%;
-      box-sizing: border-box;
-      margin: 10px 0;
-      padding: 14px 16px;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      font-size: 18px;
-      background: #fff;
-    }
-
-    .team-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 18px;
-      margin-bottom: 10px;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .team-logo {
-      width: 34px;
-      height: 34px;
-      object-fit: contain;
-      border-radius: 50%;
-      background: white;
-    }
-
-    .list-item {
-      background: #f8f8f8;
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 10px;
-      text-align: left;
-    }
-
-    .list-item p {
-      margin: 0;
-      font-size: 18px;
+    .search-head p,
+    .result-head p {
+      margin: 10px 0 0;
+      color: #666;
+      font-size: 17px;
       line-height: 1.6;
     }
 
+    .search-body {
+      position: relative;
+      padding: 26px 30px 30px;
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 110px;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .search-input-wrap {
+      position: relative;
+    }
+
+    .pitcher-input {
+      height: 58px;
+      font-size: 18px;
+      border-radius: 16px;
+      padding: 0 18px;
+      border: 1px solid #d0d0d0;
+    }
+
+    .pitcher-input:focus {
+      border-color: #111;
+      outline: none;
+    }
+
+    .pitcher-btn {
+      height: 58px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #3d434b 0%, #2d333a 100%);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .pitcher-btn:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
     .page-note {
+      margin-top: 14px;
       color: #666;
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1.6;
     }
 
     .staff-link {
       display: inline-block;
-      margin-top: 10px;
+      margin-top: 18px;
       text-decoration: none;
       color: #1b65ba;
       font-weight: 700;
@@ -86,10 +149,229 @@
       display: none !important;
     }
 
-    .empty-state {
+    .autocomplete-box {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid #d8d8d8;
+      border-radius: 18px;
+      box-shadow: 0 16px 32px rgba(0,0,0,0.10);
+      overflow: hidden;
+      z-index: 20;
+      display: none;
+    }
+
+    .autocomplete-item {
+      display: grid;
+      grid-template-columns: 20px minmax(0,1fr);
+      gap: 12px;
+      align-items: center;
+      padding: 15px 18px;
+      border-top: 1px solid #f0f0f0;
+      cursor: pointer;
+      background: #fff;
+    }
+
+    .autocomplete-item:first-child {
+      border-top: none;
+    }
+
+    .autocomplete-item:hover,
+    .autocomplete-item.active {
+      background: #f5f7fa;
+    }
+
+    .autocomplete-icon {
+      font-size: 16px;
+      color: #6e6e6e;
+      text-align: center;
+    }
+
+    .autocomplete-main {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111;
+      line-height: 1.35;
+    }
+
+    .autocomplete-sub {
+      margin-top: 3px;
+      font-size: 13px;
+      color: #777;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .result-shell {
+      margin-top: 18px;
+      display: none;
+      overflow: hidden;
+    }
+
+    .result-state {
+      padding: 24px 30px 32px;
       color: #777;
       font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .result-body {
+      padding: 26px 30px 34px;
+    }
+
+    .result-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .result-title {
+      font-size: 54px;
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin: 0;
+    }
+
+    .result-subtext {
+      margin-top: 10px;
+      color: #666;
+      font-size: 17px;
+      line-height: 1.5;
+    }
+
+    .result-team-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid #ddd;
+      font-size: 16px;
+      font-weight: 700;
+      color: #111;
+    }
+
+    .result-team-badge img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .highlight-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .stat-card,
+    .wide-card {
+      background: #fff;
+      border: 1px solid #d8d8d8;
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      min-height: 122px;
+    }
+
+    .wide-card {
+      min-height: unset;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #666;
+      letter-spacing: 0.03em;
+      margin-bottom: 12px;
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1.2;
+      color: #111;
+      word-break: keep-all;
+    }
+
+    .stat-desc {
+      margin-top: 8px;
+      color: #777;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 16px;
+    }
+
+    .wide-card.full {
+      grid-column: 1 / -1;
+    }
+
+    .pitch-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pitch-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #f4f6f8;
+      border: 1px solid #e1e4e8;
+      font-size: 15px;
+      font-weight: 700;
+      color: #111;
+    }
+
+    .empty-result {
+      background: #fff;
+      border: 1px solid #d8d8d8;
+      border-radius: 18px;
+      padding: 20px;
+      font-size: 16px;
+      color: #666;
       line-height: 1.7;
+    }
+
+    @media (max-width: 900px) {
+      .top-title h1 {
+        font-size: 42px;
+      }
+
+      .pitcher-hero h2,
+      .result-title {
+        font-size: 42px;
+      }
+
+      .search-row,
+      .highlight-grid,
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .result-body,
+      .search-body,
+      .search-head,
+      .result-head,
+      .pitcher-hero {
+        padding-left: 22px;
+        padding-right: 22px;
+      }
     }
   </style>
 </head>
@@ -99,40 +381,43 @@
       <h1>레이 마린스</h1>
       <a class="top-link" href="index.html">메인으로</a>
     </div>
-
-    <div class="menu">
-      <a href="roster.html">로스터</a>
-      <a href="pitchers.html">투수 정보</a>
-      <a href="lineup.html">라인업</a>
-      <a href="record.html">기록실</a>
-      <a href="scoresheet.html">기록지</a>
-      <a href="mypage.html">마이페이지</a>
-    </div>
   </div>
 
   <div class="pitcher-wrap">
-    <div class="pitcher-card">
+    <div class="pitcher-hero">
       <h2>투수 정보</h2>
-      <p class="page-note">투수 닉네임을 검색하면 아래 검색 결과 박스에 정보가 표시됩니다.</p>
-      <input
-        id="searchInput"
-        class="pitcher-input"
-        list="pitcherSuggestions"
-        placeholder="투수 닉네임 검색"
-        autocomplete="off"
-        oninput="searchPitchers()"
-      >
-      <datalist id="pitcherSuggestions"></datalist>
-      <a id="manageLink" class="staff-link hidden" href="pitchers-manage.html">투수 정보 관리 페이지로 이동</a>
+      <p class="page-note">투수 닉네임을 검색하면 해당 투수의 정보를 한눈에 확인할 수 있습니다.</p>
     </div>
 
-    <div class="pitcher-card">
-      <h2>검색 결과</h2>
-      <div id="list">
-        <div class="list-item empty-state">
-          <p>아직 검색한 내용이 없습니다. 위 검색창에 투수 닉네임을 입력해 주세요.</p>
-        </div>
+    <div class="search-shell">
+      <div class="search-head">
+        <h3>투수 닉네임 검색</h3>
+        <p>네이버 검색처럼 추천 목록에서 선택하거나, 닉네임을 직접 입력한 뒤 엔터를 눌러 검색할 수 있습니다.</p>
       </div>
+      <div class="search-body">
+        <div class="search-row">
+          <div class="search-input-wrap">
+            <input
+              id="searchInput"
+              class="pitcher-input"
+              placeholder="투수 닉네임을 입력하세요"
+              autocomplete="off"
+            >
+            <div id="autocompleteBox" class="autocomplete-box"></div>
+          </div>
+          <button id="searchBtn" class="pitcher-btn" type="button">검색</button>
+        </div>
+        <p class="page-note" id="guideText">아직 검색하지 않았습니다. 검색어를 입력하면 아래에 추천 목록이 나타납니다.</p>
+        <a id="manageLink" class="staff-link hidden" href="pitchers-manage.html">투수 정보 관리 페이지로 이동</a>
+      </div>
+    </div>
+
+    <div id="resultShell" class="result-shell">
+      <div class="result-head">
+        <h3>검색 결과</h3>
+        <p id="resultSummary">선택한 투수의 상세 정보입니다.</p>
+      </div>
+      <div id="resultBody" class="result-body"></div>
     </div>
   </div>
 
@@ -145,9 +430,13 @@
 
     const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
     const manageLink = document.getElementById("manageLink");
-    const list = document.getElementById("list");
     const searchInput = document.getElementById("searchInput");
-    const suggestionList = document.getElementById("pitcherSuggestions");
+    const searchBtn = document.getElementById("searchBtn");
+    const autocompleteBox = document.getElementById("autocompleteBox");
+    const guideText = document.getElementById("guideText");
+    const resultShell = document.getElementById("resultShell");
+    const resultBody = document.getElementById("resultBody");
+    const resultSummary = document.getElementById("resultSummary");
 
     const teamColors = {
       "KRA": "#c40000",
@@ -172,6 +461,8 @@
     };
 
     let pitchers = [];
+    let suggestions = [];
+    let activeSuggestionIndex = -1;
 
     function isStaff(user) {
       if (!user) return false;
@@ -182,105 +473,256 @@
       manageLink.classList.remove("hidden");
     }
 
+    function normalizePitcher(raw) {
+      const pitchText = (raw.text || "").trim();
+      const pitchTypes = Array.isArray(raw.pitchTypes)
+        ? raw.pitchTypes
+        : pitchText.includes("-")
+          ? pitchText.split("-").slice(1).join("-").split(",").map(v => v.trim()).filter(Boolean)
+          : [];
+
+      const speed = raw.speed || raw.velocity || raw.pitchSpeed || "-";
+      const throwType = raw.throwBat || raw.hand || raw.angle || "-";
+      const control = raw.control || raw.command || "-";
+      const stamina = raw.stamina || raw.endurance || "-";
+      const summary = raw.text || [speed, throwType, pitchTypes.join(", ")].filter(Boolean).join(" · ");
+
+      return {
+        ...raw,
+        name: raw.name || raw.nickname || "이름 없음",
+        team: raw.team || "-",
+        speed,
+        throwType,
+        control,
+        stamina,
+        pitchTypes,
+        summary
+      };
+    }
+
     function escapeHtml(value = "") {
       return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
     }
 
-    function renderInitialState() {
-      list.innerHTML = `
-        <div class="list-item empty-state">
-          <p>아직 검색한 내용이 없습니다. 위 검색창에 투수 닉네임을 입력해 주세요.</p>
-        </div>
-      `;
+    function hideSuggestions() {
+      autocompleteBox.style.display = "none";
+      autocompleteBox.innerHTML = "";
+      activeSuggestionIndex = -1;
     }
 
-    function updateSuggestions() {
-      const names = [...new Set(
-        pitchers
-          .map(p => (p.name || "").trim())
-          .filter(Boolean)
-      )].sort((a, b) => a.localeCompare(b, 'ko'));
+    function renderSuggestions(items) {
+      suggestions = items.slice(0, 6);
+      activeSuggestionIndex = -1;
 
-      suggestionList.innerHTML = names
-        .map(name => `<option value="${escapeHtml(name)}"></option>`)
-        .join("");
-    }
-
-    function renderPitchers(keyword = "") {
-      const normalizedKeyword = keyword.trim().toLowerCase();
-      list.innerHTML = "";
-
-      if (pitchers.length === 0) {
-        list.innerHTML = `<div class="list-item"><p>등록된 투수 정보가 없습니다.</p></div>`;
+      if (!suggestions.length) {
+        hideSuggestions();
         return;
       }
 
-      if (!normalizedKeyword) {
-        renderInitialState();
-        return;
-      }
-
-      const filtered = pitchers.filter(p =>
-        (p.name || "").toLowerCase().includes(normalizedKeyword)
-      );
-
-      if (filtered.length === 0) {
-        list.innerHTML = `<div class="list-item"><p>검색 결과가 없습니다.</p></div>`;
-        return;
-      }
-
-      const grouped = {};
-      filtered.forEach(p => {
-        if (!grouped[p.team]) grouped[p.team] = [];
-        grouped[p.team].push(p);
-      });
-
-      Object.keys(grouped).forEach(team => {
-        const color = teamColors[team] || "#999";
-        const logo = teamLogos[team] || "";
-
-        list.innerHTML += `
-          <div class="team-title" style="color:${color}">
-            ${logo ? `<img src="${logo}" class="team-logo" alt="${team} 로고">` : ""}
-            ${escapeHtml(team)}
+      autocompleteBox.innerHTML = suggestions.map((p, index) => `
+        <div class="autocomplete-item" data-index="${index}">
+          <div class="autocomplete-icon">⌕</div>
+          <div>
+            <div class="autocomplete-main">${escapeHtml(p.name)}</div>
+            <div class="autocomplete-sub">${escapeHtml(p.team)} · ${escapeHtml(p.pitchTypes.join(', ') || p.summary || '투수 정보')}</div>
           </div>
-        `;
+        </div>
+      `).join("");
 
-        grouped[team].forEach(p => {
-          list.innerHTML += `
-            <div class="list-item" style="border-left:6px solid ${color}">
-              <p>${escapeHtml(p.text || "정보가 없습니다.")}</p>
-            </div>
-          `;
+      autocompleteBox.style.display = "block";
+
+      autocompleteBox.querySelectorAll('.autocomplete-item').forEach(item => {
+        item.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          const idx = Number(item.dataset.index);
+          chooseSuggestion(idx);
         });
       });
     }
 
-    window.searchPitchers = function () {
-      renderPitchers(searchInput.value);
-    };
+    function updateActiveSuggestion() {
+      autocompleteBox.querySelectorAll('.autocomplete-item').forEach((item, index) => {
+        item.classList.toggle('active', index === activeSuggestionIndex);
+      });
+    }
+
+    function chooseSuggestion(index) {
+      const pitcher = suggestions[index];
+      if (!pitcher) return;
+      searchInput.value = pitcher.name;
+      hideSuggestions();
+      renderPitcher(pitcher);
+    }
+
+    function buildSuggestions(keyword) {
+      if (!keyword) {
+        hideSuggestions();
+        return;
+      }
+
+      const lower = keyword.toLowerCase();
+      const matched = pitchers.filter(p => (p.name || '').toLowerCase().includes(lower));
+      renderSuggestions(matched);
+    }
+
+    function renderPitcher(p) {
+      const color = teamColors[p.team] || '#555';
+      const logo = teamLogos[p.team] || '';
+      const pitchListHtml = (p.pitchTypes && p.pitchTypes.length)
+        ? p.pitchTypes.map(v => `<span class="pitch-chip">${escapeHtml(v)}</span>`).join('')
+        : `<span class="pitch-chip">등록된 구종 없음</span>`;
+
+      resultSummary.textContent = `${p.name} 투수의 상세 정보입니다.`;
+      resultBody.innerHTML = `
+        <div class="result-top">
+          <div>
+            <h4 class="result-title">${escapeHtml(p.name)}</h4>
+            <div class="result-subtext">검색한 투수의 핵심 정보를 보기 쉽게 정리했습니다.</div>
+          </div>
+          <div class="result-team-badge" style="border-color:${color}; color:${color};">
+            ${logo ? `<img src="${logo}" alt="${escapeHtml(p.team)} 로고">` : ''}
+            <span>${escapeHtml(p.team)}</span>
+          </div>
+        </div>
+
+        <div class="highlight-grid">
+          <div class="stat-card">
+            <div class="stat-label">구속</div>
+            <div class="stat-value">${escapeHtml(p.speed)}</div>
+            <div class="stat-desc">현재 등록된 최고 구속 또는 대표 구속 정보</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">투구 유형</div>
+            <div class="stat-value">${escapeHtml(p.throwType)}</div>
+            <div class="stat-desc">팔각도 / 투타 정보 기준</div>
+          </div>
+        </div>
+
+        <div class="detail-grid">
+          <div class="wide-card full">
+            <div class="stat-label">구종</div>
+            <div class="pitch-chip-list">${pitchListHtml}</div>
+          </div>
+          <div class="wide-card">
+            <div class="stat-label">제구</div>
+            <div class="stat-value">${escapeHtml(p.control)}</div>
+          </div>
+          <div class="wide-card">
+            <div class="stat-label">스태미너</div>
+            <div class="stat-value">${escapeHtml(p.stamina)}</div>
+          </div>
+          <div class="wide-card">
+            <div class="stat-label">등록 내용</div>
+            <div class="stat-desc">${escapeHtml(p.summary || '추가 설명 없음')}</div>
+          </div>
+        </div>
+      `;
+      resultShell.style.display = 'block';
+    }
+
+    function renderEmptyResult(message) {
+      resultSummary.textContent = '검색 결과';
+      resultBody.innerHTML = `<div class="empty-result">${escapeHtml(message)}</div>`;
+      resultShell.style.display = 'block';
+    }
+
+    function searchPitchers() {
+      const keyword = searchInput.value.trim();
+      hideSuggestions();
+
+      if (!keyword) {
+        resultShell.style.display = 'none';
+        guideText.textContent = '아직 검색하지 않았습니다. 검색어를 입력하면 아래에 추천 목록이 나타납니다.';
+        return;
+      }
+
+      const exact = pitchers.find(p => (p.name || '').toLowerCase() === keyword.toLowerCase());
+      if (exact) {
+        guideText.textContent = `“${exact.name}” 검색 결과입니다.`;
+        renderPitcher(exact);
+        return;
+      }
+
+      const partial = pitchers.filter(p => (p.name || '').toLowerCase().includes(keyword.toLowerCase()));
+      if (partial.length === 1) {
+        guideText.textContent = `“${partial[0].name}”와 일치하는 결과를 표시했습니다.`;
+        renderPitcher(partial[0]);
+        searchInput.value = partial[0].name;
+        return;
+      }
+
+      if (partial.length > 1) {
+        guideText.textContent = '정확한 투수명을 선택해 주세요. 아래 추천 목록을 확인할 수 있습니다.';
+        renderSuggestions(partial);
+        renderEmptyResult('검색어와 비슷한 투수가 여러 명 있습니다. 추천 목록에서 원하는 투수를 선택해 주세요.');
+        return;
+      }
+
+      guideText.textContent = '검색 결과가 없습니다.';
+      renderEmptyResult('검색한 닉네임과 일치하는 투수 정보를 찾지 못했습니다.');
+    }
+
+    searchInput.addEventListener('input', () => {
+      const keyword = searchInput.value.trim();
+      buildSuggestions(keyword);
+      if (!keyword) {
+        resultShell.style.display = 'none';
+        guideText.textContent = '아직 검색하지 않았습니다. 검색어를 입력하면 아래에 추천 목록이 나타납니다.';
+      }
+    });
+
+    searchInput.addEventListener('keydown', (event) => {
+      if (autocompleteBox.style.display === 'block') {
+        if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          activeSuggestionIndex = (activeSuggestionIndex + 1) % suggestions.length;
+          updateActiveSuggestion();
+          return;
+        }
+        if (event.key === 'ArrowUp') {
+          event.preventDefault();
+          activeSuggestionIndex = activeSuggestionIndex <= 0 ? suggestions.length - 1 : activeSuggestionIndex - 1;
+          updateActiveSuggestion();
+          return;
+        }
+        if (event.key === 'Enter' && activeSuggestionIndex >= 0) {
+          event.preventDefault();
+          chooseSuggestion(activeSuggestionIndex);
+          return;
+        }
+      }
+
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        searchPitchers();
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('.search-input-wrap')) {
+        hideSuggestions();
+      }
+    });
+
+    searchBtn.addEventListener('click', searchPitchers);
 
     onSnapshot(
-      collection(db, "pitchers"),
+      collection(db, 'pitchers'),
       (snapshot) => {
         pitchers = [];
         snapshot.forEach((doc) => {
-          pitchers.push({
-            id: doc.id,
-            ...doc.data()
-          });
+          pitchers.push(normalizePitcher({ id: doc.id, ...doc.data() }));
         });
-        updateSuggestions();
-        renderInitialState();
+        pitchers.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
       },
       (error) => {
         console.error(error);
-        list.innerHTML = `<div class="list-item"><p>투수 정보를 불러오지 못했습니다.</p></div>`;
+        renderEmptyResult('투수 정보를 불러오지 못했습니다.');
       }
     );
   </script>
