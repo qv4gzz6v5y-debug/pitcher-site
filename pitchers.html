@@ -1,288 +1,373 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>투수 정보</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>레이 마린스 - 투수 정보</title>
   <style>
-    .pitcher-wrap {
-      width: 95%;
-      max-width: 1100px;
-      margin: 34px auto;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #f3f3f3;
+      color: #111111;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
     }
-
-    .pitcher-card {
-      background: white;
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 40px 32px;
+    }
+    .top-header {
+      border-bottom: 1px solid #222222;
+      padding-bottom: 24px;
+      margin-bottom: 48px;
+    }
+    .top-header h1 {
+      font-size: 48px;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+    }
+    .main-box {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #f8f8f8;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+    }
+    .main-box-title {
+      font-size: 56px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .main-box-desc {
+      margin-top: 16px;
+      font-size: 24px;
+      font-weight: 300;
+      color: #666666;
+      word-break: keep-all;
+    }
+    .search-box {
+      margin-top: 32px;
+      background: #ffffff;
+      border: 1px solid #d6d6d6;
       border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      padding: 24px;
+    }
+    .search-label {
+      display: block;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .search-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .search-input {
+      flex: 1;
+      height: 56px;
+      border: 1px solid #d6d6d6;
+      border-radius: 14px;
+      padding: 0 18px;
+      font-size: 18px;
+      background: #ffffff;
+      color: #111111;
+      outline: none;
+    }
+    .search-input:focus { border-color: #111111; }
+    .search-btn {
+      height: 56px;
+      padding: 0 24px;
+      border: 1px solid #111111;
+      border-radius: 14px;
+      background: #111111;
+      color: #ffffff;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+    .search-btn:hover { opacity: 0.9; }
+    .empty-text, .loading-text {
+      margin-top: 18px;
+      font-size: 16px;
+      color: #777777;
+    }
+    .loading-text { color: #555555; }
+    .result-box {
+      display: none;
+      margin-top: 20px;
+      background: #ffffff;
+      border: 1px solid #d6d6d6;
+      border-radius: 18px;
+      padding: 24px;
+    }
+    .result-name {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1.2;
       margin-bottom: 18px;
     }
-
-    .pitcher-card h2 {
-      margin-top: 0;
-      margin-bottom: 14px;
-      font-size: 34px;
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
     }
-
-    .pitcher-input {
-      width: 100%;
-      box-sizing: border-box;
-      margin: 10px 0;
-      padding: 14px 16px;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      font-size: 18px;
-      background: #fff;
-    }
-
-    .team-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 18px;
-      margin-bottom: 10px;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .team-logo {
-      width: 34px;
-      height: 34px;
-      object-fit: contain;
-      border-radius: 50%;
-      background: white;
-    }
-
-    .list-item {
-      background: #f8f8f8;
+    .info-card {
+      border: 1px solid #e2e2e2;
       border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 10px;
-      text-align: left;
+      background: #fafafa;
+      padding: 16px;
     }
-
-    .list-item p {
-      margin: 0;
-      font-size: 18px;
-      line-height: 1.6;
+    .info-label {
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: #7a7a7a;
+      text-transform: uppercase;
+      margin-bottom: 8px;
     }
-
-    .page-note {
-      color: #666;
-      font-size: 15px;
-      line-height: 1.6;
+    .info-value {
+      font-size: 22px;
+      font-weight: 600;
+      word-break: keep-all;
     }
-
-    .staff-link {
+    .back-link {
       display: inline-block;
-      margin-top: 10px;
+      margin-top: 28px;
       text-decoration: none;
-      color: #1b65ba;
-      font-weight: 700;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .empty-state {
-      color: #777;
+      color: #111111;
+      border-bottom: 1px solid #111111;
       font-size: 16px;
-      line-height: 1.7;
+    }
+    @media (max-width: 768px) {
+      .page { padding: 24px 16px; }
+      .top-header { margin-bottom: 32px; }
+      .top-header h1 { font-size: 36px; }
+      .main-box { padding: 24px; }
+      .main-box-title { font-size: 42px; }
+      .main-box-desc { font-size: 18px; }
+      .search-row { flex-direction: column; }
+      .search-input, .search-btn { width: 100%; }
+      .result-name { font-size: 28px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .info-value { font-size: 18px; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top-title">
+  <div class="page">
+    <header class="top-header">
       <h1>레이 마린스</h1>
-      <a class="top-link" href="index.html">메인으로</a>
-    </div>
+    </header>
 
-    <div class="menu">
-      <a href="roster.html">로스터</a>
-      <a href="pitchers.html">투수 정보</a>
-      <a href="lineup.html">라인업</a>
-      <a href="record.html">기록실</a>
-      <a href="scoresheet.html">기록지</a>
-      <a href="mypage.html">마이페이지</a>
-    </div>
-  </div>
+    <main>
+      <section class="main-box">
+        <h2 class="main-box-title">투수 정보</h2>
+        <p class="main-box-desc">투수 닉네임을 검색하면 해당 투수의 정보를 확인할 수 있습니다.</p>
 
-  <div class="pitcher-wrap">
-    <div class="pitcher-card">
-      <h2>투수 정보</h2>
-      <p class="page-note">투수 닉네임을 검색하면 아래 검색 결과 박스에 정보가 표시됩니다.</p>
-      <input
-        id="searchInput"
-        class="pitcher-input"
-        list="pitcherSuggestions"
-        placeholder="투수 닉네임 검색"
-        autocomplete="off"
-        oninput="searchPitchers()"
-      >
-      <datalist id="pitcherSuggestions"></datalist>
-      <a id="manageLink" class="staff-link hidden" href="pitchers-manage.html">투수 정보 관리 페이지로 이동</a>
-    </div>
+        <div class="search-box">
+          <label for="searchInput" class="search-label">투수 닉네임 검색</label>
 
-    <div class="pitcher-card">
-      <h2>검색 결과</h2>
-      <div id="list">
-        <div class="list-item empty-state">
-          <p>아직 검색한 내용이 없습니다. 위 검색창에 투수 닉네임을 입력해 주세요.</p>
+          <div class="search-row">
+            <input
+              type="text"
+              id="searchInput"
+              class="search-input"
+              placeholder="투수 닉네임을 입력하세요"
+              list="pitcherList"
+              autocomplete="off"
+            />
+            <datalist id="pitcherList"></datalist>
+            <button type="button" class="search-btn" id="searchBtn">검색</button>
+          </div>
+
+          <p id="loadingText" class="loading-text">투수 목록 불러오는 중...</p>
+          <p id="emptyText" class="empty-text" style="display:none;">
+            검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.
+          </p>
+
+          <div id="resultBox" class="result-box"></div>
         </div>
-      </div>
-    </div>
+
+        <a href="index.html" class="back-link">메인 페이지로 돌아가기</a>
+      </section>
+    </main>
   </div>
 
   <script type="module">
-    import { db } from "./firebase-config.js";
+    import { db, auth } from "./firebase-config.js";
     import {
       collection,
+      getDocs,
+      query,
+      where,
+      limit,
       onSnapshot
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import {
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
-    const manageLink = document.getElementById("manageLink");
-    const list = document.getElementById("list");
     const searchInput = document.getElementById("searchInput");
-    const suggestionList = document.getElementById("pitcherSuggestions");
+    const pitcherList = document.getElementById("pitcherList");
+    const searchBtn = document.getElementById("searchBtn");
+    const resultBox = document.getElementById("resultBox");
+    const emptyText = document.getElementById("emptyText");
+    const loadingText = document.getElementById("loadingText");
 
-    const teamColors = {
-      "KRA": "#c40000",
-      "RMS": "#c9982c",
-      "NDG": "#120725",
-      "CPX": "#1B65BA",
-      "CLP": "#0cb218",
-      "SLU": "#850000",
-      "IH": "#FEC804",
-      "ODV": "#FF6A00"
-    };
+    let pitcherNames = [];
 
-    const teamLogos = {
-      "KRA": "logos/크라켄즈.png",
-      "RMS": "logos/마린스.jpg",
-      "NDG": "logos/드래곤즈.png",
-      "CPX": "logos/청피.png",
-      "CLP": "logos/플랜츠.png",
-      "SLU": "logos/슬러거즈.png",
-      "IH": "logos/호네츠.png",
-      "ODV": "logos/오버드라이브.png"
-    };
-
-    let pitchers = [];
-
-    function isStaff(user) {
-      if (!user) return false;
-      return user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
     }
 
-    if (isStaff(currentUser)) {
-      manageLink.classList.remove("hidden");
+    function showGuide(message) {
+      resultBox.style.display = "none";
+      resultBox.innerHTML = "";
+      emptyText.style.display = "block";
+      emptyText.textContent = message;
     }
 
-    function escapeHtml(value = "") {
-      return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
+    function renderPitcher(pitcher) {
+      const name = escapeHtml(pitcher.nickname || pitcher.name || "-");
+      const speed = escapeHtml(pitcher.speed || pitcher.velocity || "-");
+      const type = escapeHtml(pitcher.throwBat || pitcher.type || "-");
+      const control = escapeHtml(pitcher.control || "-");
+      const stamina = escapeHtml(pitcher.stamina || "-");
 
-    function renderInitialState() {
-      list.innerHTML = `
-        <div class="list-item empty-state">
-          <p>아직 검색한 내용이 없습니다. 위 검색창에 투수 닉네임을 입력해 주세요.</p>
+      let pitchTypes = "-";
+      if (Array.isArray(pitcher.pitchTypes)) {
+        pitchTypes = pitcher.pitchTypes.map(v => escapeHtml(v)).join(", ");
+      } else if (typeof pitcher.pitchTypes === "string") {
+        pitchTypes = escapeHtml(pitcher.pitchTypes);
+      } else if (Array.isArray(pitcher.pitches)) {
+        pitchTypes = pitcher.pitches.map(v => escapeHtml(v)).join(", ");
+      }
+
+      resultBox.innerHTML = `
+        <h3 class="result-name">${name}</h3>
+        <div class="result-grid">
+          <div class="info-card">
+            <div class="info-label">구속</div>
+            <div class="info-value">${speed}</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">투타</div>
+            <div class="info-value">${type}</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">구종</div>
+            <div class="info-value">${pitchTypes}</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">제구</div>
+            <div class="info-value">${control}</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">스태미너</div>
+            <div class="info-value">${stamina}</div>
+          </div>
         </div>
       `;
+
+      resultBox.style.display = "block";
+      emptyText.style.display = "none";
     }
 
-    function updateSuggestions() {
-      const names = [...new Set(
-        pitchers
-          .map(p => (p.name || "").trim())
-          .filter(Boolean)
-      )].sort((a, b) => a.localeCompare(b, 'ko'));
+    function bindPitcherNamesRealtime() {
+      const q = query(collection(db, "pitchers"));
 
-      suggestionList.innerHTML = names
-        .map(name => `<option value="${escapeHtml(name)}"></option>`)
-        .join("");
-    }
+      onSnapshot(q, (snapshot) => {
+        pitcherNames = [];
+        pitcherList.innerHTML = "";
 
-    function renderPitchers(keyword = "") {
-      const normalizedKeyword = keyword.trim().toLowerCase();
-      list.innerHTML = "";
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const nickname = (data.nickname || data.name || "").trim();
 
-      if (pitchers.length === 0) {
-        list.innerHTML = `<div class="list-item"><p>등록된 투수 정보가 없습니다.</p></div>`;
-        return;
-      }
+          if (!nickname) return;
+          if (pitcherNames.includes(nickname)) return;
 
-      if (!normalizedKeyword) {
-        renderInitialState();
-        return;
-      }
+          pitcherNames.push(nickname);
 
-      const filtered = pitchers.filter(p =>
-        (p.name || "").toLowerCase().includes(normalizedKeyword)
-      );
-
-      if (filtered.length === 0) {
-        list.innerHTML = `<div class="list-item"><p>검색 결과가 없습니다.</p></div>`;
-        return;
-      }
-
-      const grouped = {};
-      filtered.forEach(p => {
-        if (!grouped[p.team]) grouped[p.team] = [];
-        grouped[p.team].push(p);
-      });
-
-      Object.keys(grouped).forEach(team => {
-        const color = teamColors[team] || "#999";
-        const logo = teamLogos[team] || "";
-
-        list.innerHTML += `
-          <div class="team-title" style="color:${color}">
-            ${logo ? `<img src="${logo}" class="team-logo" alt="${team} 로고">` : ""}
-            ${escapeHtml(team)}
-          </div>
-        `;
-
-        grouped[team].forEach(p => {
-          list.innerHTML += `
-            <div class="list-item" style="border-left:6px solid ${color}">
-              <p>${escapeHtml(p.text || "정보가 없습니다.")}</p>
-            </div>
-          `;
+          const option = document.createElement("option");
+          option.value = nickname;
+          pitcherList.appendChild(option);
         });
+
+        loadingText.style.display = "none";
+        emptyText.style.display = "block";
+      }, (error) => {
+        console.error("투수 목록 실시간 불러오기 실패:", error);
+        loadingText.style.display = "none";
+        emptyText.style.display = "block";
+        emptyText.textContent = "투수 목록을 불러오지 못했습니다.";
       });
     }
 
-    window.searchPitchers = function () {
-      renderPitchers(searchInput.value);
-    };
+    async function searchPitcher() {
+      const keyword = searchInput.value.trim();
 
-    onSnapshot(
-      collection(db, "pitchers"),
-      (snapshot) => {
-        pitchers = [];
-        snapshot.forEach((doc) => {
-          pitchers.push({
-            id: doc.id,
-            ...doc.data()
-          });
-        });
-        updateSuggestions();
-        renderInitialState();
-      },
-      (error) => {
-        console.error(error);
-        list.innerHTML = `<div class="list-item"><p>투수 정보를 불러오지 못했습니다.</p></div>`;
+      if (!keyword) {
+        showGuide("검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.");
+        return;
       }
-    );
+
+      try {
+        const q = query(
+          collection(db, "pitchers"),
+          where("nickname", "==", keyword),
+          limit(1)
+        );
+
+        const snapshot = await getDocs(q);
+
+        if (!snapshot.empty) {
+          const pitcher = snapshot.docs[0].data();
+          renderPitcher(pitcher);
+          return;
+        }
+
+        const fallbackQuery = query(
+          collection(db, "pitchers"),
+          where("name", "==", keyword),
+          limit(1)
+        );
+
+        const fallbackSnapshot = await getDocs(fallbackQuery);
+
+        if (!fallbackSnapshot.empty) {
+          const pitcher = fallbackSnapshot.docs[0].data();
+          renderPitcher(pitcher);
+        } else {
+          showGuide("검색한 투수 정보를 찾을 수 없습니다.");
+        }
+      } catch (error) {
+        console.error("투수 검색 실패:", error);
+        showGuide("검색 중 오류가 발생했습니다.");
+      }
+    }
+
+    searchBtn.addEventListener("click", searchPitcher);
+
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        searchPitcher();
+      }
+    });
+
+    onAuthStateChanged(auth, async () => {
+      bindPitcherNamesRealtime();
+    });
   </script>
 </body>
 </html>
