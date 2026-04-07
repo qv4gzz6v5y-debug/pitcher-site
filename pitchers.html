@@ -115,7 +115,7 @@
       height: 60px;
       border: 1px solid #d6d6d6;
       border-radius: 16px;
-      padding: 0 20px;
+      padding: 0 52px 0 20px;
       font-size: 20px;
       background: #ffffff;
       color: #111111;
@@ -348,6 +348,44 @@
       items.forEach((item, index) => item.classList.toggle("active", index === activeIndex));
     }
 
+    function getNameFromPitcher(data) {
+      return (
+        data.nickname ||
+        data.name ||
+        data.playerName ||
+        data.minecraftNickname ||
+        data.mcNickname ||
+        ""
+      ).trim();
+    }
+
+    function getHandednessFromPitcher(data) {
+      return (
+        data.handedness ||
+        data.throwType ||
+        data.throwHand ||
+        data.throwingHand ||
+        data.throws ||
+        data.armSide ||
+        "-"
+      );
+    }
+
+    function getPitchTypesFromPitcher(data) {
+      if (Array.isArray(data.pitchTypes) && data.pitchTypes.length) return data.pitchTypes;
+      if (Array.isArray(data.pitches) && data.pitches.length) return data.pitches;
+      if (typeof data.pitchTypes === "string" && data.pitchTypes.trim()) {
+        return data.pitchTypes.split(",").map(v => v.trim()).filter(Boolean);
+      }
+      if (typeof data.pitches === "string" && data.pitches.trim()) {
+        return data.pitches.split(",").map(v => v.trim()).filter(Boolean);
+      }
+      const fallback = [data.pitch1, data.pitch2, data.pitch3, data.pitch4, data.pitch5]
+        .map(v => String(v || "").trim())
+        .filter(Boolean);
+      return fallback;
+    }
+
     function getFilteredSuggestions(keyword) {
       const text = normalizeText(keyword);
       if (!text) return [];
@@ -358,7 +396,10 @@
       autocompleteBox.innerHTML = "";
       currentSuggestions = items;
       activeIndex = -1;
-      if (!items.length) { hideAutocomplete(); return; }
+      if (!items.length) {
+        hideAutocomplete();
+        return;
+      }
       items.forEach((name) => {
         const item = document.createElement("div");
         item.className = "autocomplete-item";
@@ -379,11 +420,12 @@
     }
 
     function renderPitcher(pitcher) {
-      const name = escapeHtml(pitcher.nickname || pitcher.name || "-");
-      const handedness = escapeHtml(pitcher.handedness || pitcher.throwType || pitcher.throwHand || "-");
-      const pitchTypes = Array.isArray(pitcher.pitchTypes)
-        ? pitcher.pitchTypes.map(v => escapeHtml(v)).join(", ")
-        : escapeHtml(pitcher.pitchTypes || "-");
+      const name = escapeHtml(getNameFromPitcher(pitcher) || "-");
+      const handedness = escapeHtml(getHandednessFromPitcher(pitcher));
+      const pitchTypesArray = getPitchTypesFromPitcher(pitcher);
+      const pitchTypes = pitchTypesArray.length
+        ? pitchTypesArray.map(v => escapeHtml(v)).join(", ")
+        : "등록된 구종 정보 없음";
       const logoPath = escapeHtml(getLogoPath(pitcher));
 
       resultBox.innerHTML = `
@@ -409,8 +451,9 @@
       try {
         const snapshot = await getDocs(collection(db, "pitchers"));
         pitcherDocs = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-        pitcherNames = [...new Set(pitcherDocs.map(data => (data.nickname || data.name || "").trim()).filter(Boolean))]
+        pitcherNames = [...new Set(pitcherDocs.map(getNameFromPitcher).filter(Boolean))]
           .sort((a, b) => a.localeCompare(b, "ko"));
+        console.log("불러온 투수 데이터:", pitcherDocs);
         console.log("자동완성 닉네임 목록:", pitcherNames);
         loadingText.style.display = "none";
         emptyText.style.display = "block";
@@ -429,7 +472,15 @@
         showGuide("검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.");
         return;
       }
-      const found = pitcherDocs.find((data) => normalizeText(data.nickname || data.name) === normalizeText(keyword));
+
+      const found = pitcherDocs.find((data) => {
+        const candidate = getNameFromPitcher(data);
+        return normalizeText(candidate) === normalizeText(keyword);
+      }) || pitcherDocs.find((data) => {
+        const candidate = getNameFromPitcher(data);
+        return normalizeText(candidate).includes(normalizeText(keyword));
+      });
+
       if (found) {
         renderPitcher(found);
       } else {

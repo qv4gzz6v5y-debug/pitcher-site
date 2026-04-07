@@ -259,9 +259,12 @@
 
         const payload = {
           nickname,
+          name: nickname,
           handedness,
           throwType: handedness,
+          throwHand: handedness,
           pitchTypes,
+          pitches: pitchTypes,
           logo: logo || DEFAULT_LOGO,
           logoUrl: logo || DEFAULT_LOGO,
           updatedAt: serverTimestamp()
@@ -302,7 +305,7 @@
       try {
         const snapshot = await getDocs(collection(db, "pitchers"));
         const docs = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-        docs.sort((a, b) => (a.nickname || "").localeCompare(b.nickname || "", "ko"));
+        docs.sort((a, b) => (a.nickname || a.name || "").localeCompare(b.nickname || b.name || "", "ko"));
 
         if (!docs.length) {
           pitcherListEl.innerHTML = `<div class="empty-list">등록된 투수가 아직 없어.</div>`;
@@ -311,9 +314,13 @@
 
         pitcherListEl.innerHTML = "";
         docs.forEach((data) => {
-          const nickname = escapeHtml(data.nickname || "-");
-          const handedness = escapeHtml(data.handedness || data.throwType || "-");
-          const pitchTypes = Array.isArray(data.pitchTypes) ? data.pitchTypes.map(v => escapeHtml(v)).join(", ") : "-";
+          const nickname = escapeHtml(data.nickname || data.name || "-");
+          const handedness = escapeHtml(data.handedness || data.throwType || data.throwHand || "-");
+          const pitchTypes = Array.isArray(data.pitchTypes)
+            ? data.pitchTypes.map(v => escapeHtml(v)).join(", ")
+            : Array.isArray(data.pitches)
+              ? data.pitches.map(v => escapeHtml(v)).join(", ")
+              : escapeHtml(data.pitchTypes || data.pitches || "-");
           const logo = escapeHtml(getLogoPath(data));
 
           const card = document.createElement("div");
