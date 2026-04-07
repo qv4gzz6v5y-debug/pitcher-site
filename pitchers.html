@@ -1,59 +1,517 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>투수 정보</title>
-<style>
-body { font-family: sans-serif; background:#f3f3f3; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>레이 마린스 - 투수 정보</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #f1f1f1;
+      color: #111111;
+      font-family: "Pretendard","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    }
+    .page {
+      max-width: 1320px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 34px 32px 60px;
+    }
+    .top-header {
+      background: #ffffff;
+      border: 1px solid #d8d8d8;
+      border-bottom: 2px solid #bdbdbd;
+      border-radius: 22px 22px 0 0;
+      padding: 34px 40px 26px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+    }
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .top-header h1 {
+      font-size: 56px;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      line-height: 1;
+    }
+    .home-link {
+      text-decoration: none;
+      color: #111111;
+      font-size: 22px;
+      font-weight: 400;
+    }
+    .home-link:hover { opacity: .65; }
 
-.top-header { border-bottom:1px solid #222; padding:20px; }
+    .content {
+      max-width: 980px;
+      margin: 48px auto 0;
+    }
+    .main-title {
+      text-align: center;
+      font-size: 64px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+    }
+    .main-desc {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 28px;
+      font-weight: 300;
+      color: #666666;
+      word-break: keep-all;
+    }
 
-.header-row {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
+    .search-panel {
+      margin-top: 36px;
+      background: #f9f9f9;
+      border: 1px solid #d8d8d8;
+      border-radius: 22px;
+      overflow: visible;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+    }
+    .search-inner {
+      padding: 28px 30px 24px;
+      position: relative;
+    }
+    .search-label {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: block;
+    }
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr 110px;
+      gap: 14px;
+      align-items: start;
+    }
+    .search-box-wrap {
+      position: relative;
+    }
+    .search-field {
+      width: 100%;
+      height: 62px;
+      border: 1px solid #d3d3d3;
+      border-radius: 16px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+    }
+    .search-icon {
+      font-size: 24px;
+      color: #555;
+      flex: 0 0 auto;
+    }
+    .search-input {
+      flex: 1;
+      border: 0;
+      outline: none;
+      background: transparent;
+      font-size: 28px;
+      color: #111;
+      min-width: 0;
+    }
+    .search-input::placeholder {
+      color: #a0a0a0;
+      font-size: 24px;
+    }
+    .dropdown-btn {
+      border: 0;
+      background: transparent;
+      font-size: 18px;
+      color: #666;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      flex: 0 0 auto;
+    }
+    .dropdown-btn:hover { background: #f2f2f2; }
+    .search-btn {
+      height: 62px;
+      border: 0;
+      border-radius: 16px;
+      background: #2d7f61;
+      color: #fff;
+      font-size: 25px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.12);
+    }
+    .search-btn:hover { filter: brightness(0.97); }
 
-.home-link,
-.home-link:visited,
-.home-link:active {
-  color:#111 !important;
-  text-decoration:none !important;
-  font-size:18px;
-}
+    .suggestions {
+      display: none;
+      position: absolute;
+      top: 72px;
+      left: 0;
+      width: calc(100% - 0px);
+      background: #fff;
+      border: 1px solid #d8d8d8;
+      border-radius: 18px;
+      box-shadow: 0 18px 32px rgba(0,0,0,0.12);
+      overflow: hidden;
+      z-index: 20;
+    }
+    .suggestions.show { display: block; }
+    .suggestion-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px;
+      border-top: 1px solid #efefef;
+      cursor: pointer;
+      font-size: 18px;
+      background: #fff;
+    }
+    .suggestion-item:first-child { border-top: 0; }
+    .suggestion-item:hover,
+    .suggestion-item.active {
+      background: #f5f7f8;
+    }
+    .suggestion-item .icon {
+      width: 22px;
+      text-align: center;
+      color: #666;
+      font-size: 18px;
+      flex: 0 0 auto;
+    }
+    .suggestion-item .name {
+      font-size: 18px;
+      font-weight: 500;
+      color: #222;
+    }
 
-.home-link:hover { opacity:0.6; }
+    .search-guide {
+      margin-top: 18px;
+      font-size: 16px;
+      color: #777;
+    }
 
-.main-title {
-  text-align:center;
-  font-size:40px;
-  margin-top:40px;
-}
+    .result-area {
+      border-top: 1px solid #e2e2e2;
+      padding: 26px 30px 30px;
+      background: #fbfbfb;
+      min-height: 260px;
+    }
+    .empty-result {
+      font-size: 18px;
+      color: #757575;
+    }
 
-.search-box {
-  margin:40px auto;
-  max-width:600px;
-  background:#fff;
-  padding:20px;
-  border-radius:12px;
-}
-</style>
+    .profile-head {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .team-logo {
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid #d7d7d7;
+      background: #fff;
+      flex: 0 0 auto;
+    }
+    .profile-name {
+      font-size: 54px;
+      font-weight: 700;
+      line-height: 1.05;
+    }
+    .profile-throw {
+      margin-top: 6px;
+      font-size: 22px;
+      color: #666;
+      font-weight: 500;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .info-card {
+      background: #fff;
+      border: 1px solid #dbdbdb;
+      border-radius: 16px;
+      padding: 18px 20px;
+      min-height: 110px;
+    }
+    .info-card.wide { grid-column: span 2; }
+    .label {
+      font-size: 16px;
+      font-weight: 700;
+      color: #555;
+      margin-bottom: 12px;
+    }
+    .value {
+      font-size: 22px;
+      font-weight: 600;
+      color: #111;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    @media (max-width: 900px) {
+      .top-header h1 { font-size: 42px; }
+      .home-link { font-size: 18px; }
+      .main-title { font-size: 48px; }
+      .main-desc { font-size: 22px; }
+      .search-row { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: 1fr; }
+      .info-card.wide { grid-column: span 1; }
+      .profile-name { font-size: 40px; }
+    }
+  </style>
 </head>
 <body>
+  <div class="page">
+    <header class="top-header">
+      <div class="header-row">
+        <h1>레이 마린스</h1>
+        <a href="index.html" class="home-link">메인으로</a>
+      </div>
+    </header>
 
-<header class="top-header">
-  <div class="header-row">
-    <h1>레이 마린스</h1>
-    <a href="index.html" class="home-link">메인으로</a>
+    <main class="content">
+      <h2 class="main-title">투수 정보</h2>
+      <p class="main-desc">투수 닉네임을 검색하면 해당 투수의 정보를 확인할 수 있습니다.</p>
+
+      <section class="search-panel">
+        <div class="search-inner">
+          <label class="search-label" for="searchInput">투수 닉네임 검색</label>
+
+          <div class="search-row">
+            <div class="search-box-wrap">
+              <div class="search-field">
+                <span class="search-icon">⌕</span>
+                <input id="searchInput" class="search-input" type="text" placeholder="투수 닉네임을 입력하세요" autocomplete="off" />
+                <button id="dropdownBtn" class="dropdown-btn" type="button" aria-label="자동완성 열기">▾</button>
+              </div>
+              <div id="suggestions" class="suggestions"></div>
+            </div>
+
+            <button id="searchBtn" class="search-btn" type="button">검색</button>
+          </div>
+
+          <p id="guideText" class="search-guide">검색창에 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.</p>
+        </div>
+
+        <div id="resultArea" class="result-area">
+          <p class="empty-result">아직 검색된 투수 정보가 없습니다.</p>
+        </div>
+      </section>
+    </main>
   </div>
-</header>
 
-<h2 class="main-title">투수 정보</h2>
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      getDocs,
+      query,
+      where,
+      limit,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-<div class="search-box">
-  <input type="text" placeholder="투수 검색" style="width:80%;height:40px;">
-  <button>검색</button>
-</div>
+    const searchInput = document.getElementById("searchInput");
+    const dropdownBtn = document.getElementById("dropdownBtn");
+    const suggestions = document.getElementById("suggestions");
+    const searchBtn = document.getElementById("searchBtn");
+    const resultArea = document.getElementById("resultArea");
+    const guideText = document.getElementById("guideText");
 
+    let pitcherNames = [];
+    let activeIndex = -1;
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function showEmpty(text) {
+      resultArea.innerHTML = `<p class="empty-result">${escapeHtml(text)}</p>`;
+    }
+
+    function logoPath(data) {
+      return data.logoUrl || data.logo || "logos/default.png";
+    }
+
+    function renderPitcher(data) {
+      const nickname = escapeHtml(data.nickname || data.name || "-");
+      const throwType = escapeHtml(data.throwType || data.throwHand || "-");
+      let pitchTypes = "-";
+      if (Array.isArray(data.pitchTypes)) {
+        pitchTypes = data.pitchTypes.map(escapeHtml).join(", ");
+      } else if (typeof data.pitchTypes === "string" && data.pitchTypes.trim()) {
+        pitchTypes = escapeHtml(data.pitchTypes);
+      }
+
+      resultArea.innerHTML = `
+        <div class="profile-head">
+          <img class="team-logo" src="${escapeHtml(logoPath(data))}" alt="팀 로고" onerror="this.src='logos/default.png'">
+          <div>
+            <div class="profile-name">${nickname}</div>
+            <div class="profile-throw">${throwType}</div>
+          </div>
+        </div>
+
+        <div class="cards">
+          <div class="info-card wide">
+            <div class="label">구종</div>
+            <div class="value">${pitchTypes}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function searchPitcher() {
+      const keyword = searchInput.value.trim();
+
+      if (!keyword) {
+        showEmpty("아직 검색된 투수 정보가 없습니다.");
+        return;
+      }
+
+      try {
+        const q1 = query(collection(db, "pitchers"), where("nickname", "==", keyword), limit(1));
+        const s1 = await getDocs(q1);
+
+        if (!s1.empty) {
+          renderPitcher(s1.docs[0].data());
+          closeSuggestions();
+          return;
+        }
+
+        const q2 = query(collection(db, "pitchers"), where("name", "==", keyword), limit(1));
+        const s2 = await getDocs(q2);
+
+        if (!s2.empty) {
+          renderPitcher(s2.docs[0].data());
+        } else {
+          showEmpty("검색한 투수 정보를 찾을 수 없습니다.");
+        }
+      } catch (error) {
+        console.error(error);
+        showEmpty("투수 정보를 불러오지 못했습니다.");
+      }
+      closeSuggestions();
+    }
+
+    function filteredNames() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      if (!keyword) return pitcherNames.slice(0, 6);
+      return pitcherNames.filter(name => name.toLowerCase().includes(keyword)).slice(0, 6);
+    }
+
+    function renderSuggestions(openAll = false) {
+      const list = openAll && !searchInput.value.trim() ? pitcherNames.slice(0, 6) : filteredNames();
+
+      if (!list.length) {
+        suggestions.innerHTML = "";
+        suggestions.classList.remove("show");
+        activeIndex = -1;
+        return;
+      }
+
+      suggestions.innerHTML = list.map((name, index) => `
+        <div class="suggestion-item ${index === activeIndex ? "active" : ""}" data-name="${escapeHtml(name)}">
+          <span class="icon">⌕</span>
+          <span class="name">${escapeHtml(name)}</span>
+        </div>
+      `).join("");
+
+      suggestions.classList.add("show");
+    }
+
+    function closeSuggestions() {
+      suggestions.classList.remove("show");
+      activeIndex = -1;
+    }
+
+    function pickSuggestion(name) {
+      searchInput.value = name;
+      closeSuggestions();
+      searchPitcher();
+    }
+
+    function bindRealtimeNames() {
+      const q = query(collection(db, "pitchers"));
+      onSnapshot(q, snapshot => {
+        const names = [];
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          const nickname = (data.nickname || data.name || "").trim();
+          if (nickname && !names.includes(nickname)) names.push(nickname);
+        });
+        pitcherNames = names.sort((a, b) => a.localeCompare(b, "ko"));
+      }, error => {
+        console.error(error);
+      });
+    }
+
+    searchInput.addEventListener("input", () => {
+      activeIndex = -1;
+      renderSuggestions(false);
+    });
+
+    searchInput.addEventListener("focus", () => {
+      renderSuggestions(false);
+    });
+
+    searchInput.addEventListener("keydown", e => {
+      const items = [...suggestions.querySelectorAll(".suggestion-item")];
+
+      if (e.key === "ArrowDown" && items.length) {
+        e.preventDefault();
+        activeIndex = Math.min(activeIndex + 1, items.length - 1);
+        renderSuggestions(false);
+      } else if (e.key === "ArrowUp" && items.length) {
+        e.preventDefault();
+        activeIndex = Math.max(activeIndex - 1, 0);
+        renderSuggestions(false);
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (items.length && activeIndex >= 0) {
+          const name = items[activeIndex].dataset.name;
+          pickSuggestion(name);
+        } else {
+          searchPitcher();
+        }
+      } else if (e.key === "Escape") {
+        closeSuggestions();
+      }
+    });
+
+    dropdownBtn.addEventListener("click", () => {
+      const opened = suggestions.classList.contains("show");
+      if (opened) closeSuggestions();
+      else renderSuggestions(true);
+    });
+
+    suggestions.addEventListener("mousedown", e => {
+      const item = e.target.closest(".suggestion-item");
+      if (!item) return;
+      pickSuggestion(item.dataset.name);
+    });
+
+    document.addEventListener("click", e => {
+      if (!e.target.closest(".search-box-wrap")) closeSuggestions();
+    });
+
+    searchBtn.addEventListener("click", searchPitcher);
+
+    bindRealtimeNames();
+  </script>
 </body>
 </html>

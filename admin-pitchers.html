@@ -1,10 +1,349 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>관리자</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>레이 마린스 - 투수 정보 관리</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #f1f1f1;
+      color: #111;
+      font-family: "Pretendard","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    }
+    .page {
+      max-width: 1320px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 34px 32px 60px;
+    }
+    .top-header {
+      background: #fff;
+      border: 1px solid #d8d8d8;
+      border-bottom: 2px solid #bdbdbd;
+      border-radius: 22px 22px 0 0;
+      padding: 34px 40px 26px;
+    }
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .top-header h1 {
+      font-size: 56px;
+      font-weight: 300;
+      letter-spacing: .08em;
+      line-height: 1;
+    }
+    .home-link {
+      text-decoration: none;
+      color: #111;
+      font-size: 22px;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 48px auto 0;
+      background: #f9f9f9;
+      border: 1px solid #d8d8d8;
+      border-radius: 22px;
+      padding: 30px;
+    }
+    .title {
+      font-size: 54px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .desc {
+      margin-top: 14px;
+      font-size: 22px;
+      color: #666;
+      font-weight: 300;
+    }
+    .grid {
+      margin-top: 26px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .field {
+      background: #fff;
+      border: 1px solid #d9d9d9;
+      border-radius: 18px;
+      padding: 18px;
+    }
+    .field.full { grid-column: span 2; }
+    .field label {
+      display: block;
+      font-size: 16px;
+      font-weight: 700;
+      color: #555;
+      margin-bottom: 10px;
+    }
+    .field input, .field select {
+      width: 100%;
+      height: 56px;
+      border: 1px solid #d4d4d4;
+      border-radius: 14px;
+      padding: 0 16px;
+      font-size: 18px;
+      background: #fff;
+      outline: none;
+    }
+    .field input:focus, .field select:focus { border-color: #111; }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .btn {
+      height: 58px;
+      padding: 0 22px;
+      border-radius: 14px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 0;
+    }
+    .btn.primary {
+      background: #111;
+      color: #fff;
+    }
+    .btn.secondary {
+      background: #fff;
+      color: #111;
+      border: 1px solid #d4d4d4;
+    }
+    .message {
+      margin-top: 14px;
+      color: #666;
+      font-size: 16px;
+    }
+    .list-box {
+      margin-top: 24px;
+      background: #fff;
+      border: 1px solid #d8d8d8;
+      border-radius: 18px;
+      padding: 20px;
+    }
+    .list-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .item {
+      border: 1px solid #e6e6e6;
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin-top: 12px;
+      background: #fbfbfb;
+    }
+    .item:first-child { margin-top: 0; }
+    .item-name {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .thumb {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid #ddd;
+      object-fit: cover;
+      background: #fff;
+    }
+    .meta {
+      color: #666;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 900px) {
+      .top-header h1 { font-size: 42px; }
+      .title { font-size: 42px; }
+      .desc { font-size: 18px; }
+      .grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: span 1; }
+      .actions { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
-<h1>관리자 페이지</h1>
+  <div class="page">
+    <header class="top-header">
+      <div class="header-row">
+        <h1>레이 마린스</h1>
+        <a class="home-link" href="admin.html">관리자 홈</a>
+      </div>
+    </header>
+
+    <section class="wrap">
+      <h2 class="title">투수 정보 관리</h2>
+      <p class="desc">투수 닉네임, 좌투/우투, 구종과 로고를 저장하면 선수용 검색 페이지에 반영됩니다.</p>
+
+      <div class="grid">
+        <div class="field">
+          <label for="nickname">닉네임</label>
+          <input id="nickname" type="text" placeholder="예: 레이투수 1">
+        </div>
+
+        <div class="field">
+          <label for="throwType">투수 유형</label>
+          <select id="throwType">
+            <option value="">선택</option>
+            <option value="우투">우투</option>
+            <option value="좌투">좌투</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label for="pitchTypes">구종</label>
+          <input id="pitchTypes" type="text" placeholder="예: 포심, 슬라이더, 체인지업">
+        </div>
+
+        <div class="field full">
+          <label for="logoUrl">로고 이미지 경로 또는 URL</label>
+          <input id="logoUrl" type="text" placeholder="예: logos/rms.png">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="saveBtn" type="button">저장</button>
+        <button class="btn secondary" id="resetBtn" type="button">초기화</button>
+      </div>
+
+      <p class="message" id="messageText">저장 전입니다.</p>
+
+      <div class="list-box">
+        <div class="list-title">등록된 투수 목록</div>
+        <div id="list"></div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      addDoc,
+      updateDoc,
+      getDocs,
+      query,
+      where,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const nicknameEl = document.getElementById("nickname");
+    const throwTypeEl = document.getElementById("throwType");
+    const pitchTypesEl = document.getElementById("pitchTypes");
+    const logoUrlEl = document.getElementById("logoUrl");
+    const saveBtn = document.getElementById("saveBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const messageText = document.getElementById("messageText");
+    const listEl = document.getElementById("list");
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function resetForm() {
+      nicknameEl.value = "";
+      throwTypeEl.value = "";
+      pitchTypesEl.value = "";
+      logoUrlEl.value = "";
+    }
+
+    async function savePitcher() {
+      const nickname = nicknameEl.value.trim();
+      const throwType = throwTypeEl.value.trim();
+      const pitchTypes = pitchTypesEl.value.split(",").map(v => v.trim()).filter(Boolean);
+      const logoUrl = logoUrlEl.value.trim();
+
+      if (!nickname) {
+        messageText.textContent = "닉네임을 입력해줘.";
+        return;
+      }
+      if (!throwType) {
+        messageText.textContent = "좌투인지 우투인지 선택해줘.";
+        return;
+      }
+
+      try {
+        const q = query(collection(db, "pitchers"), where("nickname", "==", nickname));
+        const snap = await getDocs(q);
+
+        if (!snap.empty) {
+          const docRef = snap.docs[0].ref;
+          await updateDoc(docRef, {
+            nickname,
+            throwType,
+            pitchTypes,
+            logoUrl,
+            updatedAt: serverTimestamp()
+          });
+          messageText.textContent = "기존 투수 정보를 수정했어.";
+        } else {
+          await addDoc(collection(db, "pitchers"), {
+            nickname,
+            throwType,
+            pitchTypes,
+            logoUrl,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+          messageText.textContent = "새 투수 정보를 저장했어.";
+        }
+
+        resetForm();
+      } catch (error) {
+        console.error(error);
+        messageText.textContent = "저장 중 오류가 발생했어.";
+      }
+    }
+
+    function renderList(snapshot) {
+      if (snapshot.empty) {
+        listEl.innerHTML = `<div class="meta">등록된 투수가 아직 없어.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = "";
+      snapshot.forEach(docSnap => {
+        const p = docSnap.data();
+        const name = escapeHtml(p.nickname || "-");
+        const throwType = escapeHtml(p.throwType || "-");
+        const pitches = Array.isArray(p.pitchTypes) ? p.pitchTypes.map(escapeHtml).join(", ") : "-";
+        const logo = escapeHtml(p.logoUrl || "logos/default.png");
+
+        listEl.innerHTML += `
+          <div class="item">
+            <div class="item-name">
+              <img class="thumb" src="${logo}" alt="로고" onerror="this.src='logos/default.png'">
+              <span>${name}</span>
+            </div>
+            <div class="meta">
+              ${throwType}<br>
+              구종: ${pitches}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    saveBtn.addEventListener("click", savePitcher);
+    resetBtn.addEventListener("click", resetForm);
+
+    onSnapshot(query(collection(db, "pitchers")), renderList);
+  </script>
 </body>
 </html>
