@@ -4,172 +4,453 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>레이 마린스 - 투수 정보</title>
-  <link rel="stylesheet" href="styles.css">
   <style>
-    .pitchers-page-wrap {
-      width: min(1100px, calc(100% - 32px));
-      margin: 34px auto;
-    }
-    .pitchers-hero {
-      max-width: 900px;
-      margin: 48px auto 0;
-      background: #f8f8f8;
-      border: 1px solid #e5e5e5;
-      border-radius: 24px;
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.02);
-      padding: 32px;
-    }
-    .pitchers-hero h2 {
+    * {
+      box-sizing: border-box;
       margin: 0;
-      font-size: 64px;
-      font-weight: 700;
-      line-height: 1.08;
-      letter-spacing: -0.03em;
+      padding: 0;
     }
-    .pitchers-hero p {
-      margin: 16px 0 0;
-      font-size: 22px;
+
+    body {
+      background: #f3f3f3;
+      color: #111111;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    }
+
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 36px 32px 60px;
+    }
+
+    .top-header {
+      border-bottom: 1px solid #222222;
+      padding-bottom: 24px;
+      margin-bottom: 22px;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .top-header h1 {
+      font-size: 72px;
       font-weight: 300;
-      color: #666;
-      line-height: 1.6;
+      letter-spacing: 0.08em;
+      line-height: 1;
     }
-    .search-card {
-      margin-top: 32px;
-      background: #fff;
+
+    .home-link,
+    .home-link:visited,
+    .home-link:active {
+      color: #111111 !important;
+      text-decoration: none !important;
+      font-size: 20px;
+      font-weight: 300;
+    }
+
+    .home-link:hover {
+      opacity: 0.65;
+    }
+
+    .tab-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .tab-link,
+    .tab-link:visited,
+    .tab-link:active {
+      text-decoration: none !important;
+      color: #111111 !important;
+      background: #ffffff;
       border: 1px solid #d6d6d6;
-      border-radius: 18px;
+      border-radius: 14px;
+      padding: 10px 16px;
+      font-size: 17px;
+      font-weight: 500;
+    }
+
+    .tab-link.active {
+      border-color: #111111;
+      background: #f8f8f8;
+    }
+
+    .main-box {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: #f8f8f8;
+      border-radius: 28px;
+      padding: 34px 34px 28px;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+    }
+
+    .main-box-title {
+      font-size: 72px;
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      text-align: center;
+    }
+
+    .main-box-desc {
+      margin-top: 18px;
+      font-size: 26px;
+      font-weight: 300;
+      color: #666666;
+      word-break: keep-all;
+      text-align: center;
+    }
+
+    .search-box {
+      margin-top: 34px;
+      background: #ffffff;
+      border: 1px solid #d6d6d6;
+      border-radius: 22px;
       padding: 24px;
     }
+
     .search-label {
       display: block;
-      margin-bottom: 12px;
       font-size: 18px;
       font-weight: 700;
+      margin-bottom: 16px;
     }
+
     .search-row {
       display: flex;
-      gap: 12px;
-      align-items: center;
+      gap: 14px;
+      align-items: flex-start;
     }
-    .search-input {
+
+    .search-input-wrap {
+      position: relative;
       flex: 1;
-      height: 56px;
-      border: 1px solid #cccccc;
-      border-radius: 14px;
-      padding: 0 18px;
-      font-size: 18px;
-      background: #fff;
     }
-    .search-btn {
-      min-width: 84px;
-      height: 56px;
+
+    .search-input {
+      width: 100%;
+      height: 60px;
+      border: 1px solid #d6d6d6;
       border-radius: 16px;
-      border: 1px solid #111;
-      background: #111;
-      color: #fff;
-      font-size: 18px;
+      padding: 0 20px;
+      font-size: 20px;
+      background: #ffffff;
+      color: #111111;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: #111111;
+    }
+
+    .search-btn {
+      height: 60px;
+      min-width: 92px;
+      padding: 0 24px;
+      border: 1px solid #111111;
+      border-radius: 18px;
+      background: #111111;
+      color: #ffffff;
+      font-size: 22px;
       font-weight: 700;
       cursor: pointer;
     }
-    .search-status {
-      margin-top: 16px;
-      font-size: 16px;
-      color: #666;
+
+    .search-btn:hover {
+      opacity: 0.92;
     }
+
+    .autocomplete-box {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #d6d6d6;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      display: none;
+      z-index: 30;
+    }
+
+    .autocomplete-item {
+      padding: 14px 18px;
+      font-size: 18px;
+      cursor: pointer;
+      border-bottom: 1px solid #efefef;
+      background: #ffffff;
+    }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+
+    .autocomplete-item:hover,
+    .autocomplete-item.active {
+      background: #f5f5f5;
+    }
+
+    .loading-text,
+    .empty-text {
+      margin-top: 16px;
+      font-size: 17px;
+      color: #666666;
+    }
+
     .result-box {
       display: none;
-      margin-top: 20px;
-      border-top: 1px solid #ececec;
-      padding-top: 20px;
+      margin-top: 24px;
+      background: #ffffff;
+      border: 1px solid #d6d6d6;
+      border-radius: 22px;
+      overflow: hidden;
     }
+
+    .result-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 24px 24px 18px;
+      border-bottom: 1px solid #ececec;
+    }
+
+    .result-logo {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: #ffffff;
+    }
+
+    .result-name-wrap {
+      min-width: 0;
+    }
+
     .result-name {
-      margin: 0 0 16px;
-      font-size: 42px;
+      font-size: 48px;
       font-weight: 800;
+      line-height: 1.1;
     }
+
+    .result-sub {
+      margin-top: 6px;
+      font-size: 22px;
+      color: #666666;
+      font-weight: 400;
+    }
+
     .result-grid {
+      padding: 22px 24px 24px;
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
     }
-    .result-card {
-      background: #fafafa;
+
+    .info-card {
       border: 1px solid #e2e2e2;
-      border-radius: 14px;
-      padding: 16px;
+      border-radius: 18px;
+      background: #fafafa;
+      padding: 18px;
     }
-    .result-card .k {
-      font-size: 13px;
-      letter-spacing: .08em;
+
+    .info-label {
+      font-size: 15px;
+      letter-spacing: 0.06em;
       color: #7a7a7a;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    .result-card .v {
-      font-size: 24px;
+      margin-bottom: 10px;
       font-weight: 600;
-      line-height: 1.5;
-      word-break: keep-all;
     }
+
+    .info-value {
+      font-size: 28px;
+      font-weight: 700;
+      word-break: keep-all;
+      line-height: 1.35;
+    }
+
+    .info-card.full {
+      grid-column: 1 / -1;
+    }
+
+    @media (max-width: 900px) {
+      .top-header h1 {
+        font-size: 52px;
+      }
+
+      .main-box-title {
+        font-size: 52px;
+      }
+
+      .main-box-desc {
+        font-size: 22px;
+      }
+
+      .result-name {
+        font-size: 38px;
+      }
+
+      .info-value {
+        font-size: 23px;
+      }
+    }
+
     @media (max-width: 768px) {
-      .pitchers-page-wrap { width: min(100%, calc(100% - 24px)); }
-      .pitchers-hero { margin-top: 32px; padding: 24px; }
-      .pitchers-hero h2 { font-size: 42px; }
-      .pitchers-hero p { font-size: 18px; }
-      .search-row { flex-direction: column; }
-      .search-input, .search-btn { width: 100%; }
-      .result-grid { grid-template-columns: 1fr; }
+      .page {
+        padding: 24px 16px 44px;
+      }
+
+      .header-row {
+        align-items: flex-end;
+      }
+
+      .top-header h1 {
+        font-size: 40px;
+      }
+
+      .home-link {
+        font-size: 16px !important;
+      }
+
+      .main-box {
+        padding: 24px 18px 20px;
+      }
+
+      .main-box-title {
+        font-size: 42px;
+      }
+
+      .main-box-desc {
+        font-size: 18px;
+      }
+
+      .search-row {
+        flex-direction: column;
+      }
+
+      .search-input,
+      .search-btn {
+        width: 100%;
+      }
+
+      .search-btn {
+        min-width: 100%;
+      }
+
+      .result-top {
+        align-items: flex-start;
+      }
+
+      .result-logo {
+        width: 56px;
+        height: 56px;
+      }
+
+      .result-name {
+        font-size: 32px;
+      }
+
+      .result-sub {
+        font-size: 18px;
+      }
+
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .info-card.full {
+        grid-column: auto;
+      }
+
+      .info-value {
+        font-size: 21px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top-title">
-      <h1>레이 마린스</h1>
-      <a class="top-link" href="index.html">메인으로</a>
-    </div>
-
-    <div class="menu">
-      <a href="roster.html">로스터</a>
-      <a href="pitchers.html" class="current">투수 정보</a>
-      <a href="lineup.html">라인업</a>
-      <a href="record.html">기록실</a>
-      <a href="scoresheet.html">기록지</a>
-      <a href="mypage.html">마이페이지</a>
-    </div>
-  </div>
-
-  <div class="pitchers-page-wrap">
-    <section class="pitchers-hero">
-      <h2>투수 정보</h2>
-      <p>투수 닉네임을 검색하면 해당 투수의 정보를 확인할 수 있습니다.</p>
-
-      <div class="search-card">
-        <label for="searchInput" class="search-label">투수 닉네임 검색</label>
-        <div class="search-row">
-          <input type="text" id="searchInput" class="search-input" placeholder="투수 닉네임을 입력하세요" list="pitcherList" autocomplete="off" />
-          <datalist id="pitcherList"></datalist>
-          <button type="button" class="search-btn" id="searchBtn">검색</button>
-        </div>
-        <p id="loadingText" class="search-status">투수 목록 불러오는 중...</p>
-        <p id="emptyText" class="search-status" style="display:none;">검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.</p>
-
-        <div id="resultBox" class="result-box"></div>
+  <div class="page">
+    <header class="top-header">
+      <div class="header-row">
+        <h1>레이 마린스</h1>
+        <a href="index.html" class="home-link">메인으로</a>
       </div>
-    </section>
+    </header>
+
+    <nav class="tab-row">
+      <a href="roster.html" class="tab-link">로스터</a>
+      <a href="pitchers.html" class="tab-link active">투수 정보</a>
+      <a href="lineup.html" class="tab-link">라인업</a>
+      <a href="stats.html" class="tab-link">기록실</a>
+      <a href="record.html" class="tab-link">기록지</a>
+      <a href="mypage.html" class="tab-link">마이페이지</a>
+    </nav>
+
+    <main>
+      <section class="main-box">
+        <h2 class="main-box-title">투수 정보</h2>
+        <p class="main-box-desc">투수 닉네임을 검색하면 해당 투수의 정보를 확인할 수 있습니다.</p>
+
+        <div class="search-box">
+          <label for="searchInput" class="search-label">투수 닉네임 검색</label>
+
+          <div class="search-row">
+            <div class="search-input-wrap">
+              <input
+                type="text"
+                id="searchInput"
+                class="search-input"
+                placeholder="투수 닉네임을 입력하세요"
+                autocomplete="off"
+              />
+              <div id="autocompleteBox" class="autocomplete-box"></div>
+            </div>
+
+            <button type="button" class="search-btn" id="searchBtn">검색</button>
+          </div>
+
+          <p id="loadingText" class="loading-text">투수 목록 불러오는 중...</p>
+          <p id="emptyText" class="empty-text" style="display:none;">
+            검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.
+          </p>
+
+          <div id="resultBox" class="result-box"></div>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script type="module">
     import { db, auth } from "./firebase-config.js";
-    import { collection, getDocs, query, where, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import {
+      collection,
+      getDocs,
+      query,
+      where,
+      limit
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import {
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
     const searchInput = document.getElementById("searchInput");
-    const pitcherList = document.getElementById("pitcherList");
     const searchBtn = document.getElementById("searchBtn");
     const resultBox = document.getElementById("resultBox");
     const emptyText = document.getElementById("emptyText");
     const loadingText = document.getElementById("loadingText");
+    const autocompleteBox = document.getElementById("autocompleteBox");
+
+    let pitcherNames = [];
+    let currentSuggestions = [];
+    let activeIndex = -1;
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -187,77 +468,209 @@
       emptyText.textContent = message;
     }
 
+    function hideAutocomplete() {
+      autocompleteBox.style.display = "none";
+      autocompleteBox.innerHTML = "";
+      activeIndex = -1;
+      currentSuggestions = [];
+    }
+
+    function showAutocomplete(items) {
+      autocompleteBox.innerHTML = "";
+      currentSuggestions = items;
+      activeIndex = -1;
+
+      if (!items.length) {
+        hideAutocomplete();
+        return;
+      }
+
+      items.forEach((name, index) => {
+        const item = document.createElement("div");
+        item.className = "autocomplete-item";
+        item.textContent = name;
+
+        item.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          searchInput.value = name;
+          hideAutocomplete();
+          searchPitcher();
+        });
+
+        autocompleteBox.appendChild(item);
+      });
+
+      autocompleteBox.style.display = "block";
+    }
+
+    function updateActiveItem() {
+      const items = autocompleteBox.querySelectorAll(".autocomplete-item");
+      items.forEach((item, index) => {
+        item.classList.toggle("active", index === activeIndex);
+      });
+    }
+
+    function getFilteredSuggestions(keyword) {
+      const text = keyword.trim().toLowerCase();
+      if (!text) return [];
+
+      return pitcherNames
+        .filter((name) => name.toLowerCase().includes(text))
+        .slice(0, 8);
+    }
+
+    function getLogoPath(pitcher) {
+      const logo = pitcher.logo || pitcher.teamLogo || pitcher.logoPath || "";
+      return logo || "logos/default.png";
+    }
+
     function renderPitcher(pitcher) {
       const name = escapeHtml(pitcher.nickname || pitcher.name || "-");
-      const speed = escapeHtml(pitcher.speed || pitcher.velocity || "-");
-      const type = escapeHtml(pitcher.throwBat || pitcher.type || "-");
-      const control = escapeHtml(pitcher.control || "-");
-      const stamina = escapeHtml(pitcher.stamina || "-");
+      const handedness = escapeHtml(pitcher.handedness || pitcher.throwType || pitcher.throwHand || "-");
+
       let pitchTypes = "-";
-      if (Array.isArray(pitcher.pitchTypes)) pitchTypes = pitcher.pitchTypes.map(v => escapeHtml(v)).join(", ");
-      else if (typeof pitcher.pitchTypes === "string") pitchTypes = escapeHtml(pitcher.pitchTypes);
-      else if (Array.isArray(pitcher.pitches)) pitchTypes = pitcher.pitches.map(v => escapeHtml(v)).join(", ");
+      if (Array.isArray(pitcher.pitchTypes)) {
+        pitchTypes = pitcher.pitchTypes.map(v => escapeHtml(v)).join(", ");
+      } else if (typeof pitcher.pitchTypes === "string") {
+        pitchTypes = escapeHtml(pitcher.pitchTypes);
+      }
+
+      const logoPath = escapeHtml(getLogoPath(pitcher));
 
       resultBox.innerHTML = `
-        <h3 class="result-name">${name}</h3>
+        <div class="result-top">
+          <img src="${logoPath}" alt="팀 로고" class="result-logo" onerror="this.src='logos/default.png'">
+          <div class="result-name-wrap">
+            <div class="result-name">${name}</div>
+            <div class="result-sub">${handedness}</div>
+          </div>
+        </div>
+
         <div class="result-grid">
-          <div class="result-card"><div class="k">구속</div><div class="v">${speed}</div></div>
-          <div class="result-card"><div class="k">투타</div><div class="v">${type}</div></div>
-          <div class="result-card"><div class="k">구종</div><div class="v">${pitchTypes}</div></div>
-          <div class="result-card"><div class="k">제구</div><div class="v">${control}</div></div>
-          <div class="result-card"><div class="k">스태미너</div><div class="v">${stamina}</div></div>
-        </div>`;
+          <div class="info-card full">
+            <div class="info-label">구종</div>
+            <div class="info-value">${pitchTypes}</div>
+          </div>
+        </div>
+      `;
+
       resultBox.style.display = "block";
       emptyText.style.display = "none";
     }
 
-    function bindPitcherNamesRealtime() {
-      const q = query(collection(db, "pitchers"));
-      onSnapshot(q, (snapshot) => {
-        const names = new Set();
-        pitcherList.innerHTML = "";
+    async function loadPitcherNames() {
+      try {
+        const snapshot = await getDocs(collection(db, "pitchers"));
+        const nameSet = new Set();
+
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
           const nickname = (data.nickname || data.name || "").trim();
-          if (!nickname || names.has(nickname)) return;
-          names.add(nickname);
-          const option = document.createElement("option");
-          option.value = nickname;
-          pitcherList.appendChild(option);
+          if (nickname) nameSet.add(nickname);
         });
+
+        pitcherNames = Array.from(nameSet).sort((a, b) => a.localeCompare(b, "ko"));
         loadingText.style.display = "none";
         emptyText.style.display = "block";
-      }, (error) => {
-        console.error("투수 목록 실시간 불러오기 실패:", error);
+      } catch (error) {
+        console.error("투수 목록 불러오기 실패:", error);
         loadingText.style.display = "none";
         emptyText.style.display = "block";
         emptyText.textContent = "투수 목록을 불러오지 못했습니다.";
-      });
+      }
     }
 
     async function searchPitcher() {
       const keyword = searchInput.value.trim();
-      if (!keyword) { showGuide("검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요."); return; }
+      hideAutocomplete();
+
+      if (!keyword) {
+        showGuide("검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.");
+        return;
+      }
+
       try {
-        let q = query(collection(db, "pitchers"), where("nickname", "==", keyword), limit(1));
-        let snapshot = await getDocs(q);
-        if (snapshot.empty) {
-          q = query(collection(db, "pitchers"), where("name", "==", keyword), limit(1));
-          snapshot = await getDocs(q);
+        const q = query(
+          collection(db, "pitchers"),
+          where("nickname", "==", keyword),
+          limit(1)
+        );
+
+        const snapshot = await getDocs(q);
+
+        if (!snapshot.empty) {
+          renderPitcher(snapshot.docs[0].data());
+          return;
         }
-        if (snapshot.empty) showGuide("검색한 투수 정보를 찾을 수 없습니다.");
-        else renderPitcher(snapshot.docs[0].data());
+
+        const fallback = query(
+          collection(db, "pitchers"),
+          where("name", "==", keyword),
+          limit(1)
+        );
+
+        const fallbackSnapshot = await getDocs(fallback);
+
+        if (!fallbackSnapshot.empty) {
+          renderPitcher(fallbackSnapshot.docs[0].data());
+        } else {
+          showGuide("검색한 투수 정보를 찾을 수 없습니다.");
+        }
       } catch (error) {
         console.error("투수 검색 실패:", error);
         showGuide("검색 중 오류가 발생했습니다.");
       }
     }
 
-    searchBtn.addEventListener("click", searchPitcher);
-    searchInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") { e.preventDefault(); searchPitcher(); }
+    searchInput.addEventListener("input", () => {
+      const keyword = searchInput.value;
+      const suggestions = getFilteredSuggestions(keyword);
+      showAutocomplete(suggestions);
     });
-    onAuthStateChanged(auth, () => bindPitcherNamesRealtime());
+
+    searchInput.addEventListener("focus", () => {
+      const keyword = searchInput.value;
+      if (!keyword.trim()) return;
+      showAutocomplete(getFilteredSuggestions(keyword));
+    });
+
+    searchInput.addEventListener("keydown", (e) => {
+      const items = autocompleteBox.querySelectorAll(".autocomplete-item");
+
+      if (e.key === "ArrowDown") {
+        if (!currentSuggestions.length) return;
+        e.preventDefault();
+        activeIndex = activeIndex < currentSuggestions.length - 1 ? activeIndex + 1 : 0;
+        updateActiveItem();
+      } else if (e.key === "ArrowUp") {
+        if (!currentSuggestions.length) return;
+        e.preventDefault();
+        activeIndex = activeIndex > 0 ? activeIndex - 1 : currentSuggestions.length - 1;
+        updateActiveItem();
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+
+        if (activeIndex >= 0 && currentSuggestions[activeIndex]) {
+          searchInput.value = currentSuggestions[activeIndex];
+        }
+
+        searchPitcher();
+      } else if (e.key === "Escape") {
+        hideAutocomplete();
+      }
+    });
+
+    searchBtn.addEventListener("click", searchPitcher);
+
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".search-input-wrap")) {
+        hideAutocomplete();
+      }
+    });
+
+    onAuthStateChanged(auth, async () => {
+      await loadPitcherNames();
+    });
   </script>
 </body>
 </html>
