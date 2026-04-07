@@ -537,3 +537,9 @@ tr:last-child td {
 .home-link:hover {
   opacity: 0.6;
 }
+.home-link,
+.home-link:visited,
+.home-link:active {
+  color: #111111 !important;
+  text-decoration: none !important;
+}
