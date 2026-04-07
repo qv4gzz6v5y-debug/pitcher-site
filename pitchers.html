@@ -163,10 +163,6 @@
       cursor: pointer;
     }
 
-    .search-btn:hover {
-      opacity: 0.92;
-    }
-
     .autocomplete-box {
       position: absolute;
       top: calc(100% + 8px);
@@ -178,7 +174,9 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
       overflow: hidden;
       display: none;
-      z-index: 30;
+      z-index: 50;
+      max-height: 320px;
+      overflow-y: auto;
     }
 
     .autocomplete-item {
@@ -231,10 +229,6 @@
       background: #ffffff;
     }
 
-    .result-name-wrap {
-      min-width: 0;
-    }
-
     .result-name {
       font-size: 48px;
       font-weight: 800;
@@ -251,7 +245,7 @@
     .result-grid {
       padding: 22px 24px 24px;
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr;
       gap: 16px;
     }
 
@@ -277,39 +271,9 @@
       line-height: 1.35;
     }
 
-    .info-card.full {
-      grid-column: 1 / -1;
-    }
-
-    @media (max-width: 900px) {
-      .top-header h1 {
-        font-size: 52px;
-      }
-
-      .main-box-title {
-        font-size: 52px;
-      }
-
-      .main-box-desc {
-        font-size: 22px;
-      }
-
-      .result-name {
-        font-size: 38px;
-      }
-
-      .info-value {
-        font-size: 23px;
-      }
-    }
-
     @media (max-width: 768px) {
       .page {
         padding: 24px 16px 44px;
-      }
-
-      .header-row {
-        align-items: flex-end;
       }
 
       .top-header h1 {
@@ -336,22 +300,8 @@
         flex-direction: column;
       }
 
-      .search-input,
       .search-btn {
         width: 100%;
-      }
-
-      .search-btn {
-        min-width: 100%;
-      }
-
-      .result-top {
-        align-items: flex-start;
-      }
-
-      .result-logo {
-        width: 56px;
-        height: 56px;
       }
 
       .result-name {
@@ -360,14 +310,6 @@
 
       .result-sub {
         font-size: 18px;
-      }
-
-      .result-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .info-card.full {
-        grid-column: auto;
       }
 
       .info-value {
@@ -429,7 +371,7 @@
   </div>
 
   <script type="module">
-    import { db, auth } from "./firebase-config.js";
+    import { db } from "./firebase-config.js";
     import {
       collection,
       getDocs,
@@ -437,9 +379,6 @@
       where,
       limit
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-    import {
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
     const searchInput = document.getElementById("searchInput");
     const searchBtn = document.getElementById("searchBtn");
@@ -449,8 +388,8 @@
     const autocompleteBox = document.getElementById("autocompleteBox");
 
     let pitcherNames = [];
-    let currentSuggestions = [];
     let activeIndex = -1;
+    let currentSuggestions = [];
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -471,8 +410,23 @@
     function hideAutocomplete() {
       autocompleteBox.style.display = "none";
       autocompleteBox.innerHTML = "";
-      activeIndex = -1;
       currentSuggestions = [];
+      activeIndex = -1;
+    }
+
+    function updateActiveItem() {
+      const items = autocompleteBox.querySelectorAll(".autocomplete-item");
+      items.forEach((item, index) => {
+        item.classList.toggle("active", index === activeIndex);
+      });
+    }
+
+    function getFilteredSuggestions(keyword) {
+      const text = keyword.trim().toLowerCase();
+      if (!text) return [];
+      return pitcherNames
+        .filter(name => name.toLowerCase().includes(text))
+        .slice(0, 8);
     }
 
     function showAutocomplete(items) {
@@ -485,7 +439,7 @@
         return;
       }
 
-      items.forEach((name, index) => {
+      items.forEach((name) => {
         const item = document.createElement("div");
         item.className = "autocomplete-item";
         item.textContent = name;
@@ -503,51 +457,29 @@
       autocompleteBox.style.display = "block";
     }
 
-    function updateActiveItem() {
-      const items = autocompleteBox.querySelectorAll(".autocomplete-item");
-      items.forEach((item, index) => {
-        item.classList.toggle("active", index === activeIndex);
-      });
-    }
-
-    function getFilteredSuggestions(keyword) {
-      const text = keyword.trim().toLowerCase();
-      if (!text) return [];
-
-      return pitcherNames
-        .filter((name) => name.toLowerCase().includes(text))
-        .slice(0, 8);
-    }
-
     function getLogoPath(pitcher) {
-      const logo = pitcher.logo || pitcher.teamLogo || pitcher.logoPath || "";
-      return logo || "logos/default.png";
+      return pitcher.logo || pitcher.teamLogo || pitcher.logoPath || "logos/default.png";
     }
 
     function renderPitcher(pitcher) {
       const name = escapeHtml(pitcher.nickname || pitcher.name || "-");
-      const handedness = escapeHtml(pitcher.handedness || pitcher.throwType || pitcher.throwHand || "-");
-
-      let pitchTypes = "-";
-      if (Array.isArray(pitcher.pitchTypes)) {
-        pitchTypes = pitcher.pitchTypes.map(v => escapeHtml(v)).join(", ");
-      } else if (typeof pitcher.pitchTypes === "string") {
-        pitchTypes = escapeHtml(pitcher.pitchTypes);
-      }
-
+      const handedness = escapeHtml(pitcher.handedness || "-");
+      const pitchTypes = Array.isArray(pitcher.pitchTypes)
+        ? pitcher.pitchTypes.map(v => escapeHtml(v)).join(", ")
+        : escapeHtml(pitcher.pitchTypes || "-");
       const logoPath = escapeHtml(getLogoPath(pitcher));
 
       resultBox.innerHTML = `
         <div class="result-top">
           <img src="${logoPath}" alt="팀 로고" class="result-logo" onerror="this.src='logos/default.png'">
-          <div class="result-name-wrap">
+          <div>
             <div class="result-name">${name}</div>
             <div class="result-sub">${handedness}</div>
           </div>
         </div>
 
         <div class="result-grid">
-          <div class="info-card full">
+          <div class="info-card">
             <div class="info-label">구종</div>
             <div class="info-value">${pitchTypes}</div>
           </div>
@@ -561,15 +493,17 @@
     async function loadPitcherNames() {
       try {
         const snapshot = await getDocs(collection(db, "pitchers"));
-        const nameSet = new Set();
+        const names = [];
 
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
           const nickname = (data.nickname || data.name || "").trim();
-          if (nickname) nameSet.add(nickname);
+          if (nickname) names.push(nickname);
         });
 
-        pitcherNames = Array.from(nameSet).sort((a, b) => a.localeCompare(b, "ko"));
+        pitcherNames = [...new Set(names)].sort((a, b) => a.localeCompare(b, "ko"));
+        console.log("자동완성 닉네임 목록:", pitcherNames);
+
         loadingText.style.display = "none";
         emptyText.style.display = "block";
       } catch (error) {
@@ -590,29 +524,19 @@
       }
 
       try {
-        const q = query(
-          collection(db, "pitchers"),
-          where("nickname", "==", keyword),
-          limit(1)
-        );
+        const q1 = query(collection(db, "pitchers"), where("nickname", "==", keyword), limit(1));
+        const s1 = await getDocs(q1);
 
-        const snapshot = await getDocs(q);
-
-        if (!snapshot.empty) {
-          renderPitcher(snapshot.docs[0].data());
+        if (!s1.empty) {
+          renderPitcher(s1.docs[0].data());
           return;
         }
 
-        const fallback = query(
-          collection(db, "pitchers"),
-          where("name", "==", keyword),
-          limit(1)
-        );
+        const q2 = query(collection(db, "pitchers"), where("name", "==", keyword), limit(1));
+        const s2 = await getDocs(q2);
 
-        const fallbackSnapshot = await getDocs(fallback);
-
-        if (!fallbackSnapshot.empty) {
-          renderPitcher(fallbackSnapshot.docs[0].data());
+        if (!s2.empty) {
+          renderPitcher(s2.docs[0].data());
         } else {
           showGuide("검색한 투수 정보를 찾을 수 없습니다.");
         }
@@ -623,20 +547,21 @@
     }
 
     searchInput.addEventListener("input", () => {
-      const keyword = searchInput.value;
-      const suggestions = getFilteredSuggestions(keyword);
-      showAutocomplete(suggestions);
+      const keyword = searchInput.value.trim();
+      if (!keyword) {
+        hideAutocomplete();
+        return;
+      }
+      showAutocomplete(getFilteredSuggestions(keyword));
     });
 
     searchInput.addEventListener("focus", () => {
-      const keyword = searchInput.value;
-      if (!keyword.trim()) return;
+      const keyword = searchInput.value.trim();
+      if (!keyword) return;
       showAutocomplete(getFilteredSuggestions(keyword));
     });
 
     searchInput.addEventListener("keydown", (e) => {
-      const items = autocompleteBox.querySelectorAll(".autocomplete-item");
-
       if (e.key === "ArrowDown") {
         if (!currentSuggestions.length) return;
         e.preventDefault();
@@ -649,11 +574,9 @@
         updateActiveItem();
       } else if (e.key === "Enter") {
         e.preventDefault();
-
         if (activeIndex >= 0 && currentSuggestions[activeIndex]) {
           searchInput.value = currentSuggestions[activeIndex];
         }
-
         searchPitcher();
       } else if (e.key === "Escape") {
         hideAutocomplete();
@@ -668,9 +591,7 @@
       }
     });
 
-    onAuthStateChanged(auth, async () => {
-      await loadPitcherNames();
-    });
+    loadPitcherNames();
   </script>
 </body>
 </html>
