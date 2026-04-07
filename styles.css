@@ -522,3 +522,20 @@ tr:last-child td {
   table,
   .sheet-table { min-width: 560px; }
 }
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.home-link {
+  font-size: 20px;
+  font-weight: 300;
+  text-decoration: none;
+  color: #111111;
+  transition: opacity 0.2s ease;
+}
+
+.home-link:hover {
+  opacity: 0.6;
+}
