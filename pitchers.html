@@ -5,45 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>레이 마린스 - 투수 정보</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: #f3f3f3;
       color: #111111;
       font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
     }
-
     .page {
       max-width: 1280px;
       margin: 0 auto;
       min-height: 100vh;
       padding: 36px 32px 60px;
     }
-
     .top-header {
       border-bottom: 1px solid #222222;
       padding-bottom: 24px;
       margin-bottom: 22px;
     }
-
     .header-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 20px;
     }
-
     .top-header h1 {
       font-size: 72px;
       font-weight: 300;
       letter-spacing: 0.08em;
       line-height: 1;
     }
-
     .home-link,
     .home-link:visited,
     .home-link:active {
@@ -52,18 +42,13 @@
       font-size: 20px;
       font-weight: 300;
     }
-
-    .home-link:hover {
-      opacity: 0.65;
-    }
-
+    .home-link:hover { opacity: 0.65; }
     .tab-row {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
       margin-bottom: 36px;
     }
-
     .tab-link,
     .tab-link:visited,
     .tab-link:active {
@@ -76,12 +61,10 @@
       font-size: 17px;
       font-weight: 500;
     }
-
     .tab-link.active {
       border-color: #111111;
       background: #f8f8f8;
     }
-
     .main-box {
       max-width: 1000px;
       margin: 0 auto;
@@ -90,7 +73,6 @@
       padding: 34px 34px 28px;
       box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
     }
-
     .main-box-title {
       font-size: 72px;
       font-weight: 700;
@@ -98,7 +80,6 @@
       letter-spacing: -0.03em;
       text-align: center;
     }
-
     .main-box-desc {
       margin-top: 18px;
       font-size: 26px;
@@ -107,7 +88,6 @@
       word-break: keep-all;
       text-align: center;
     }
-
     .search-box {
       margin-top: 34px;
       background: #ffffff;
@@ -115,25 +95,21 @@
       border-radius: 22px;
       padding: 24px;
     }
-
     .search-label {
       display: block;
       font-size: 18px;
       font-weight: 700;
       margin-bottom: 16px;
     }
-
     .search-row {
       display: flex;
       gap: 14px;
       align-items: flex-start;
     }
-
     .search-input-wrap {
       position: relative;
       flex: 1;
     }
-
     .search-input {
       width: 100%;
       height: 60px;
@@ -145,11 +121,20 @@
       color: #111111;
       outline: none;
     }
-
-    .search-input:focus {
-      border-color: #111111;
+    .search-input:focus { border-color: #111111; }
+    .search-toggle {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      border: 0;
+      background: transparent;
+      color: #888888;
+      font-size: 14px;
+      cursor: pointer;
     }
-
     .search-btn {
       height: 60px;
       min-width: 92px;
@@ -162,7 +147,6 @@
       font-weight: 700;
       cursor: pointer;
     }
-
     .autocomplete-box {
       position: absolute;
       top: calc(100% + 8px);
@@ -172,13 +156,11 @@
       border: 1px solid #d6d6d6;
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
       display: none;
       z-index: 50;
       max-height: 320px;
       overflow-y: auto;
     }
-
     .autocomplete-item {
       padding: 14px 18px;
       font-size: 18px;
@@ -186,23 +168,15 @@
       border-bottom: 1px solid #efefef;
       background: #ffffff;
     }
-
-    .autocomplete-item:last-child {
-      border-bottom: none;
-    }
-
+    .autocomplete-item:last-child { border-bottom: none; }
     .autocomplete-item:hover,
-    .autocomplete-item.active {
-      background: #f5f5f5;
-    }
-
+    .autocomplete-item.active { background: #f5f5f5; }
     .loading-text,
     .empty-text {
       margin-top: 16px;
       font-size: 17px;
       color: #666666;
     }
-
     .result-box {
       display: none;
       margin-top: 24px;
@@ -211,7 +185,6 @@
       border-radius: 22px;
       overflow: hidden;
     }
-
     .result-top {
       display: flex;
       align-items: center;
@@ -219,7 +192,6 @@
       padding: 24px 24px 18px;
       border-bottom: 1px solid #ececec;
     }
-
     .result-logo {
       width: 64px;
       height: 64px;
@@ -228,34 +200,20 @@
       border-radius: 50%;
       background: #ffffff;
     }
-
-    .result-name {
-      font-size: 48px;
-      font-weight: 800;
-      line-height: 1.1;
-    }
-
-    .result-sub {
-      margin-top: 6px;
-      font-size: 22px;
-      color: #666666;
-      font-weight: 400;
-    }
-
+    .result-name { font-size: 48px; font-weight: 800; line-height: 1.1; }
+    .result-sub { margin-top: 6px; font-size: 22px; color: #666666; font-weight: 400; }
     .result-grid {
       padding: 22px 24px 24px;
       display: grid;
       grid-template-columns: 1fr;
       gap: 16px;
     }
-
     .info-card {
       border: 1px solid #e2e2e2;
       border-radius: 18px;
       background: #fafafa;
       padding: 18px;
     }
-
     .info-label {
       font-size: 15px;
       letter-spacing: 0.06em;
@@ -263,58 +221,24 @@
       margin-bottom: 10px;
       font-weight: 600;
     }
-
     .info-value {
       font-size: 28px;
       font-weight: 700;
       word-break: keep-all;
       line-height: 1.35;
     }
-
     @media (max-width: 768px) {
-      .page {
-        padding: 24px 16px 44px;
-      }
-
-      .top-header h1 {
-        font-size: 40px;
-      }
-
-      .home-link {
-        font-size: 16px !important;
-      }
-
-      .main-box {
-        padding: 24px 18px 20px;
-      }
-
-      .main-box-title {
-        font-size: 42px;
-      }
-
-      .main-box-desc {
-        font-size: 18px;
-      }
-
-      .search-row {
-        flex-direction: column;
-      }
-
-      .search-btn {
-        width: 100%;
-      }
-
-      .result-name {
-        font-size: 32px;
-      }
-
-      .result-sub {
-        font-size: 18px;
-      }
-
-      .info-value {
-        font-size: 21px;
-      }
+      .page { padding: 24px 16px 44px; }
+      .top-header h1 { font-size: 40px; }
+      .home-link { font-size: 16px !important; }
+      .main-box { padding: 24px 18px 20px; }
+      .main-box-title { font-size: 42px; }
+      .main-box-desc { font-size: 18px; }
+      .search-row { flex-direction: column; }
+      .search-btn { width: 100%; }
+      .result-name { font-size: 32px; }
+      .result-sub { font-size: 18px; }
+      .info-value { font-size: 21px; }
     }
   </style>
 </head>
@@ -353,6 +277,7 @@
                 placeholder="투수 닉네임을 입력하세요"
                 autocomplete="off"
               />
+              <button type="button" id="toggleAutocomplete" class="search-toggle" aria-label="자동완성 열기">▼</button>
               <div id="autocompleteBox" class="autocomplete-box"></div>
             </div>
 
@@ -360,10 +285,7 @@
           </div>
 
           <p id="loadingText" class="loading-text">투수 목록 불러오는 중...</p>
-          <p id="emptyText" class="empty-text" style="display:none;">
-            검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.
-          </p>
-
+          <p id="emptyText" class="empty-text" style="display:none;">검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.</p>
           <div id="resultBox" class="result-box"></div>
         </div>
       </section>
@@ -372,13 +294,7 @@
 
   <script type="module">
     import { db } from "./firebase-config.js";
-    import {
-      collection,
-      getDocs,
-      query,
-      where,
-      limit
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const searchInput = document.getElementById("searchInput");
     const searchBtn = document.getElementById("searchBtn");
@@ -386,7 +302,16 @@
     const emptyText = document.getElementById("emptyText");
     const loadingText = document.getElementById("loadingText");
     const autocompleteBox = document.getElementById("autocompleteBox");
+    const toggleAutocomplete = document.getElementById("toggleAutocomplete");
 
+    const DEFAULT_LOGO = "data:image/svg+xml;utf8," + encodeURIComponent(`
+      <svg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'>
+        <rect width='128' height='128' rx='64' fill='#f2f2f2'/>
+        <path d='M64 26c21 0 38 17 38 38S85 102 64 102 26 85 26 64 43 26 64 26Z' fill='#ffffff' stroke='#d0d0d0' stroke-width='6'/>
+        <path d='M45 45c8-10 30-10 38 0M45 83c8-10 30-10 38 0' fill='none' stroke='#bcbcbc' stroke-width='5' stroke-linecap='round'/>
+      </svg>`);
+
+    let pitcherDocs = [];
     let pitcherNames = [];
     let activeIndex = -1;
     let currentSuggestions = [];
@@ -398,6 +323,10 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#39;");
+    }
+
+    function normalizeText(value) {
+      return String(value ?? "").trim().toLowerCase();
     }
 
     function showGuide(message) {
@@ -416,54 +345,42 @@
 
     function updateActiveItem() {
       const items = autocompleteBox.querySelectorAll(".autocomplete-item");
-      items.forEach((item, index) => {
-        item.classList.toggle("active", index === activeIndex);
-      });
+      items.forEach((item, index) => item.classList.toggle("active", index === activeIndex));
     }
 
     function getFilteredSuggestions(keyword) {
-      const text = keyword.trim().toLowerCase();
+      const text = normalizeText(keyword);
       if (!text) return [];
-      return pitcherNames
-        .filter(name => name.toLowerCase().includes(text))
-        .slice(0, 8);
+      return pitcherNames.filter(name => normalizeText(name).includes(text)).slice(0, 8);
     }
 
     function showAutocomplete(items) {
       autocompleteBox.innerHTML = "";
       currentSuggestions = items;
       activeIndex = -1;
-
-      if (!items.length) {
-        hideAutocomplete();
-        return;
-      }
-
+      if (!items.length) { hideAutocomplete(); return; }
       items.forEach((name) => {
         const item = document.createElement("div");
         item.className = "autocomplete-item";
         item.textContent = name;
-
         item.addEventListener("mousedown", (e) => {
           e.preventDefault();
           searchInput.value = name;
           hideAutocomplete();
           searchPitcher();
         });
-
         autocompleteBox.appendChild(item);
       });
-
       autocompleteBox.style.display = "block";
     }
 
     function getLogoPath(pitcher) {
-      return pitcher.logo || pitcher.teamLogo || pitcher.logoPath || "logos/default.png";
+      return pitcher.logo || pitcher.logoUrl || pitcher.teamLogo || pitcher.logoPath || DEFAULT_LOGO;
     }
 
     function renderPitcher(pitcher) {
       const name = escapeHtml(pitcher.nickname || pitcher.name || "-");
-      const handedness = escapeHtml(pitcher.handedness || "-");
+      const handedness = escapeHtml(pitcher.handedness || pitcher.throwType || pitcher.throwHand || "-");
       const pitchTypes = Array.isArray(pitcher.pitchTypes)
         ? pitcher.pitchTypes.map(v => escapeHtml(v)).join(", ")
         : escapeHtml(pitcher.pitchTypes || "-");
@@ -471,13 +388,12 @@
 
       resultBox.innerHTML = `
         <div class="result-top">
-          <img src="${logoPath}" alt="팀 로고" class="result-logo" onerror="this.src='logos/default.png'">
+          <img src="${logoPath}" alt="팀 로고" class="result-logo" onerror="this.src='${DEFAULT_LOGO}'">
           <div>
             <div class="result-name">${name}</div>
             <div class="result-sub">${handedness}</div>
           </div>
         </div>
-
         <div class="result-grid">
           <div class="info-card">
             <div class="info-label">구종</div>
@@ -485,73 +401,45 @@
           </div>
         </div>
       `;
-
       resultBox.style.display = "block";
       emptyText.style.display = "none";
     }
 
-    async function loadPitcherNames() {
+    async function loadPitchers() {
       try {
         const snapshot = await getDocs(collection(db, "pitchers"));
-        const names = [];
-
-        snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          const nickname = (data.nickname || data.name || "").trim();
-          if (nickname) names.push(nickname);
-        });
-
-        pitcherNames = [...new Set(names)].sort((a, b) => a.localeCompare(b, "ko"));
+        pitcherDocs = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        pitcherNames = [...new Set(pitcherDocs.map(data => (data.nickname || data.name || "").trim()).filter(Boolean))]
+          .sort((a, b) => a.localeCompare(b, "ko"));
         console.log("자동완성 닉네임 목록:", pitcherNames);
-
         loadingText.style.display = "none";
         emptyText.style.display = "block";
       } catch (error) {
         console.error("투수 목록 불러오기 실패:", error);
         loadingText.style.display = "none";
         emptyText.style.display = "block";
-        emptyText.textContent = "투수 목록을 불러오지 못했습니다.";
+        emptyText.textContent = "투수 목록을 불러오지 못했습니다: " + error.message;
       }
     }
 
-    async function searchPitcher() {
+    function searchPitcher() {
       const keyword = searchInput.value.trim();
       hideAutocomplete();
-
       if (!keyword) {
         showGuide("검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.");
         return;
       }
-
-      try {
-        const q1 = query(collection(db, "pitchers"), where("nickname", "==", keyword), limit(1));
-        const s1 = await getDocs(q1);
-
-        if (!s1.empty) {
-          renderPitcher(s1.docs[0].data());
-          return;
-        }
-
-        const q2 = query(collection(db, "pitchers"), where("name", "==", keyword), limit(1));
-        const s2 = await getDocs(q2);
-
-        if (!s2.empty) {
-          renderPitcher(s2.docs[0].data());
-        } else {
-          showGuide("검색한 투수 정보를 찾을 수 없습니다.");
-        }
-      } catch (error) {
-        console.error("투수 검색 실패:", error);
-        showGuide("검색 중 오류가 발생했습니다.");
+      const found = pitcherDocs.find((data) => normalizeText(data.nickname || data.name) === normalizeText(keyword));
+      if (found) {
+        renderPitcher(found);
+      } else {
+        showGuide("검색한 투수 정보를 찾을 수 없습니다.");
       }
     }
 
     searchInput.addEventListener("input", () => {
       const keyword = searchInput.value.trim();
-      if (!keyword) {
-        hideAutocomplete();
-        return;
-      }
+      if (!keyword) { hideAutocomplete(); return; }
       showAutocomplete(getFilteredSuggestions(keyword));
     });
 
@@ -561,9 +449,24 @@
       showAutocomplete(getFilteredSuggestions(keyword));
     });
 
+    toggleAutocomplete.addEventListener("click", () => {
+      if (autocompleteBox.style.display === "block") {
+        hideAutocomplete();
+        return;
+      }
+      const base = searchInput.value.trim();
+      const items = base ? getFilteredSuggestions(base) : pitcherNames.slice(0, 8);
+      showAutocomplete(items);
+      searchInput.focus();
+    });
+
     searchInput.addEventListener("keydown", (e) => {
       if (e.key === "ArrowDown") {
-        if (!currentSuggestions.length) return;
+        if (!currentSuggestions.length) {
+          const items = pitcherNames.slice(0, 8);
+          showAutocomplete(items);
+          return;
+        }
         e.preventDefault();
         activeIndex = activeIndex < currentSuggestions.length - 1 ? activeIndex + 1 : 0;
         updateActiveItem();
@@ -586,12 +489,10 @@
     searchBtn.addEventListener("click", searchPitcher);
 
     document.addEventListener("click", (e) => {
-      if (!e.target.closest(".search-input-wrap")) {
-        hideAutocomplete();
-      }
+      if (!e.target.closest(".search-input-wrap")) hideAutocomplete();
     });
 
-    loadPitcherNames();
+    loadPitchers();
   </script>
 </body>
 </html>
