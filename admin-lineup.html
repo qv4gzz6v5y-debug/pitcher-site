@@ -2,466 +2,108 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>라인업 관리</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>라인업 관리 | 레이 마린스</title>
   <link rel="stylesheet" href="styles.css">
-
-  <style>
-    .lineup-wrap {
-      width: 95%;
-      max-width: 1100px;
-      margin: 34px auto;
-    }
-
-    .lineup-card {
-      background: white;
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-      margin-bottom: 22px;
-    }
-
-    .card-title {
-      font-size: 34px;
-      font-weight: 800;
-      margin-bottom: 16px;
-    }
-
-    .lineup-note {
-      color: #666;
-      font-size: 15px;
-      margin-bottom: 14px;
-      line-height: 1.6;
-    }
-
-    .lineup-input,
-    .lineup-select {
-      width: 100%;
-      padding: 12px 14px;
-      margin: 8px 0;
-      border-radius: 12px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      font-size: 16px;
-      background: #fff;
-    }
-
-    .lineup-btn {
-      padding: 11px 18px;
-      border-radius: 10px;
-      border: none;
-      background: #111;
-      color: white;
-      cursor: pointer;
-      margin-right: 8px;
-      margin-top: 12px;
-      font-size: 15px;
-    }
-
-    .lineup-btn.sub {
-      background: #666;
-    }
-
-    .lineup-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .lineup-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    .lineup-table th,
-    .lineup-table td {
-      border-bottom: 1px solid #ddd;
-      padding: 10px 8px;
-      text-align: left;
-      vertical-align: middle;
-    }
-
-    .lineup-table th {
-      background: #f7f7f7;
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .lineup-order {
-      width: 60px;
-      text-align: center;
-      font-weight: bold;
-    }
-
-    .view-box {
-      background: #f8f8f8;
-      padding: 16px;
-      border-radius: 14px;
-    }
-
-    .view-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      padding: 10px 0;
-      border-bottom: 1px solid #ddd;
-      font-size: 16px;
-    }
-
-    .view-row:last-child {
-      border-bottom: none;
-    }
-
-    .view-left {
-      min-width: 50px;
-      font-weight: 700;
-    }
-
-    .view-mid {
-      flex: 1;
-    }
-
-    .view-right {
-      min-width: 90px;
-      text-align: right;
-      color: #555;
-    }
-
-    .empty-text {
-      color: #666;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-  </style>
 </head>
 <body>
-
-  <div class="wrap">
-    <div class="top-title">
-      <h1>레이 마린스</h1>
-      <a class="top-link" href="admin.html">관리자 홈</a>
-    </div>
-
-    <div class="menu">
-      <a href="admin.html">관리자 홈</a>
-      <a href="admin-lineup.html">라인업 관리</a>
-      <a href="admin-pitchers.html">투수정보관리</a>
-      <a href="admin-scoresheet.html">기록지 관리</a>
-    </div>
-  </div>
-
-  <div class="lineup-wrap">
-
-    <div class="lineup-card">
-      <div class="card-title">현재 라인업</div>
-      <div id="viewBox" class="view-box">
-        <p class="empty-text">라인업을 불러오는 중...</p>
+<div class="page">
+  <header class="top-title"><h1>레이 마린스</h1><a class="top-link" href="admin.html">관리자 홈</a></header>
+  <nav class="menu">
+    <a href="admin.html">관리자 홈</a>
+    <a href="admin-lineup.html" class="active">라인업 관리</a>
+    <a href="admin-lineup-history.html">라인업 기록</a>
+    <a href="admin-pitchers.html">투수 정보</a>
+    <a href="admin-scoresheet.html">경기 기록</a>
+    <a href="admin-record-history.html">기록 내역</a>
+  </nav>
+  <section class="main-box">
+    <span class="badge">LINEUP EDIT</span>
+    <h2 class="main-box-title">라인업 관리</h2>
+    <p class="main-box-desc">연습경기와 리그 경기 라인업을 따로 저장하고 미리보기까지 확인해요.</p>
+    <div class="toolbar">
+      <div class="seg-group">
+        <button class="seg-btn active" data-type="practice">연습경기</button>
+        <button class="seg-btn" data-type="league">리그 경기</button>
       </div>
+      <input id="gameDateEdit" type="date" class="input" style="max-width:220px;">
     </div>
-
-    <div class="lineup-card">
-      <div class="card-title">라인업 수정</div>
-      <p class="lineup-note">날짜별 라인업을 저장하고 불러올 수 있어.</p>
-
-      <label for="gameDateEdit">날짜</label>
-      <input id="gameDateEdit" type="date" class="lineup-input">
-
-      <label for="pitcher">선발투수</label>
-      <select id="pitcher" class="lineup-select">
-        <option value="">선발투수 선택</option>
-      </select>
-
-      <table class="lineup-table">
-        <thead>
-          <tr>
-            <th class="lineup-order">타순</th>
-            <th>선수 이름</th>
-            <th>포지션</th>
-            <th>타석</th>
-          </tr>
-        </thead>
-        <tbody id="lineupBody"></tbody>
-      </table>
-
-      <button id="saveBtn" class="lineup-btn">저장</button>
-      <button id="resetBtn" class="lineup-btn sub">초기화</button>
+    <div class="split-grid" style="margin-top:20px;">
+      <section class="surface" style="padding:24px;">
+        <div class="item-title">현재 저장된 라인업</div>
+        <div id="viewBox" class="list-stack" style="margin-top:18px;"><div class="item-card"><div class="empty-text">라인업을 불러오는 중...</div></div></div>
+      </section>
+      <section class="surface" style="padding:24px;">
+        <div class="item-title">라인업 입력</div>
+        <div class="toolbar"><select id="pitcher" class="select" style="max-width:260px;"><option value="">선발투수 선택</option></select></div>
+        <table class="list-table" style="margin-top:10px;">
+          <thead><tr><th style="width:70px;">타순</th><th>선수</th><th>포지션</th><th>타석</th></tr></thead>
+          <tbody id="lineupBody"></tbody>
+        </table>
+        <div class="toolbar"><button id="saveBtn" class="primary-btn">저장</button><button id="resetBtn" class="secondary-btn">초기화</button></div>
+      </section>
     </div>
-
-  </div>
-
-  <script type="module">
-    import { db } from "./firebase-config.js";
-    import {
-      doc,
-      setDoc,
-      getDoc,
-      collection,
-      query,
-      where,
-      onSnapshot
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
-    const isStaff = currentUser && (
-      currentUser.role === "super_admin" ||
-      currentUser.role === "admin" ||
-      currentUser.role === "scorer"
-    );
-
-    if (!isStaff) {
-      alert("접근 권한이 없어.");
-      location.href = "index.html";
+  </section>
+</div>
+<script type="module">
+  import { db } from "./firebase-config.js";
+  import { doc, setDoc, getDoc, collection, query, where, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+  const isStaff = currentUser && ["super_admin","admin","scorer"].includes(currentUser.role);
+  if (!isStaff) { alert('접근 권한이 없어.'); location.href = 'index.html'; }
+  const lineupBody = document.getElementById('lineupBody');
+  const saveBtn = document.getElementById('saveBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const pitcherSelect = document.getElementById('pitcher');
+  const viewBox = document.getElementById('viewBox');
+  const gameDateEdit = document.getElementById('gameDateEdit');
+  const typeButtons = [...document.querySelectorAll('.seg-btn')];
+  let rosterPlayers = []; let currentType = 'practice';
+  const positionList = ['P','C','1B','2B','3B','SS','LF','CF','RF'];
+  function getDisplayName(user){ return user.rosterNick && user.rosterNick.trim() ? user.rosterNick.trim() : user.mcNick; }
+  function getDefaultDate(){ const now = new Date(); return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`; }
+  function docId(date, type){ return `${type}_${date}`; }
+  function typeLabel(type){ return type === 'league' ? '리그 경기' : '연습경기'; }
+  function createLineupInputs(){
+    lineupBody.innerHTML='';
+    for(let i=1;i<=9;i++){
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${i}</td><td><select id="name-${i}" class="select"><option value="">선수 선택</option></select></td><td><select id="pos-${i}" class="select"><option value="">포지션 선택</option>${positionList.map(pos=>`<option value="${pos}">${pos}</option>`).join('')}</select></td><td><select id="bat-${i}" class="select"><option value="">선택</option><option value="우타">우타</option><option value="좌타">좌타</option><option value="양타">양타</option></select></td>`;
+      lineupBody.appendChild(row);
     }
-
-    const lineupBody = document.getElementById("lineupBody");
-    const saveBtn = document.getElementById("saveBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const pitcherSelect = document.getElementById("pitcher");
-    const viewBox = document.getElementById("viewBox");
-    const gameDateEdit = document.getElementById("gameDateEdit");
-
-    let rosterPlayers = [];
-
-    const positionList = [
-      { name: "투수", value: "P" },
-      { name: "포수", value: "C" },
-      { name: "1루", value: "1B" },
-      { name: "2루", value: "2B" },
-      { name: "3루", value: "3B" },
-      { name: "유격수", value: "SS" },
-      { name: "좌익수", value: "LF" },
-      { name: "중견수", value: "CF" },
-      { name: "우익수", value: "RF" }
-    ];
-
-    function getDisplayName(user) {
-      return user.rosterNick && user.rosterNick.trim()
-        ? user.rosterNick.trim()
-        : user.mcNick;
+  }
+  function fillRosterOptions(){
+    const sorted = [...rosterPlayers].sort((a,b)=>getDisplayName(a).localeCompare(getDisplayName(b), 'ko'));
+    pitcherSelect.innerHTML = '<option value="">선발투수 선택</option>';
+    sorted.forEach(player=>{ const name=getDisplayName(player); pitcherSelect.innerHTML += `<option value="${name}">${name}</option>`; });
+    for(let i=1;i<=9;i++){
+      const select = document.getElementById(`name-${i}`);
+      select.innerHTML = '<option value="">선수 선택</option>' + sorted.map(player=>{ const name=getDisplayName(player); return `<option value="${name}">${name}</option>`; }).join('');
     }
-
-    function getDefaultDate() {
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, "0");
-      const dd = String(now.getDate()).padStart(2, "0");
-      return `${yyyy}-${mm}-${dd}`;
-    }
-
-    function createLineupInputs() {
-      lineupBody.innerHTML = "";
-
-      for (let i = 1; i <= 9; i++) {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td class="lineup-order">${i}</td>
-          <td>
-            <select id="name-${i}" class="lineup-select">
-              <option value="">선수 선택</option>
-            </select>
-          </td>
-          <td>
-            <select id="pos-${i}" class="lineup-select">
-              <option value="">포지션 선택</option>
-            </select>
-          </td>
-          <td>
-            <select id="bat-${i}" class="lineup-select">
-              <option value="">선택</option>
-              <option value="우타">우타</option>
-              <option value="좌타">좌타</option>
-              <option value="양타">양타</option>
-            </select>
-          </td>
-        `;
-        lineupBody.appendChild(row);
-      }
-    }
-
-    function fillRosterOptions() {
-      const sortedPlayers = [...rosterPlayers].sort((a, b) =>
-        getDisplayName(a).localeCompare(getDisplayName(b), "ko")
-      );
-
-      pitcherSelect.innerHTML = `<option value="">선발투수 선택</option>`;
-      sortedPlayers.forEach(player => {
-        const option = document.createElement("option");
-        option.value = getDisplayName(player);
-        option.textContent = getDisplayName(player);
-        pitcherSelect.appendChild(option);
-      });
-
-      for (let i = 1; i <= 9; i++) {
-        const select = document.getElementById(`name-${i}`);
-        if (!select) continue;
-
-        select.innerHTML = `<option value="">선수 선택</option>`;
-        sortedPlayers.forEach(player => {
-          const option = document.createElement("option");
-          option.value = getDisplayName(player);
-          option.textContent = getDisplayName(player);
-          select.appendChild(option);
-        });
-      }
-    }
-
-    function fillPositionOptions() {
-      for (let i = 1; i <= 9; i++) {
-        const select = document.getElementById(`pos-${i}`);
-        if (!select) continue;
-
-        select.innerHTML = `<option value="">포지션 선택</option>`;
-        positionList.forEach(pos => {
-          const option = document.createElement("option");
-          option.value = pos.value;
-          option.textContent = pos.name;
-          select.appendChild(option);
-        });
-      }
-    }
-
-    function getLineupData() {
-      const players = [];
-
-      for (let i = 1; i <= 9; i++) {
-        players.push({
-          order: i,
-          name: document.getElementById(`name-${i}`).value.trim(),
-          position: document.getElementById(`pos-${i}`).value.trim(),
-          batting: document.getElementById(`bat-${i}`).value.trim()
-        });
-      }
-
-      return {
-        gameDate: gameDateEdit.value,
-        pitcher: pitcherSelect.value.trim(),
-        players,
-        updatedAt: Date.now()
-      };
-    }
-
-    function fillInputs(data) {
-      pitcherSelect.value = data?.pitcher || "";
-      for (let i = 1; i <= 9; i++) {
-        const player = data?.players?.find(p => p.order === i);
-        document.getElementById(`name-${i}`).value = player?.name || "";
-        document.getElementById(`pos-${i}`).value = player?.position || "";
-        document.getElementById(`bat-${i}`).value = player?.batting || "";
-      }
-    }
-
-    function renderView(data) {
-      if (!data || (!data.pitcher && (!data.players || data.players.every(p => !p.name && !p.position && !p.batting)))) {
-        viewBox.innerHTML = `<p class="empty-text">아직 저장된 라인업이 없어.</p>`;
-        return;
-      }
-
-      let html = `
-        <div class="view-row">
-          <div class="view-left">SP</div>
-          <div class="view-mid">${data.pitcher || "-"}</div>
-          <div class="view-right">선발투수</div>
-        </div>
-      `;
-
-      (data.players || []).forEach(player => {
-        const battingText = player.batting ? ` (${player.batting})` : "";
-        html += `
-          <div class="view-row">
-            <div class="view-left">${player.order}</div>
-            <div class="view-mid">${player.name || "-"}${battingText}</div>
-            <div class="view-right">${player.position || "-"}</div>
-          </div>
-        `;
-      });
-
-      viewBox.innerHTML = html;
-    }
-
-    async function loadLineupByDate(dateStr) {
-      if (!dateStr) {
-        renderView(null);
-        return;
-      }
-
-      const snap = await getDoc(doc(db, "lineups", dateStr));
-
-      if (snap.exists()) {
-        const data = snap.data();
-        renderView(data);
-        fillInputs(data);
-      } else {
-        renderView(null);
-        resetInputsOnly();
-      }
-    }
-
-    async function saveLineup() {
-      const data = getLineupData();
-
-      if (!data.gameDate) {
-        alert("날짜를 선택해줘.");
-        return;
-      }
-
-      saveBtn.disabled = true;
-      saveBtn.textContent = "저장 중...";
-
-      try {
-        await setDoc(doc(db, "lineups", data.gameDate), data);
-        alert("라인업 저장 완료!");
-        await loadLineupByDate(data.gameDate);
-      } catch (error) {
-        console.error(error);
-        alert("라인업 저장 중 오류가 발생했어.");
-      } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = "저장";
-      }
-    }
-
-    function resetInputsOnly() {
-      pitcherSelect.value = "";
-      for (let i = 1; i <= 9; i++) {
-        document.getElementById(`name-${i}`).value = "";
-        document.getElementById(`pos-${i}`).value = "";
-        document.getElementById(`bat-${i}`).value = "";
-      }
-    }
-
-    function resetAll() {
-      gameDateEdit.value = getDefaultDate();
-      resetInputsOnly();
-      loadLineupByDate(gameDateEdit.value);
-    }
-
-    createLineupInputs();
-    fillPositionOptions();
-
-    gameDateEdit.value = getDefaultDate();
-
-    saveBtn.addEventListener("click", saveLineup);
-    resetBtn.addEventListener("click", resetAll);
-    gameDateEdit.addEventListener("change", () => loadLineupByDate(gameDateEdit.value));
-
-    const rosterQuery = query(
-      collection(db, "users"),
-      where("approved", "==", true)
-    );
-
-    onSnapshot(rosterQuery, (snapshot) => {
-      rosterPlayers = [];
-      snapshot.forEach((docu) => {
-        rosterPlayers.push({
-          id: docu.id,
-          ...docu.data()
-        });
-      });
-      fillRosterOptions();
-      loadLineupByDate(gameDateEdit.value);
-    });
-  </script>
-
+  }
+  function fillInputs(data){ pitcherSelect.value = data?.pitcher || ''; for(let i=1;i<=9;i++){ const player=data?.players?.find(p=>p.order===i); document.getElementById(`name-${i}`).value=player?.name||''; document.getElementById(`pos-${i}`).value=player?.position||''; document.getElementById(`bat-${i}`).value=player?.batting||''; } }
+  function resetInputsOnly(){ pitcherSelect.value=''; for(let i=1;i<=9;i++){ document.getElementById(`name-${i}`).value=''; document.getElementById(`pos-${i}`).value=''; document.getElementById(`bat-${i}`).value=''; } }
+  function renderView(data){
+    if(!data || !data.players || data.players.length===0){ viewBox.innerHTML = '<div class="item-card"><div class="empty-text">저장된 라인업이 없어.</div></div>'; return; }
+    let html = `<div class="item-card"><div class="item-top"><div><div class="item-title">선발투수</div><div class="item-meta">${data.pitcher || '-'}</div></div><span class="record-chip ${currentType==='league'?'league':'practice'}">${typeLabel(currentType)}</span></div></div>`;
+    data.players.forEach(player=>{ html += `<div class="item-card"><div class="item-top"><div class="item-title">${player.order}번 ${player.name || '-'}</div><div class="item-meta">${player.position || '-'} ${player.batting ? '· ' + player.batting : ''}</div></div></div>`; });
+    viewBox.innerHTML = html;
+  }
+  async function loadLineupByDate(dateStr){
+    if(!dateStr){ renderView(null); return; }
+    let snap = await getDoc(doc(db, 'lineups', docId(dateStr, currentType)));
+    if(!snap.exists() && currentType === 'league') snap = await getDoc(doc(db, 'lineups', dateStr));
+    if(snap.exists()){ const data = snap.data(); renderView(data); fillInputs(data); } else { renderView(null); resetInputsOnly(); }
+  }
+  function getLineupData(){ const players=[]; for(let i=1;i<=9;i++){ players.push({ order:i, name:document.getElementById(`name-${i}`).value.trim(), position:document.getElementById(`pos-${i}`).value.trim(), batting:document.getElementById(`bat-${i}`).value.trim() }); } return { gameDate: gameDateEdit.value, gameType: currentType, pitcher: pitcherSelect.value.trim(), players, updatedAt: Date.now(), updatedBy: currentUser?.mcNick || currentUser?.email || 'admin' }; }
+  async function saveLineup(){ const data = getLineupData(); if(!data.gameDate){ alert('날짜를 선택해줘.'); return; } saveBtn.disabled=true; saveBtn.textContent='저장 중...'; try { const id = docId(data.gameDate, currentType); await setDoc(doc(db, 'lineups', id), data); await addDoc(collection(db, 'lineup_logs'), { lineupId:id, gameDate:data.gameDate, gameType:data.gameType, pitcher:data.pitcher, players:data.players, updatedAt:data.updatedAt, updatedBy:data.updatedBy }); alert('라인업 저장 완료!'); await loadLineupByDate(data.gameDate); } catch(error){ console.error(error); alert('라인업 저장 중 오류가 발생했어.'); } finally { saveBtn.disabled=false; saveBtn.textContent='저장'; } }
+  function resetAll(){ gameDateEdit.value=getDefaultDate(); resetInputsOnly(); loadLineupByDate(gameDateEdit.value); }
+  createLineupInputs();
+  gameDateEdit.value=getDefaultDate();
+  saveBtn.addEventListener('click', saveLineup); resetBtn.addEventListener('click', resetAll); gameDateEdit.addEventListener('change', ()=>loadLineupByDate(gameDateEdit.value));
+  typeButtons.forEach(btn=>btn.addEventListener('click', ()=>{ currentType = btn.dataset.type; typeButtons.forEach(b=>b.classList.toggle('active', b===btn)); loadLineupByDate(gameDateEdit.value); }));
+  const rosterQuery = query(collection(db, 'users'), where('approved','==', true));
+  onSnapshot(rosterQuery, (snapshot)=>{ rosterPlayers=[]; snapshot.forEach(docu=>rosterPlayers.push({id:docu.id, ...docu.data()})); fillRosterOptions(); loadLineupByDate(gameDateEdit.value); });
+</script>
 </body>
 </html>

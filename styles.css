@@ -1,545 +1,93 @@
-* {
-  box-sizing: border-box;
-}
 
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
 body {
-  margin: 0;
-  background: #f3f3f3;
-  color: #111111;
+  background: #f4f6f8;
+  color: #111827;
   font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  line-height: 1.5;
 }
-
-a {
-  color: inherit;
+a { color: inherit; }
+.wrap, .section, .page { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
+.page { min-height: 100vh; padding: 32px 0 48px; }
+.top-title, .top-header {
+  display:flex; justify-content:space-between; align-items:flex-end; gap:16px;
+  padding: 18px 0 22px; border-bottom: 1px solid #d7dde4;
 }
-
-.wrap,
-.section,
-.page {
-  width: min(1200px, calc(100% - 32px));
-  margin: 0 auto;
+.top-title h1, .top-header h1 {
+  margin:0; font-size:48px; font-weight:300; letter-spacing:0.04em;
 }
-
-.page {
-  min-height: 100vh;
-  padding: 40px 0;
-}
-
-.top-title,
-.top-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 20px 0 24px;
-  border-bottom: 1px solid #bdbdbd;
-}
-
-.top-title h1,
-.top-header h1 {
-  margin: 0;
-  font-size: 64px;
-  font-weight: 300;
-  letter-spacing: 0.08em;
-}
-
-.top-link,
-.home-link {
-  font-size: 20px;
-  text-decoration: none;
-  color: #444444;
-}
-
-.top-link:hover,
-.home-link:hover,
-.menu a:hover,
-.back-link:hover {
-  opacity: 0.7;
-}
-
+.top-link, .home-link { text-decoration:none; color:#4b5563; font-size:18px; font-weight:500; }
+.top-link:hover, .home-link:hover, .menu a:hover, .back-link:hover, .seg-btn:hover, .filter-chip:hover { opacity:.72; }
 .menu {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 16px 0 0;
+  display:flex; flex-wrap:wrap; gap:10px; padding:16px 0 0;
 }
-
 .menu a {
-  text-decoration: none;
-  padding: 10px 14px;
-  border-radius: 14px;
-  background: #ffffff;
-  border: 1px solid #d6d6d6;
-  font-size: 18px;
+  text-decoration:none; padding:10px 15px; border-radius:999px; background:#fff; border:1px solid #dbe2ea;
+  font-size:15px; color:#4b5563; transition:.2s ease;
 }
-
-.hidden {
-  display: none !important;
+.menu a.active, .menu a[aria-current="page"] { color:#111827; border-color:#111827; }
+.hidden { display:none !important; }
+.main-box, .home-box, .card-box, .panel, .lineup-card, .pitcher-card, .record-card, .roster-header-card, .roster-card, .mypage-card, .sheet-card, .user-row, .empty-box, .surface {
+  background:#fff; border:1px solid #e5e9ef; border-radius:28px; box-shadow:0 12px 30px rgba(15,23,42,.05);
 }
-
-.main-box,
-.home-box,
-.card-box,
-.panel,
-.lineup-card,
-.pitcher-card,
-.record-card,
-.roster-header-card,
-.roster-card,
-.mypage-card,
-.sheet-card,
-.user-row,
-.empty-box {
-  background: #f8f8f8;
-  border: 1px solid #e5e5e5;
-  border-radius: 24px;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.02);
+.main-box, .home-box { max-width:980px; margin:32px auto 0; padding:36px; }
+.card-box { max-width:760px; margin:32px auto 0; padding:32px; }
+.main-box-title, .home-box h2, .card-box h2 { margin:0; font-size:56px; font-weight:800; line-height:1.05; letter-spacing:-0.04em; }
+.main-box-desc, .home-box p, .page-note, .lineup-note, .sheet-note, .record-note, .mypage-note, .roster-header-card p, .info-text, .msg {
+  margin-top:14px; font-size:18px; color:#6b7280; line-height:1.6;
 }
-
-.main-box,
-.home-box {
-  max-width: 900px;
-  margin: 48px auto 0;
-  padding: 32px;
+.home-links, .info-grid, .menu-grid, .bottom-grid, .dashboard-grid {
+  margin-top:28px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px;
 }
-
-.card-box {
-  max-width: 720px;
-  margin: 48px auto 0;
-  padding: 32px;
+.menu-card, .action-card, .home-links a, .bottom-grid a, .info-card {
+  display:block; text-decoration:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:22px; padding:24px; transition:.2s ease;
 }
-
-.home-box {
-  text-align: left;
+.menu-card:hover, .action-card:hover, .home-links a:hover, .bottom-grid a:hover, .info-card:hover { border-color:#94a3b8; transform:translateY(-1px); }
+.menu-card .title, .action-card .title, .home-links .title, .bottom-grid .title, .info-card .title { font-size:28px; font-weight:700; line-height:1.2; }
+.menu-card .sub, .action-card .sub, .home-links .sub, .bottom-grid .sub, .info-card .sub {
+  margin-top:8px; font-size:12px; color:#94a3b8; letter-spacing:.12em; text-transform:uppercase;
 }
-
-.main-box-title,
-.home-box h2,
-.card-box h2 {
-  margin: 0;
-  font-size: 72px;
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
+.notice, .info-card p { margin-top:10px; font-size:14px; color:#64748b; }
+.back-link { display:inline-block; margin-top:18px; text-decoration:none; color:#475569; }
+.toolbar, .filter-row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:18px; }
+.seg-group { display:inline-flex; gap:8px; padding:6px; background:#eef2f6; border-radius:999px; }
+.seg-btn, .filter-chip {
+  border:none; background:transparent; color:#64748b; padding:10px 16px; border-radius:999px; font-size:14px; font-weight:700; cursor:pointer;
 }
-
-.main-box-desc,
-.home-box p,
-.page-note,
-.lineup-note,
-.sheet-note,
-.record-note,
-.mypage-note,
-.roster-header-card p,
-.info-text,
-.msg {
-  margin-top: 16px;
-  font-size: 22px;
-  font-weight: 300;
-  color: #666666;
-  line-height: 1.6;
+.seg-btn.active, .filter-chip.active { background:#111827; color:#fff; }
+.input, .select, .lineup-input, .lineup-select, .sheet-input, .sheet-select, .cell-input {
+  width:100%; padding:12px 14px; border-radius:14px; border:1px solid #d6dde6; background:#fff; font-size:15px;
 }
-
-.home-links,
-.info-grid,
-.menu-grid,
-.bottom-grid {
-  margin-top: 32px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+.input:focus, .select:focus, .lineup-input:focus, .lineup-select:focus, .sheet-input:focus, .sheet-select:focus, .cell-input:focus {
+  outline:none; border-color:#111827;
 }
-
-.home-links a,
-.info-card,
-.menu-card,
-.bottom-grid a,
-.action-card {
-  display: block;
-  text-decoration: none;
-  background: #ffffff;
-  border: 1px solid #d6d6d6;
-  border-radius: 18px;
-  padding: 28px 24px;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+.primary-btn, .secondary-btn, .lineup-btn, .sheet-btn {
+  padding:12px 18px; border-radius:14px; border:none; cursor:pointer; font-size:15px; font-weight:700;
 }
-
-.home-links a:hover,
-.info-card:hover,
-.menu-card:hover,
-.bottom-grid a:hover,
-.action-card:hover {
-  border-color: #111111;
-  transform: translateY(-1px);
-}
-
-.home-links .title,
-.info-card .title,
-.menu-card .title,
-.bottom-grid .title,
-.action-card .title {
-  font-size: 44px;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.home-links .sub,
-.info-card .sub,
-.menu-card .sub,
-.bottom-grid .sub,
-.action-card .sub {
-  margin-top: 8px;
-  font-size: 16px;
-  font-weight: 300;
-  letter-spacing: 0.08em;
-  color: #7a7a7a;
-  text-transform: uppercase;
-}
-
-.notice,
-.info-card p {
-  margin-top: 12px;
-  font-size: 15px;
-  color: #666666;
-  line-height: 1.6;
-}
-
-.back-link {
-  display: inline-block;
-  margin-top: 24px;
-  text-decoration: none;
-  color: #444444;
-  font-size: 18px;
-}
-
-.form-card {
-  margin-top: 32px;
-  background: #ffffff;
-  border: 1px solid #d6d6d6;
-  border-radius: 18px;
-  padding: 24px;
-}
-
-label {
-  display: block;
-  margin-top: 14px;
-  margin-bottom: 8px;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.input,
-.inline-input,
-.lineup-input,
-.lineup-select,
-.pitcher-input,
-.pitcher-select,
-.sheet-input,
-.sheet-select,
-.cell-input,
-.mypage-input,
-select,
-textarea,
-input {
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 14px 16px;
-  border: 1px solid #cccccc;
-  border-radius: 14px;
-  font-size: 16px;
-  background: #ffffff;
-  font-family: inherit;
-}
-
-textarea {
-  resize: vertical;
-}
-
-.button-row,
-.page-actions,
-.action-row,
-.section-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.btn,
-.small-btn,
-.lineup-btn,
-.pitcher-btn,
-.sheet-btn,
-.mypage-btn,
-.primary-button,
-.secondary-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  padding: 12px 18px;
-  border-radius: 14px;
-  border: 1px solid #111111;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 16px;
-  font-family: inherit;
-  transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
-}
-
-.btn,
-.small-btn,
-.lineup-btn,
-.pitcher-btn,
-.sheet-btn,
-.mypage-btn,
-.primary-button {
-  background: #111111;
-  color: #ffffff;
-}
-
-.btn.sub,
-.small-btn.sub,
-.lineup-btn.sub,
-.pitcher-btn.sub,
-.sheet-btn.sub,
-.mypage-btn.sub,
-.secondary-button {
-  background: #ffffff;
-  color: #111111;
-  border-color: #d0d0d0;
-}
-
-.small-btn.red,
-.pitcher-btn.delete,
-.sheet-btn.delete {
-  background: #b00020;
-  color: #ffffff;
-  border-color: #b00020;
-}
-
-.btn:hover,
-.small-btn:hover,
-.lineup-btn:hover,
-.pitcher-btn:hover,
-.sheet-btn:hover,
-.mypage-btn:hover,
-.primary-button:hover,
-.secondary-button:hover {
-  opacity: 0.92;
-}
-
-.btn:disabled,
-.small-btn:disabled,
-.lineup-btn:disabled,
-.pitcher-btn:disabled,
-.sheet-btn:disabled,
-.mypage-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.section,
-.lineup-wrap,
-.pitcher-wrap,
-.record-wrap,
-.roster-wrap,
-.mypage-wrap,
-.sheet-wrap {
-  width: min(1100px, calc(100% - 32px));
-  margin: 34px auto;
-}
-
-.panel,
-.lineup-card,
-.pitcher-card,
-.record-card,
-.roster-header-card,
-.roster-card,
-.mypage-card,
-.sheet-card,
-.user-row,
-.empty-box {
-  padding: 24px;
-  margin-bottom: 18px;
-}
-
-.section h2,
-.lineup-card h2,
-.pitcher-card h2,
-.roster-header-card h2,
-.sheet-card h2,
-.card-title {
-  margin: 0 0 14px;
-  font-size: 40px;
-}
-
-.home-links a,
-.roster-card,
-.user-row,
-.list-item,
-.view-box,
-.record-box,
-.stat-box {
-  background: #ffffff;
-}
-
-.list-item,
-.view-box,
-.record-box,
-.stat-box {
-  border: 1px solid #ececec;
-  border-radius: 16px;
-}
-
-.table-card,
-.sheet-table-wrap {
-  margin-top: 24px;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 18px;
-  overflow-x: auto;
-}
-
-table,
-.sheet-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 640px;
-}
-
-thead th,
-.sheet-table th {
-  background: #f5f5f5;
-  font-size: 15px;
-  font-weight: 700;
-  color: #333333;
-}
-
-th, td,
-.sheet-table th,
-.sheet-table td {
-  padding: 14px 12px;
-  border-bottom: 1px solid #eeeeee;
-  text-align: left;
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
-.badge,
-.status-badge,
-.role-badge,
-.pitch-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.badge.member,
-.status-pending,
-.role-member {
-  background: #e9ecef;
-  color: #222222;
-}
-
-.badge.owner,
-.role-owner { background: #ff6a00; color: white; }
-.badge.admin,
-.role-admin { background: #8b0000; color: white; }
-.badge.scorer,
-.role-scorer { background: #1b65ba; color: white; }
-.status-approved { background: #e8f7ec; color: #0a7a2f; }
-
-@media (max-width: 1024px) {
-  .top-title h1,
-  .top-header h1,
-  .main-box-title,
-  .home-box h2,
-  .card-box h2 { font-size: 56px; }
-  .main-box-desc,
-  .home-box p { font-size: 20px; }
-  .home-links .title,
-  .info-card .title,
-  .menu-card .title,
-  .bottom-grid .title,
-  .action-card .title { font-size: 34px; }
-}
-
-@media (max-width: 768px) {
-  .wrap,
-  .section,
-  .page,
-  .lineup-wrap,
-  .pitcher-wrap,
-  .record-wrap,
-  .roster-wrap,
-  .mypage-wrap,
-  .sheet-wrap { width: min(100%, calc(100% - 24px)); }
-  .page { padding: 24px 0; }
-  .top-title,
-  .top-header { align-items: flex-start; flex-direction: column; }
-  .top-title h1,
-  .top-header h1,
-  .main-box-title,
-  .home-box h2,
-  .card-box h2 { font-size: 42px; }
-  .main-box,
-  .home-box,
-  .card-box { padding: 24px; }
-  .main-box-desc,
-  .home-box p,
-  .page-note,
-  .lineup-note,
-  .sheet-note,
-  .record-note,
-  .mypage-note,
-  .roster-header-card p,
-  .info-text,
-  .msg { font-size: 17px; }
-  .home-links,
-  .info-grid,
-  .menu-grid,
-  .bottom-grid { grid-template-columns: 1fr; }
-  .menu a { font-size: 16px; }
-  .home-links .title,
-  .info-card .title,
-  .menu-card .title,
-  .bottom-grid .title,
-  .action-card .title,
-  .section h2,
-  .lineup-card h2,
-  .pitcher-card h2,
-  .roster-header-card h2,
-  .sheet-card h2,
-  .card-title { font-size: 28px; }
-  table,
-  .sheet-table { min-width: 560px; }
-}
-.home-link {
-  font-size: 20px;
-  font-weight: 300;
-  text-decoration: none;   
-  color: #111111;         
-  cursor: pointer;
-}
-
-.home-link:visited {
-  color: #111111;          
-}
-
-.home-link:hover {
-  opacity: 0.6;
-}
-.home-link,
-.home-link:visited,
-.home-link:active {
-  color: #111111 !important;
-  text-decoration: none !important;
+.primary-btn, .lineup-btn, .sheet-btn { background:#111827; color:#fff; }
+.secondary-btn, .lineup-btn.sub, .sheet-btn.sub { background:#e5e7eb; color:#111827; }
+.badge { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#eff6ff; color:#2563eb; font-size:12px; font-weight:700; }
+.split-grid { display:grid; grid-template-columns:1.2fr .8fr; gap:20px; }
+.list-stack { display:grid; gap:14px; }
+.item-card { background:#f8fafc; border:1px solid #e2e8f0; border-radius:20px; padding:18px; }
+.item-top { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap; }
+.item-title { font-size:24px; font-weight:800; }
+.item-meta { color:#64748b; font-size:14px; margin-top:6px; }
+.empty-text { color:#6b7280; }
+.record-chip { display:inline-flex; align-items:center; gap:8px; padding:7px 11px; border-radius:999px; font-size:12px; font-weight:800; }
+.record-chip.league { background:#ecfeff; color:#0f766e; }
+.record-chip.practice { background:#fef3c7; color:#92400e; }
+.record-chip.win { background:#dcfce7; color:#166534; }
+.record-chip.lose { background:#fee2e2; color:#991b1b; }
+.record-chip.draw { background:#e5e7eb; color:#374151; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th, .list-table td { padding:12px 10px; border-bottom:1px solid #eef2f7; text-align:left; }
+.list-table th { color:#64748b; font-size:13px; }
+.card-header { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; flex-wrap:wrap; margin-bottom:14px; }
+.muted { color:#64748b; }
+@media (max-width: 900px) {
+  .top-title h1, .top-header h1 { font-size:38px; }
+  .main-box-title, .home-box h2, .card-box h2 { font-size:40px; }
+  .home-links, .info-grid, .menu-grid, .bottom-grid, .dashboard-grid, .split-grid { grid-template-columns:1fr; }
 }

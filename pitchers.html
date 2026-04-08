@@ -5,329 +5,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>레이 마린스 - 투수 정보</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background: #f3f3f3;
-      color: #111111;
-      font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-    }
-
-    .page {
-      max-width: 1280px;
-      margin: 0 auto;
-      min-height: 100vh;
-      padding: 36px 32px 60px;
-    }
-
-    .top-header {
-      border-bottom: 1px solid #222222;
-      padding-bottom: 24px;
-      margin-bottom: 22px;
-    }
-
-    .header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .top-header h1 {
-      font-size: 72px;
-      font-weight: 300;
-      letter-spacing: 0.08em;
-      line-height: 1;
-    }
-
-    .home-link,
-    .home-link:visited,
-    .home-link:active {
-      color: #111111 !important;
-      text-decoration: none !important;
-      font-size: 20px;
-      font-weight: 300;
-    }
-
-    .home-link:hover {
-      opacity: 0.65;
-    }
-
-    .tab-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 36px;
-    }
-
-    .tab-link,
-    .tab-link:visited,
-    .tab-link:active {
-      text-decoration: none !important;
-      color: #111111 !important;
-      background: #ffffff;
-      border: 1px solid #d6d6d6;
-      border-radius: 14px;
-      padding: 10px 16px;
-      font-size: 17px;
-      font-weight: 500;
-    }
-
-    .tab-link.active {
-      border-color: #111111;
-      background: #f8f8f8;
-    }
-
-    .main-box {
-      max-width: 1000px;
-      margin: 0 auto;
-      background: #f8f8f8;
-      border-radius: 28px;
-      padding: 34px 34px 28px;
-      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
-    }
-
-    .main-box-title {
-      font-size: 72px;
-      font-weight: 700;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-      text-align: center;
-    }
-
-    .main-box-desc {
-      margin-top: 18px;
-      font-size: 26px;
-      font-weight: 300;
-      color: #666666;
-      word-break: keep-all;
-      text-align: center;
-    }
-
-    .search-box {
-      margin-top: 34px;
-      background: #ffffff;
-      border: 1px solid #d6d6d6;
-      border-radius: 22px;
-      padding: 24px;
-    }
-
-    .search-label {
-      display: block;
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 16px;
-    }
-
-    .search-row {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-    }
-
-    .search-input-wrap {
-      position: relative;
-      flex: 1;
-    }
-
-    .search-input {
-      width: 100%;
-      height: 60px;
-      border: 1px solid #d6d6d6;
-      border-radius: 16px;
-      padding: 0 56px 0 20px;
-      font-size: 20px;
-      background: #ffffff;
-      color: #111111;
-      outline: none;
-    }
-
-    .search-input:focus {
-      border-color: #111111;
-    }
-
-    .dropdown-btn {
-      position: absolute;
-      top: 50%;
-      right: 14px;
-      transform: translateY(-50%);
-      border: none;
-      background: transparent;
-      font-size: 18px;
-      color: #888888;
-      cursor: pointer;
-      line-height: 1;
-    }
-
-    .search-btn {
-      height: 60px;
-      min-width: 92px;
-      padding: 0 24px;
-      border: 1px solid #111111;
-      border-radius: 18px;
-      background: #111111;
-      color: #ffffff;
-      font-size: 22px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .autocomplete-box {
-      position: absolute;
-      top: calc(100% + 8px);
-      left: 0;
-      width: 100%;
-      background: #ffffff;
-      border: 1px solid #d6d6d6;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-      display: none;
-      z-index: 50;
-      max-height: 320px;
-      overflow-y: auto;
-    }
-
-    .autocomplete-item {
-      padding: 14px 18px;
-      font-size: 18px;
-      cursor: pointer;
-      border-bottom: 1px solid #efefef;
-      background: #ffffff;
-    }
-
-    .autocomplete-item:last-child {
-      border-bottom: none;
-    }
-
-    .autocomplete-item:hover,
-    .autocomplete-item.active {
-      background: #f5f5f5;
-    }
-
-    .loading-text,
-    .empty-text {
-      margin-top: 16px;
-      font-size: 17px;
-      color: #666666;
-    }
-
-    .result-box {
-      display: none;
-      margin-top: 24px;
-      background: #ffffff;
-      border: 1px solid #d6d6d6;
-      border-radius: 22px;
-      overflow: hidden;
-    }
-
-    .result-top {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 24px 24px 18px;
-      border-bottom: 1px solid #ececec;
-    }
-
-    .result-logo {
-      width: 64px;
-      height: 64px;
-      object-fit: contain;
-      flex-shrink: 0;
-      border-radius: 50%;
-      background: #ffffff;
-    }
-
-    .result-name {
-      font-size: 48px;
-      font-weight: 800;
-      line-height: 1.1;
-    }
-
-    .result-sub {
-      margin-top: 6px;
-      font-size: 22px;
-      color: #666666;
-      font-weight: 400;
-    }
-
-    .result-grid {
-      padding: 22px 24px 24px;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    .info-card {
-      border: 1px solid #e2e2e2;
-      border-radius: 18px;
-      background: #fafafa;
-      padding: 18px;
-    }
-
-    .info-label {
-      font-size: 15px;
-      letter-spacing: 0.06em;
-      color: #7a7a7a;
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
-
-    .info-value {
-      font-size: 28px;
-      font-weight: 700;
-      word-break: keep-all;
-      line-height: 1.35;
-    }
-
-    @media (max-width: 768px) {
-      .page {
-        padding: 24px 16px 44px;
-      }
-
-      .top-header h1 {
-        font-size: 40px;
-      }
-
-      .home-link {
-        font-size: 16px !important;
-      }
-
-      .main-box {
-        padding: 24px 18px 20px;
-      }
-
-      .main-box-title {
-        font-size: 42px;
-      }
-
-      .main-box-desc {
-        font-size: 18px;
-      }
-
-      .search-row {
-        flex-direction: column;
-      }
-
-      .search-btn {
-        width: 100%;
-      }
-
-      .result-name {
-        font-size: 32px;
-      }
-
-      .result-sub {
-        font-size: 18px;
-      }
-
-      .info-value {
-        font-size: 21px;
-      }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f3f3f3; color: #111111; font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+    .page { max-width: 1280px; margin: 0 auto; min-height: 100vh; padding: 36px 32px 60px; }
+    .top-header { border-bottom: 1px solid #222222; padding-bottom: 24px; margin-bottom: 22px; }
+    .header-row { display:flex; justify-content:space-between; align-items:center; gap:20px; }
+    .top-header h1 { font-size:72px; font-weight:300; letter-spacing:0.08em; line-height:1; }
+    .home-link, .home-link:visited, .home-link:active { color:#111111 !important; text-decoration:none !important; font-size:20px; font-weight:300; }
+    .home-link:hover { opacity:.65; }
+    .tab-row { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:36px; }
+    .tab-link, .tab-link:visited, .tab-link:active { text-decoration:none !important; color:#111111 !important; background:#ffffff; border:1px solid #d6d6d6; border-radius:14px; padding:10px 16px; font-size:17px; font-weight:500; }
+    .tab-link.active { border-color:#111111; background:#f8f8f8; }
+    .main-box { max-width:1000px; margin:0 auto; background:#f8f8f8; border-radius:28px; padding:34px 34px 28px; box-shadow:0 0 0 1px rgba(0,0,0,.04); }
+    .main-box-title { font-size:72px; font-weight:700; line-height:1.05; letter-spacing:-0.03em; text-align:center; }
+    .main-box-desc { margin-top:18px; font-size:26px; font-weight:300; color:#666666; word-break:keep-all; text-align:center; }
+    .search-box { margin-top:34px; background:#ffffff; border:1px solid #d6d6d6; border-radius:22px; padding:24px; }
+    .search-label { display:block; font-size:18px; font-weight:700; margin-bottom:16px; }
+    .search-row { display:flex; gap:14px; align-items:flex-start; }
+    .search-input-wrap { position:relative; flex:1; }
+    .search-input { width:100%; height:60px; border:1px solid #d6d6d6; border-radius:16px; padding:0 56px 0 20px; font-size:20px; background:#ffffff; color:#111111; outline:none; }
+    .search-input:focus { border-color:#111111; }
+    .dropdown-btn { position:absolute; top:50%; right:14px; transform:translateY(-50%); border:none; background:transparent; font-size:18px; color:#888888; cursor:pointer; line-height:1; }
+    .search-btn { height:60px; min-width:92px; padding:0 24px; border:1px solid #111111; border-radius:18px; background:#111111; color:#ffffff; font-size:22px; font-weight:700; cursor:pointer; }
+    .autocomplete-box { position:absolute; top:calc(100% + 8px); left:0; width:100%; background:#ffffff; border:1px solid #d6d6d6; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.08); overflow:hidden; display:none; z-index:50; max-height:320px; overflow-y:auto; }
+    .autocomplete-item { padding:14px 18px; font-size:18px; cursor:pointer; border-bottom:1px solid #efefef; background:#ffffff; }
+    .autocomplete-item:last-child { border-bottom:none; }
+    .autocomplete-item:hover, .autocomplete-item.active { background:#f5f5f5; }
+    .loading-text, .empty-text { margin-top:16px; font-size:17px; color:#666666; }
+    .result-box { display:none; margin-top:24px; background:#ffffff; border:1px solid #d6d6d6; border-radius:22px; overflow:hidden; }
+    .result-top { display:flex; align-items:center; gap:16px; padding:24px 24px 18px; border-bottom:1px solid #ececec; }
+    .result-logo { width:64px; height:64px; object-fit:contain; flex-shrink:0; border-radius:50%; background:#ffffff; }
+    .result-name { font-size:48px; font-weight:800; line-height:1.1; }
+    .result-sub { margin-top:6px; font-size:22px; color:#666666; font-weight:400; }
+    .result-grid { padding:22px 24px 24px; display:grid; grid-template-columns:1fr; gap:16px; }
+    .info-card { border:1px solid #e2e2e2; border-radius:18px; background:#fafafa; padding:18px; }
+    .info-label { font-size:15px; letter-spacing:0.06em; color:#7a7a7a; margin-bottom:10px; font-weight:600; }
+    .info-value { font-size:28px; font-weight:700; word-break:keep-all; line-height:1.35; }
+    @media (max-width:768px) {
+      .page { padding:24px 16px 44px; }
+      .top-header h1 { font-size:40px; }
+      .home-link { font-size:16px !important; }
+      .main-box { padding:24px 18px 20px; }
+      .main-box-title { font-size:42px; }
+      .main-box-desc { font-size:18px; }
+      .search-row { flex-direction:column; }
+      .search-btn { width:100%; }
+      .result-name { font-size:32px; }
+      .result-sub { font-size:18px; }
+      .info-value { font-size:21px; }
     }
   </style>
 </head>
@@ -344,7 +69,7 @@
       <a href="roster.html" class="tab-link">로스터</a>
       <a href="pitchers.html" class="tab-link active">투수 정보</a>
       <a href="lineup.html" class="tab-link">라인업</a>
-      <a href="stats.html" class="tab-link">기록실</a>
+      <a href="scoresheet.html" class="tab-link">기록실</a>
       <a href="record.html" class="tab-link">기록지</a>
       <a href="mypage.html" class="tab-link">마이페이지</a>
     </nav>
@@ -359,25 +84,15 @@
 
           <div class="search-row">
             <div class="search-input-wrap">
-              <input
-                type="text"
-                id="searchInput"
-                class="search-input"
-                placeholder="투수 닉네임을 입력하세요"
-                autocomplete="off"
-              />
+              <input type="text" id="searchInput" class="search-input" placeholder="투수 닉네임을 입력하세요" autocomplete="off" />
               <button type="button" class="dropdown-btn" id="dropdownBtn">▼</button>
               <div id="autocompleteBox" class="autocomplete-box"></div>
             </div>
-
             <button type="button" class="search-btn" id="searchBtn">검색</button>
           </div>
 
           <p id="loadingText" class="loading-text">투수 목록 불러오는 중...</p>
-          <p id="emptyText" class="empty-text" style="display:none;">
-            검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.
-          </p>
-
+          <p id="emptyText" class="empty-text" style="display:none;">검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.</p>
           <div id="resultBox" class="result-box"></div>
         </div>
       </section>
@@ -386,10 +101,7 @@
 
   <script type="module">
     import { db } from "./firebase-config.js";
-    import {
-      collection,
-      getDocs
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
     const searchInput = document.getElementById("searchInput");
     const searchBtn = document.getElementById("searchBtn");
@@ -416,98 +128,40 @@
     function pickFirstValue(obj, keys) {
       for (const key of keys) {
         const value = obj?.[key];
-
-        if (Array.isArray(value) && value.length > 0) {
-          return value;
-        }
-
-        if (typeof value === "string" && value.trim() !== "") {
-          return value.trim();
-        }
-
-        if (value !== undefined && value !== null && value !== "") {
-          return value;
-        }
+        if (Array.isArray(value) && value.length > 0) return value;
+        if (typeof value === "string" && value.trim() !== "") return value.trim();
+        if (value !== undefined && value !== null && value !== "") return value;
       }
       return "";
     }
 
     function normalizePitchTypes(data) {
-      const arrayValue = pickFirstValue(data, [
-        "pitchTypes",
-        "pitches",
-        "pitchType",
-        "arsenal",
-        "breakingBalls",
-        "구종"
-      ]);
-
-      if (Array.isArray(arrayValue)) {
-        return arrayValue.map(v => String(v).trim()).filter(Boolean);
-      }
-
+      const arrayValue = pickFirstValue(data, ["pitchTypes", "pitches", "pitchType", "arsenal", "breakingBalls", "구종"]);
+      if (Array.isArray(arrayValue)) return arrayValue.map(v => String(v).trim()).filter(Boolean);
       if (typeof arrayValue === "string" && arrayValue.trim()) {
-        return arrayValue
-          .split(",")
-          .map(v => v.trim())
-          .filter(Boolean);
+        return arrayValue.split(",").map(v => v.trim()).filter(Boolean);
       }
-
-      const singles = [
+      return [
         pickFirstValue(data, ["pitch1", "mainPitch", "주구종"]),
         pickFirstValue(data, ["pitch2", "subPitch1"]),
         pickFirstValue(data, ["pitch3", "subPitch2"]),
         pickFirstValue(data, ["pitch4", "subPitch3"])
       ].filter(Boolean);
-
-      return singles;
     }
 
     function normalizeHandedness(data) {
-      const throwSide = pickFirstValue(data, [
-        "handedness",
-        "throwType",
-        "throwHand",
-        "hand",
-        "armSide",
-        "투구방향",
-        "투구"
-      ]);
-
-      const batSide = pickFirstValue(data, [
-        "batType",
-        "batHand",
-        "hitType",
-        "타격방향",
-        "타격"
-      ]);
-
-      if (throwSide && batSide) {
-        return `${throwSide}${batSide}`;
-      }
-
+      const throwSide = pickFirstValue(data, ["handedness", "throwType", "throwHand", "hand", "armSide", "투구방향", "투구"]);
+      const batSide = pickFirstValue(data, ["batType", "batHand", "hitType", "타격방향", "타격"]);
+      if (throwSide && batSide) return `${throwSide}${batSide}`;
       return throwSide || "-";
     }
 
     function normalizeLogo(data) {
-      return pickFirstValue(data, [
-        "logo",
-        "logoUrl",
-        "teamLogo",
-        "logoPath"
-      ]) || "logos/default.png";
+      return pickFirstValue(data, ["logo", "logoUrl", "teamLogo", "logoPath"]) || "logos/default.png";
     }
 
     function normalizeNickname(data) {
-      return String(
-        pickFirstValue(data, [
-          "nickname",
-          "name",
-          "playerName",
-          "minecraftNickname",
-          "nickName"
-        ]) || ""
-      ).trim();
+      return String(pickFirstValue(data, ["nickname", "name", "playerName", "minecraftNickname", "nickName"]) || "").trim();
     }
 
     function showGuide(message) {
@@ -526,44 +180,33 @@
 
     function updateActiveItem() {
       const items = autocompleteBox.querySelectorAll(".autocomplete-item");
-      items.forEach((item, index) => {
-        item.classList.toggle("active", index === activeIndex);
-      });
+      items.forEach((item, index) => item.classList.toggle("active", index === activeIndex));
     }
 
     function getFilteredSuggestions(keyword) {
       const text = keyword.trim().toLowerCase();
       if (!text) return [];
-      return pitcherNames
-        .filter(name => name.toLowerCase().includes(text))
-        .slice(0, 8);
+      return pitcherNames.filter(name => name.toLowerCase().includes(text)).slice(0, 8);
     }
 
     function showAutocomplete(items) {
       autocompleteBox.innerHTML = "";
       currentSuggestions = items;
       activeIndex = -1;
-
-      if (!items.length) {
-        hideAutocomplete();
-        return;
-      }
+      if (!items.length) return hideAutocomplete();
 
       items.forEach((name) => {
         const item = document.createElement("div");
         item.className = "autocomplete-item";
         item.textContent = name;
-
         item.addEventListener("mousedown", (e) => {
           e.preventDefault();
           searchInput.value = name;
           hideAutocomplete();
           searchPitcher();
         });
-
         autocompleteBox.appendChild(item);
       });
-
       autocompleteBox.style.display = "block";
     }
 
@@ -572,10 +215,7 @@
       const handedness = escapeHtml(normalizeHandedness(pitcher));
       const pitchTypes = normalizePitchTypes(pitcher);
       const logoPath = escapeHtml(normalizeLogo(pitcher));
-
-      const pitchText = pitchTypes.length
-        ? pitchTypes.map(v => escapeHtml(v)).join(", ")
-        : "등록된 구종 정보 없음";
+      const pitchText = pitchTypes.length ? pitchTypes.map(v => escapeHtml(v)).join(", ") : "등록된 구종 정보 없음";
 
       resultBox.innerHTML = `
         <div class="result-top">
@@ -585,43 +225,31 @@
             <div class="result-sub">${handedness}</div>
           </div>
         </div>
-
         <div class="result-grid">
           <div class="info-card">
             <div class="info-label">구종</div>
             <div class="info-value">${pitchText}</div>
           </div>
-        </div>
-      `;
-
+        </div>`;
       resultBox.style.display = "block";
       emptyText.style.display = "none";
     }
 
     async function loadPitcherNames() {
       try {
-        console.log("db 확인:", db);
-
         const snapshot = await getDocs(collection(db, "pitchers"));
         const names = [];
         const docs = [];
-
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
           docs.push(data);
-
           const nickname = normalizeNickname(data);
           if (nickname) names.push(nickname);
         });
-
         pitcherDocs = docs;
         pitcherNames = [...new Set(names)].sort((a, b) => a.localeCompare(b, "ko"));
-
         loadingText.style.display = "none";
         emptyText.style.display = "block";
-
-        console.log("자동완성 닉네임 목록:", pitcherNames);
-        console.log("불러온 투수 문서:", pitcherDocs);
       } catch (error) {
         console.error("투수 목록 불러오기 실패:", error);
         loadingText.style.display = "none";
@@ -633,40 +261,16 @@
     function searchPitcher() {
       const keyword = searchInput.value.trim();
       hideAutocomplete();
+      if (!keyword) return showGuide("검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.");
 
-      if (!keyword) {
-        showGuide("검색창에 투수 닉네임을 입력한 뒤 엔터를 누르거나 검색 버튼을 눌러주세요.");
-        return;
-      }
-
-      try {
-        let found = null;
-
-        for (const data of pitcherDocs) {
-          const nickname = normalizeNickname(data);
-          if (nickname.toLowerCase() === keyword.toLowerCase()) {
-            found = data;
-            break;
-          }
-        }
-
-        if (found) {
-          renderPitcher(found);
-        } else {
-          showGuide("검색한 투수 정보를 찾을 수 없습니다.");
-        }
-      } catch (error) {
-        console.error("투수 검색 실패:", error);
-        showGuide("검색 중 오류가 발생했습니다: " + error.message);
-      }
+      const found = pitcherDocs.find(data => normalizeNickname(data).toLowerCase() === keyword.toLowerCase());
+      if (found) renderPitcher(found);
+      else showGuide("검색한 투수 정보를 찾을 수 없습니다.");
     }
 
     searchInput.addEventListener("input", () => {
       const keyword = searchInput.value.trim();
-      if (!keyword) {
-        hideAutocomplete();
-        return;
-      }
+      if (!keyword) return hideAutocomplete();
       showAutocomplete(getFilteredSuggestions(keyword));
     });
 
@@ -689,9 +293,7 @@
         updateActiveItem();
       } else if (e.key === "Enter") {
         e.preventDefault();
-        if (activeIndex >= 0 && currentSuggestions[activeIndex]) {
-          searchInput.value = currentSuggestions[activeIndex];
-        }
+        if (activeIndex >= 0 && currentSuggestions[activeIndex]) searchInput.value = currentSuggestions[activeIndex];
         searchPitcher();
       } else if (e.key === "Escape") {
         hideAutocomplete();
@@ -699,23 +301,15 @@
     });
 
     dropdownBtn.addEventListener("click", () => {
-      if (autocompleteBox.style.display === "block") {
-        hideAutocomplete();
-        return;
-      }
-
+      if (autocompleteBox.style.display === "block") return hideAutocomplete();
       if (!pitcherNames.length) return;
-
       searchInput.focus();
       showAutocomplete(pitcherNames.slice(0, 8));
     });
 
     searchBtn.addEventListener("click", searchPitcher);
-
     document.addEventListener("click", (e) => {
-      if (!e.target.closest(".search-input-wrap")) {
-        hideAutocomplete();
-      }
+      if (!e.target.closest(".search-input-wrap")) hideAutocomplete();
     });
 
     loadPitcherNames();

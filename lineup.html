@@ -2,162 +2,112 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>라인업</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>라인업 | 레이 마린스</title>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    .lineup-wrap {
-      width: 95%;
-      max-width: 1100px;
-      margin: 34px auto;
-    }
-
-    .lineup-card {
-      background: white;
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-    }
-
-    .lineup-card h2 {
-      margin-top: 0;
-      font-size: 34px;
-    }
-
-    .lineup-input {
-      width: 100%;
-      padding: 12px 14px;
-      margin: 10px 0;
-      border-radius: 12px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-
-    .view-box {
-      background: #f8f8f8;
-      padding: 16px;
-      border-radius: 14px;
-      margin-top: 14px;
-    }
-
-    .view-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      padding: 10px 0;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .view-row:last-child {
-      border-bottom: none;
-    }
-
-    .view-left {
-      min-width: 50px;
-      font-weight: 700;
-    }
-
-    .view-mid {
-      flex: 1;
-    }
-
-    .view-right {
-      min-width: 90px;
-      text-align: right;
-      color: #555;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-  </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top-title">
-      <h1>레이 마린스</h1>
-      <a class="top-link" href="index.html">메인으로</a>
-    </div>
-
-    <div class="menu">
+  <div class="page">
+    <header class="top-title"><h1>레이 마린스</h1><a class="top-link" href="index.html">메인으로</a></header>
+    <nav class="menu">
       <a href="roster.html">로스터</a>
       <a href="pitchers.html">투수 정보</a>
-      <a href="lineup.html">라인업</a>
+      <a href="lineup.html" class="active">라인업</a>
       <a href="record.html">기록실</a>
       <a href="mypage.html">마이페이지</a>
       <a id="adminMenu" class="hidden" href="admin.html">관리자</a>
-    </div>
+    </nav>
+    <section class="main-box">
+      <div class="card-header">
+        <div><span class="badge">LINEUP</span><h2 class="main-box-title">라인업</h2><p class="main-box-desc">연습경기 라인업과 리그 경기 라인업을 따로 확인할 수 있어요.</p></div>
+      </div>
+      <div class="toolbar">
+        <div class="seg-group">
+          <button class="seg-btn active" data-type="practice">연습경기</button>
+          <button class="seg-btn" data-type="league">리그 경기</button>
+        </div>
+        <select id="gameTypeSelect" class="select" style="max-width:170px;">
+          <option value="practice">연습경기</option>
+          <option value="league">리그 경기</option>
+        </select>
+        <input id="gameDate" type="date" class="input" style="max-width:220px;">
+      </div>
+      <div class="split-grid" style="margin-top:20px;">
+        <section class="surface" style="padding:22px;">
+          <div class="item-title">선발 라인업</div>
+          <p class="muted" id="lineupMeta" style="margin-top:8px;">불러오는 중...</p>
+          <div id="viewBox" class="list-stack" style="margin-top:18px;"></div>
+        </section>
+        <section class="surface" style="padding:22px;">
+          <div class="item-title">안내</div>
+          <div class="item-card" style="margin-top:18px;">
+            <div class="item-meta">상단 버튼으로 경기 종류를 바꾸고, 날짜를 선택하면 저장된 라인업을 볼 수 있어요.</div>
+          </div>
+          <div class="item-card" style="margin-top:12px;">
+            <div class="item-meta">기존에 저장된 예전 리그 라인업은 자동으로 같이 불러오도록 유지했어요.</div>
+          </div>
+        </section>
+      </div>
+    </section>
   </div>
-
-  <div class="lineup-wrap">
-    <div class="lineup-card">
-      <h2>라인업</h2>
-
-      <label for="gameDate">날짜</label>
-      <input id="gameDate" type="date" class="lineup-input">
-
-      <div id="viewBox" class="view-box">불러오는 중...</div>
-    </div>
-  </div>
-
   <script type="module">
     import { db } from "./firebase-config.js";
     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const user = JSON.parse(sessionStorage.getItem("currentUser"));
-    if (user && (user.role === "super_admin" || user.role === "admin" || user.role === "scorer")) {
-      document.getElementById("adminMenu").classList.remove("hidden");
-    }
+    if (user && ["super_admin","admin","scorer"].includes(user.role)) document.getElementById("adminMenu").classList.remove("hidden");
 
     const gameDate = document.getElementById("gameDate");
     const viewBox = document.getElementById("viewBox");
+    const lineupMeta = document.getElementById("lineupMeta");
+    const typeButtons = [...document.querySelectorAll('.seg-btn')];
+    const gameTypeSelect = document.getElementById("gameTypeSelect");
+    let currentType = 'practice';
 
     function getDefaultDate() {
       const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, "0");
-      const dd = String(now.getDate()).padStart(2, "0");
-      return `${yyyy}-${mm}-${dd}`;
+      return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
     }
-
+    function docId(date, type) { return `${type}_${date}`; }
+    function typeLabel(type){ return type === 'league' ? '리그 경기' : '연습경기'; }
     function renderView(data) {
       if (!data || !data.players || data.players.length === 0) {
-        viewBox.innerHTML = "저장된 라인업이 없어.";
+        viewBox.innerHTML = `<div class="item-card"><div class="empty-text">저장된 라인업이 없습니다.</div></div>`;
         return;
       }
-
       let html = `
-        <div class="view-row">
-          <div class="view-left">SP</div>
-          <div class="view-mid">${data.pitcher || "-"}</div>
-          <div class="view-right">선발투수</div>
-        </div>
+        <div class="item-card"><div class="item-top"><div><div class="item-title">선발투수</div><div class="item-meta">${data.pitcher || '-'}</div></div><span class="record-chip ${data.gameType === 'league' ? 'league' : 'practice'}">${typeLabel(data.gameType || currentType)}</span></div></div>
       `;
-
       data.players.forEach(player => {
-        const batting = player.batting ? ` (${player.batting})` : "";
-        html += `
-          <div class="view-row">
-            <div class="view-left">${player.order}</div>
-            <div class="view-mid">${player.name || "-"}${batting}</div>
-            <div class="view-right">${player.position || "-"}</div>
-          </div>
-        `;
+        html += `<div class="item-card"><div class="item-top"><div class="item-title">${player.order}번 ${player.name || '-'}</div><div class="item-meta">${player.position || '-'} ${player.batting ? '· ' + player.batting : ''}</div></div></div>`;
       });
-
       viewBox.innerHTML = html;
     }
-
     async function loadLineup() {
       const dateStr = gameDate.value;
       if (!dateStr) return;
-
-      const snap = await getDoc(doc(db, "lineups", dateStr));
-      if (snap.exists()) renderView(snap.data());
-      else renderView(null);
+      lineupMeta.textContent = `${typeLabel(currentType)} · ${dateStr}`;
+      let snap = await getDoc(doc(db, 'lineups', docId(dateStr, currentType)));
+      if (!snap.exists() && currentType === 'league') snap = await getDoc(doc(db, 'lineups', dateStr));
+      renderView(snap.exists() ? snap.data() : null);
     }
-
+    function syncTypeUI() {
+      typeButtons.forEach(b => b.classList.toggle('active', b.dataset.type === currentType));
+      gameTypeSelect.value = currentType;
+    }
+    typeButtons.forEach(btn => btn.addEventListener('click', () => {
+      currentType = btn.dataset.type;
+      syncTypeUI();
+      loadLineup();
+    }));
+    gameTypeSelect.addEventListener("change", () => {
+      currentType = gameTypeSelect.value;
+      syncTypeUI();
+      loadLineup();
+    });
     gameDate.value = getDefaultDate();
-    gameDate.addEventListener("change", loadLineup);
+    syncTypeUI();
+    gameDate.addEventListener('change', loadLineup);
     loadLineup();
   </script>
 </body>

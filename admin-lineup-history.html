@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>라인업 기록 | 레이 마린스</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="page">
+  <header class="top-title"><h1>레이 마린스</h1><a class="top-link" href="admin.html">관리자 홈</a></header>
+  <nav class="menu">
+    <a href="admin.html">관리자 홈</a>
+    <a href="admin-lineup.html">라인업 관리</a>
+    <a href="admin-lineup-history.html" class="active">라인업 기록</a>
+    <a href="admin-pitchers.html">투수 정보</a>
+    <a href="admin-scoresheet.html">경기 기록</a>
+    <a href="admin-record-history.html">기록 내역</a>
+  </nav>
+  <section class="main-box">
+    <span class="badge">LINEUP LOG</span>
+    <h2 class="main-box-title">라인업 기록</h2>
+    <p class="main-box-desc">저장된 라인업 내역을 연습경기와 리그 경기로 나눠서 확인해요.</p>
+    <div class="toolbar">
+      <div class="seg-group">
+        <button class="seg-btn active" data-type="all">전체</button>
+        <button class="seg-btn" data-type="practice">연습경기</button>
+        <button class="seg-btn" data-type="league">리그 경기</button>
+      </div>
+    </div>
+    <div id="historyList" class="list-stack" style="margin-top:20px;"><div class="item-card"><div class="empty-text">불러오는 중...</div></div></div>
+  </section>
+</div>
+<script type="module">
+  import { db } from "./firebase-config.js";
+  import { collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+  if (!(currentUser && ['super_admin','admin','scorer'].includes(currentUser.role))) { alert('접근 권한이 없어.'); location.href='index.html'; }
+  const list = document.getElementById('historyList');
+  const btns = [...document.querySelectorAll('.seg-btn')];
+  let currentType = 'all'; let logs = [];
+  const typeLabel = (type) => type === 'league' ? '리그 경기' : '연습경기';
+  function render(){
+    const filtered = logs.filter(item => currentType === 'all' ? true : (item.gameType || 'league') === currentType);
+    list.innerHTML = '';
+    if(!filtered.length){ list.innerHTML = '<div class="item-card"><div class="empty-text">저장된 라인업 기록이 없습니다.</div></div>'; return; }
+    filtered.forEach(item => {
+      const html = `
+        <div class="item-card">
+          <div class="item-top"><div><div class="item-title">${item.gameDate || '-'}</div><div class="item-meta">저장자 ${item.updatedBy || '-'} · 선발 ${item.pitcher || '-'}</div></div><span class="record-chip ${(item.gameType||'league')==='league'?'league':'practice'}">${typeLabel(item.gameType || 'league')}</span></div>
+          <div class="item-meta" style="margin-top:12px;">${(item.players || []).map(p => `${p.order}번 ${p.name || '-'} (${p.position || '-'})`).join(' / ') || '선수 정보 없음'}</div>
+        </div>`;
+      list.insertAdjacentHTML('beforeend', html);
+    });
+  }
+  btns.forEach(btn => btn.addEventListener('click', ()=>{ currentType = btn.dataset.type; btns.forEach(b=>b.classList.toggle('active', b===btn)); render(); }));
+  onSnapshot(query(collection(db, 'lineup_logs'), orderBy('updatedAt', 'desc')), snap => { logs=[]; snap.forEach(docu => logs.push({id:docu.id, ...docu.data()})); render(); }, err => { console.error(err); list.innerHTML = '<div class="item-card"><div class="empty-text">기록을 불러오지 못했습니다.</div></div>'; });
+</script>
+</body>
+</html>

@@ -182,25 +182,42 @@
     <div class="menu">
       <a href="admin.html">관리자 홈</a>
       <a href="admin-lineup.html">라인업 관리</a>
-      <a href="admin-pitchers.html">투수정보관리</a>
-      <a href="admin-scoresheet.html">기록지 관리</a>
+      <a href="admin-lineup-history.html">라인업 기록</a>
+      <a href="admin-pitchers.html">투수 정보</a>
+      <a href="admin-scoresheet.html" class="active">경기 기록</a>
+      <a href="admin-record-history.html">기록 내역</a>
     </div>
   </div>
 
   <div class="sheet-wrap">
 
     <div class="sheet-card">
-      <div class="card-title">기록지 관리</div>
-      <p class="sheet-note">날짜가 같은 라인업을 자동으로 불러와서 타자 기록표를 채워줘.</p>
+      <div class="card-title">경기 기록 관리</div>
+      <p class="sheet-note">연습경기와 리그 경기 기록을 나눠 저장할 수 있어. 저장된 기록은 기록 내역 탭에 남고, 나중에 다시 수정할 수도 있어.</p>
     </div>
 
     <div class="sheet-card">
       <div class="card-title">기록지 작성 / 수정</div>
+      <div class="toolbar" style="margin-bottom:16px;">
+        <div class="seg-group">
+          <button type="button" class="filter-chip active" data-filter="all">전체</button>
+          <button type="button" class="filter-chip" data-filter="practice">연습경기</button>
+          <button type="button" class="filter-chip" data-filter="league">리그 경기</button>
+        </div>
+      </div>
 
       <div class="sheet-grid">
         <div>
           <label for="gameDate">경기 날짜</label>
           <input id="gameDate" type="date" class="sheet-input">
+        </div>
+
+        <div>
+          <label for="gameType">경기 종류</label>
+          <select id="gameType" class="sheet-select">
+            <option value="practice">연습경기</option>
+            <option value="league">리그 경기</option>
+          </select>
         </div>
 
         <div>
@@ -340,6 +357,7 @@
     }
 
     const gameDateInput = document.getElementById("gameDate");
+    const gameTypeInput = document.getElementById("gameType");
     const gameTimeInput = document.getElementById("gameTime");
     const opponentInput = document.getElementById("opponent");
     const homeAwayInput = document.getElementById("homeAway");
@@ -351,6 +369,7 @@
     const removeInningBtn = document.getElementById("removeInningBtn");
     const addPitcherBtn = document.getElementById("addPitcherBtn");
     const sheetList = document.getElementById("sheetList");
+    const filterButtons = [...document.querySelectorAll(".filter-chip")];
     const battersBody = document.getElementById("battersBody");
     const pitchersBody = document.getElementById("pitchersBody");
     const inningHead = document.getElementById("inningHead");
@@ -361,6 +380,8 @@
     let batterRowCounter = 0;
     let pitcherRowCounter = 0;
     let inningCount = 9;
+    let currentFilter = "all";
+    const initialEditId = new URLSearchParams(location.search).get("edit");
 
     function getDefaultDate() {
       const now = new Date();
@@ -605,6 +626,7 @@
     function resetForm() {
       currentEditId = null;
       gameDateInput.value = getDefaultDate();
+      gameTypeInput.value = "practice";
       gameTimeInput.value = "";
       opponentInput.value = "";
       homeAwayInput.value = "";
@@ -624,7 +646,11 @@
     async function loadLineupToSheet(dateStr) {
       if (!dateStr || currentEditId) return;
 
-      const snap = await getDoc(doc(db, "lineups", dateStr));
+      const selectedType = gameTypeInput.value || "practice";
+      let snap = await getDoc(doc(db, "lineups", `${selectedType}_${dateStr}`));
+      if (!snap.exists() && selectedType === "league") {
+        snap = await getDoc(doc(db, "lineups", dateStr));
+      }
       if (!snap.exists()) return;
 
       const lineup = snap.data();
@@ -654,23 +680,31 @@
     function renderSheets() {
       sheetList.innerHTML = "";
 
-      if (sheets.length === 0) {
-        sheetList.innerHTML = `<p class="empty-text">아직 저장된 기록지가 없어.</p>`;
+      const filteredSheets = sheets.filter((sheet) => {
+        if (currentFilter === "all") return true;
+        return (sheet.gameType || "league") === currentFilter;
+      });
+
+      if (!filteredSheets.length) {
+        sheetList.innerHTML = `<p class="empty-text">선택한 경기 종류의 기록지가 아직 없어.</p>`;
         return;
       }
 
-      sheets.forEach((sheet) => {
+      filteredSheets.forEach((sheet) => {
         const innings = sheet.innings || {
           header: ["1","2","3","4","5","6","7","8","9"],
           away: [],
           home: []
         };
+        const gameType = sheet.gameType || "league";
+        const gameTypeText = gameType === "league" ? "리그 경기" : "연습경기";
 
         const box = document.createElement("div");
         box.className = "sheet-box";
 
         box.innerHTML = `
           <div class="sheet-top">${sheet.gameDate || "-"} ${sheet.gameTime || ""} vs ${sheet.opponent || "-"} (${sheet.homeAway || "-"}) ${sheet.finalScore || "-"} ${sheet.gameResult || "-"}</div>
+          <div style="margin-bottom:10px;"><span class="record-chip ${gameType === "league" ? "league" : "practice"}">${gameTypeText}</span></div>
 
           <div class="result-subtitle">이닝 점수</div>
           <div class="sheet-table-wrap">
@@ -699,35 +733,14 @@
             <table class="sheet-table">
               <thead>
                 <tr>
-                  <th>타순</th>
-                  <th>선수명</th>
-                  <th>포지션</th>
-                  <th>기록</th>
-                  <th>타수</th>
-                  <th>안타</th>
-                  <th>2루타</th>
-                  <th>3루타</th>
-                  <th>홈런</th>
-                  <th>타점</th>
-                  <th>득점</th>
-                  <th>삼진</th>
+                  <th>타순</th><th>선수명</th><th>포지션</th><th>기록</th><th>타수</th><th>안타</th><th>2루타</th><th>3루타</th><th>홈런</th><th>타점</th><th>득점</th><th>삼진</th>
                 </tr>
               </thead>
               <tbody>
                 ${(sheet.batters || []).map(b => `
                   <tr ${b.isSub ? 'class="sub-row"' : ""}>
-                    <td>${b.order || ""}</td>
-                    <td>${b.name || ""}</td>
-                    <td>${b.position || ""}</td>
-                    <td>${b.record || ""}</td>
-                    <td>${b.stats?.ab ?? 0}</td>
-                    <td>${b.stats?.h ?? 0}</td>
-                    <td>${b.stats?.double ?? 0}</td>
-                    <td>${b.stats?.triple ?? 0}</td>
-                    <td>${b.stats?.hr ?? 0}</td>
-                    <td>${b.stats?.rbi ?? 0}</td>
-                    <td>${b.stats?.r ?? 0}</td>
-                    <td>${b.stats?.so ?? 0}</td>
+                    <td>${b.order || ""}</td><td>${b.name || ""}</td><td>${b.position || ""}</td><td>${b.record || ""}</td>
+                    <td>${b.stats?.ab ?? 0}</td><td>${b.stats?.h ?? 0}</td><td>${b.stats?.double ?? 0}</td><td>${b.stats?.triple ?? 0}</td><td>${b.stats?.hr ?? 0}</td><td>${b.stats?.rbi ?? 0}</td><td>${b.stats?.r ?? 0}</td><td>${b.stats?.so ?? 0}</td>
                   </tr>
                 `).join("")}
               </tbody>
@@ -738,33 +751,11 @@
           <div class="sheet-table-wrap">
             <table class="sheet-table">
               <thead>
-                <tr>
-                  <th>선수명</th>
-                  <th>결과</th>
-                  <th>이닝</th>
-                  <th>실점</th>
-                  <th>자책</th>
-                  <th>피안타</th>
-                  <th>피홈런</th>
-                  <th>탈삼진</th>
-                  <th>사사구</th>
-                  <th>ERA</th>
-                </tr>
+                <tr><th>선수명</th><th>결과</th><th>이닝</th><th>실점</th><th>자책</th><th>피안타</th><th>피홈런</th><th>탈삼진</th><th>사사구</th><th>ERA</th></tr>
               </thead>
               <tbody>
                 ${(sheet.pitchers || []).map(p => `
-                  <tr>
-                    <td>${p.name || ""}</td>
-                    <td>${p.decision || ""}</td>
-                    <td>${p.inning || ""}</td>
-                    <td>${p.runs || ""}</td>
-                    <td>${p.er || ""}</td>
-                    <td>${p.hits || ""}</td>
-                    <td>${p.hr || ""}</td>
-                    <td>${p.so || ""}</td>
-                    <td>${p.bb || ""}</td>
-                    <td>${p.era || "0.00"}</td>
-                  </tr>
+                  <tr><td>${p.name || ""}</td><td>${p.decision || ""}</td><td>${p.inning || ""}</td><td>${p.runs || ""}</td><td>${p.er || ""}</td><td>${p.hits || ""}</td><td>${p.hr || ""}</td><td>${p.so || ""}</td><td>${p.bb || ""}</td><td>${p.era || "0.00"}</td></tr>
                 `).join("")}
               </tbody>
             </table>
@@ -775,7 +766,6 @@
             <button class="sheet-btn delete" onclick="window.deleteSheet('${sheet.id}')">삭제</button>
           </div>
         `;
-
         sheetList.appendChild(box);
       });
     }
@@ -783,6 +773,7 @@
     async function syncRecordSummary(sheetId, data) {
       await setDoc(doc(db, "records", sheetId), {
         date: data.gameDate,
+        gameType: data.gameType || "league",
         opponent: data.opponent,
         result: data.gameResult === "승리" ? "승" : data.gameResult === "패배" ? "패" : "무",
         score: data.finalScore,
@@ -799,6 +790,7 @@
 
       const data = {
         gameDate: gameDateInput.value.trim(),
+        gameType: gameTypeInput.value,
         gameTime: gameTimeInput.value.trim(),
         opponent: opponentInput.value.trim(),
         homeAway: homeAwayInput.value,
@@ -848,6 +840,7 @@
 
     function fillForm(sheet) {
       gameDateInput.value = sheet.gameDate || "";
+      gameTypeInput.value = sheet.gameType || "league";
       gameTimeInput.value = sheet.gameTime || "";
       opponentInput.value = sheet.opponent || "";
       homeAwayInput.value = sheet.homeAway || "";
@@ -973,19 +966,25 @@
       pitchersBody.appendChild(createPitcherRow());
     });
 
+    filterButtons.forEach((btn) => btn.addEventListener("click", () => { currentFilter = btn.dataset.filter; filterButtons.forEach((b) => b.classList.toggle("active", b === btn)); renderSheets(); }));
+
     saveBtn.addEventListener("click", saveSheet);
     resetBtn.addEventListener("click", resetForm);
 
     gameDateInput.addEventListener("change", async () => {
-      if (!currentEditId) {
-        await loadLineupToSheet(gameDateInput.value);
-      }
+      if (!currentEditId) await loadLineupToSheet(gameDateInput.value);
+    });
+
+    gameTypeInput.addEventListener("change", async () => {
+      if (!currentEditId) await loadLineupToSheet(gameDateInput.value);
+      renderSheets();
     });
 
     createBattersRows();
     createPitchersRows();
     renderInningTable();
     gameDateInput.value = getDefaultDate();
+    gameTypeInput.value = "practice";
 
     const sheetQuery = query(collection(db, "scoresheets"), orderBy("createdAt", "desc"));
 
@@ -998,6 +997,13 @@
         });
       });
       renderSheets();
+      if (initialEditId) {
+        const target = sheets.find((s) => s.id === initialEditId);
+        if (target) {
+          editSheet(initialEditId);
+          history.replaceState({}, "", "admin-scoresheet.html");
+        }
+      }
     }, (error) => {
       console.error(error);
       sheetList.innerHTML = `<p class="empty-text">기록지를 불러오지 못했어.</p>`;

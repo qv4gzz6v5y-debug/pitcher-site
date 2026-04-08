@@ -2,207 +2,79 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>기록실</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>기록실 | 레이 마린스</title>
   <link rel="stylesheet" href="styles.css">
-
-  <style>
-    .record-wrap {
-      width: 95%;
-      max-width: 1100px;
-      margin: 34px auto;
-    }
-
-    .record-card {
-      background: white;
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-      margin-bottom: 22px;
-    }
-
-    .card-title {
-      font-size: 34px;
-      font-weight: 800;
-      margin-bottom: 16px;
-    }
-
-    .record-note {
-      color: #666;
-      font-size: 15px;
-      margin-bottom: 14px;
-      line-height: 1.6;
-    }
-
-    .record-box {
-      background: #f8f8f8;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 14px;
-      border-left: 6px solid #999;
-    }
-
-    .record-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-
-    .record-date {
-      font-weight: 700;
-      font-size: 18px;
-    }
-
-    .record-result {
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 700;
-      color: white;
-    }
-
-    .record-result.win {
-      background: #0a7a2f;
-    }
-
-    .record-result.lose {
-      background: #b00020;
-    }
-
-    .record-result.draw {
-      background: #666;
-    }
-
-    .record-line {
-      margin: 6px 0;
-      line-height: 1.6;
-    }
-
-    .empty-text {
-      color: #666;
-    }
-
-    .staff-link {
-      display: inline-block;
-      margin-top: 10px;
-      text-decoration: none;
-      color: #1b65ba;
-      font-weight: 700;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-  </style>
 </head>
 <body>
-
-  <div class="wrap">
-    <div class="top-title">
-      <h1>레이 마린스</h1>
-      <a class="top-link" href="index.html">메인으로</a>
-    </div>
-
-    <div class="menu">
+  <div class="page">
+    <header class="top-title"><h1>레이 마린스</h1><a class="top-link" href="index.html">메인으로</a></header>
+    <nav class="menu">
       <a href="roster.html">로스터</a>
       <a href="pitchers.html">투수 정보</a>
       <a href="lineup.html">라인업</a>
-      <a href="record.html">기록실</a>
+      <a href="record.html" class="active">기록실</a>
       <a href="scoresheet.html">기록지</a>
       <a href="mypage.html">마이페이지</a>
-    </div>
-  </div>
-
-  <div class="record-wrap">
-    <div class="record-card">
-      <div class="card-title">기록실</div>
-      <p class="record-note">저장된 경기 기록을 확인할 수 있습니다.</p>
-      <a id="sheetLink" class="staff-link hidden" href="scoresheet.html">기록지로 이동</a>
-    </div>
-
-    <div class="record-card">
-      <div class="card-title">경기 기록</div>
-      <div id="recordList">
-        <p class="empty-text">기록을 불러오는 중...</p>
+    </nav>
+    <section class="main-box">
+      <div><span class="badge">RECORDS</span><h2 class="main-box-title">기록실</h2><p class="main-box-desc">연습경기 기록과 리그 경기 기록을 분리해서 확인할 수 있어요.</p></div>
+      <div class="toolbar">
+        <div class="seg-group">
+          <button class="seg-btn active" data-type="practice">연습경기 기록</button>
+          <button class="seg-btn" data-type="league">리그 경기 기록</button>
+        </div>
+        <a id="sheetLink" class="top-link hidden" href="scoresheet.html">기록지로 이동</a>
       </div>
-    </div>
+      <div id="recordList" class="list-stack" style="margin-top:22px;"><div class="item-card"><div class="empty-text">기록을 불러오는 중...</div></div></div>
+    </section>
   </div>
-
   <script type="module">
     import { db } from "./firebase-config.js";
-    import {
-      collection,
-      onSnapshot,
-      query,
-      orderBy
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+    import { collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
-    const recordList = document.getElementById("recordList");
-    const sheetLink = document.getElementById("sheetLink");
-
-    function isStaff(user) {
-      if (!user) return false;
-      return user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
-    }
-
-    if (isStaff(currentUser)) {
-      sheetLink.classList.remove("hidden");
-    }
-
-    function getResultClass(result) {
-      if (result === "승") return "win";
-      if (result === "패") return "lose";
-      return "draw";
-    }
-
-    function renderRecords(records) {
-      recordList.innerHTML = "";
-
-      if (records.length === 0) {
-        recordList.innerHTML = `<p class="empty-text">아직 저장된 기록이 없습니다.</p>`;
+    if (currentUser && ["super_admin","admin","scorer"].includes(currentUser.role)) document.getElementById('sheetLink').classList.remove('hidden');
+    const recordList = document.getElementById('recordList');
+    const typeButtons = [...document.querySelectorAll('.seg-btn')];
+    let currentType = 'practice';
+    let allRecords = [];
+    const typeLabel = (type) => type === 'league' ? '리그 경기' : '연습경기';
+    const resultClass = (result) => result === '승' ? 'win' : result === '패' ? 'lose' : 'draw';
+    function render() {
+      const records = allRecords.filter(record => (record.gameType || 'league') === currentType);
+      recordList.innerHTML = '';
+      if (!records.length) {
+        recordList.innerHTML = `<div class="item-card"><div class="empty-text">${typeLabel(currentType)} 기록이 아직 없습니다.</div></div>`;
         return;
       }
-
-      records.forEach((record) => {
-        const resultClass = getResultClass(record.result);
-
-        const box = document.createElement("div");
-        box.className = "record-box";
-
+      records.forEach(record => {
+        const box = document.createElement('div');
+        box.className = 'item-card';
         box.innerHTML = `
-          <div class="record-top">
-            <div class="record-date">${record.date || "-"}</div>
-            <div class="record-result ${resultClass}">${record.result || "-"}</div>
+          <div class="item-top">
+            <div>
+              <div class="item-title">${record.date || '-'}</div>
+              <div class="item-meta">상대팀 ${record.opponent || '-'} · 스코어 ${record.score || '-'}</div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <span class="record-chip ${currentType === 'league' ? 'league' : 'practice'}">${typeLabel(currentType)}</span>
+              <span class="record-chip ${resultClass(record.result || '')}">${record.result || '-'}</span>
+            </div>
           </div>
-
-          <div class="record-line"><strong>상대팀:</strong> ${record.opponent || "-"}</div>
-          <div class="record-line"><strong>스코어:</strong> ${record.score || "-"}</div>
-          <div class="record-line"><strong>메모:</strong> ${record.memo || "-"}</div>
+          <div class="item-meta" style="margin-top:12px;">${record.memo || '메모 없음'}</div>
         `;
-
         recordList.appendChild(box);
       });
     }
-
-    const recordQuery = query(collection(db, "records"), orderBy("createdAt", "desc"));
-
-    onSnapshot(recordQuery, (snapshot) => {
-      const records = [];
-      snapshot.forEach((docu) => {
-        records.push({
-          id: docu.id,
-          ...docu.data()
-        });
-      });
-      renderRecords(records);
-    }, (error) => {
+    typeButtons.forEach(btn => btn.addEventListener('click', () => { currentType = btn.dataset.type; typeButtons.forEach(b => b.classList.toggle('active', b===btn)); render(); }));
+    onSnapshot(query(collection(db, 'records'), orderBy('createdAt', 'desc')), snapshot => {
+      allRecords = [];
+      snapshot.forEach(docu => allRecords.push({id: docu.id, ...docu.data()}));
+      render();
+    }, error => {
       console.error(error);
-      recordList.innerHTML = `<p class="empty-text">기록을 불러오지 못했습니다.</p>`;
+      recordList.innerHTML = `<div class="item-card"><div class="empty-text">기록을 불러오지 못했습니다.</div></div>`;
     });
   </script>
-
 </body>
 </html>

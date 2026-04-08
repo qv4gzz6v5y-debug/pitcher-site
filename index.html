@@ -15,96 +15,31 @@
 
     <main>
       <section class="home-box">
-        <h2>레이 마린스</h2>
-        <p id="welcomeText">환영합니다.</p>
+        <span class="badge">TEAM DASHBOARD</span>
+        <h2>팀 메인</h2>
+        <p id="welcomeText">로그인 후 팀 페이지 기능을 이용할 수 있습니다.</p>
 
-        <div class="home-links">
-          <a href="roster.html" class="menu-card">
-            <div class="title">로스터</div>
-            <div class="sub">ROSTER</div>
-          </a>
-          <a href="pitchers.html" class="menu-card">
-            <div class="title">투수 정보</div>
-            <div class="sub">PITCHERS</div>
-          </a>
-          <a id="homeLineup" class="menu-card hidden" href="lineup.html">
-            <div class="title">라인업</div>
-            <div class="sub">LINEUP</div>
-          </a>
-          <a href="record.html" class="menu-card">
-            <div class="title">기록실</div>
-            <div class="sub">STATS</div>
-          </a>
-          <a id="homeSheet" class="menu-card hidden" href="scoresheet.html">
-            <div class="title">기록지</div>
-            <div class="sub">SCORESHEET</div>
-          </a>
-          <a href="mypage.html" class="menu-card">
-            <div class="title">마이페이지</div>
-            <div class="sub">MY PAGE</div>
-          </a>
-          <a id="homePitcherManage" class="menu-card hidden" href="pitchers-manage.html">
-            <div class="title">투수 정보 관리</div>
-            <div class="sub">PITCHER MANAGE</div>
-          </a>
-          <a id="superAdminLink" class="menu-card hidden" href="super-admin.html">
-            <div class="title">비공개 페이지</div>
-            <div class="sub">SUPER ADMIN</div>
-          </a>
-        </div>
-
-        <div class="bottom-grid">
-          <a href="login.html" class="menu-card">
-            <div class="title">로그인</div>
-            <div class="sub">LOGIN</div>
-          </a>
-          <a href="admin.html" class="menu-card">
-            <div class="title">관리자</div>
-            <div class="sub">ADMIN</div>
-          </a>
+        <div class="dashboard-grid">
+          <a href="roster.html" class="menu-card"><div class="title">로스터</div><div class="sub">ROSTER</div><p>승인된 선수 명단을 확인해요.</p></a>
+          <a href="pitchers.html" class="menu-card"><div class="title">투수 정보</div><div class="sub">PITCHERS</div><p>투수 닉네임으로 구종 정보를 검색해요.</p></a>
+          <a href="lineup.html" class="menu-card"><div class="title">라인업</div><div class="sub">LINEUP</div><p>연습경기와 리그 경기 라인업을 따로 확인해요.</p></a>
+          <a href="record.html" class="menu-card"><div class="title">기록실</div><div class="sub">RECORDS</div><p>연습경기 기록과 리그 기록을 분리해서 봐요.</p></a>
+          <a href="mypage.html" class="menu-card"><div class="title">마이페이지</div><div class="sub">MY PAGE</div><p>내 계정 정보와 역할을 확인해요.</p></a>
+          <a href="admin.html" class="menu-card"><div class="title">관리자</div><div class="sub">ADMIN</div><p>라인업, 투수 정보, 기록지를 관리해요.</p></a>
         </div>
       </section>
     </main>
   </div>
-
   <script>
     const user = JSON.parse(sessionStorage.getItem("currentUser"));
     const topAccount = document.getElementById("topAccount");
     const welcomeText = document.getElementById("welcomeText");
-
-    function isStaff(user) {
-      if (!user) return false;
-      return user.role === "super_admin" || user.role === "admin" || user.role === "scorer";
-    }
-
     if (user) {
       topAccount.textContent = `${user.mcNick} / 로그아웃`;
-      topAccount.href = "#";
-      topAccount.onclick = (e) => {
-        e.preventDefault();
-        sessionStorage.removeItem("currentUser");
-        location.reload();
-      };
-
-      let roleText = "선수";
-      if (user.role === "owner") roleText = "구단주";
-      else if (user.role === "admin") roleText = "관리진";
-      else if (user.role === "scorer") roleText = "기록원";
-      else if (user.role === "super_admin") roleText = "선수";
-
-      welcomeText.textContent = `${user.mcNick}님 환영합니다. 현재 역할: ${roleText}`;
-
-      if (isStaff(user)) {
-        document.getElementById("homeLineup").classList.remove("hidden");
-        document.getElementById("homeSheet").classList.remove("hidden");
-        document.getElementById("homePitcherManage").classList.remove("hidden");
-      }
-
-      if (user.role === "super_admin") {
-        document.getElementById("superAdminLink").classList.remove("hidden");
-      }
-    } else {
-      welcomeText.textContent = "로그인 후 팀 페이지 기능을 이용할 수 있습니다.";
+      topAccount.href = '#';
+      topAccount.onclick = (e) => { e.preventDefault(); sessionStorage.removeItem('currentUser'); location.reload(); };
+      const roleMap = { owner:'구단주', admin:'관리진', scorer:'기록원', super_admin:'슈퍼 관리자' };
+      welcomeText.textContent = `${user.mcNick}님 환영합니다. 현재 역할: ${roleMap[user.role] || '선수'}`;
     }
   </script>
 </body>
