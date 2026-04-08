@@ -61,7 +61,10 @@
       font-size: 17px;
       font-weight: 500;
     }
-    .tab-link.active { border-color: #111111; background: #f8f8f8; }
+    .tab-link.active {
+      border-color: #111111;
+      background: #f8f8f8;
+    }
     .main-box {
       max-width: 1000px;
       margin: 0 auto;
@@ -70,46 +73,131 @@
       padding: 34px 34px 28px;
       box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
     }
-    .main-box-title { font-size: 60px; font-weight: 700; line-height: 1.08; letter-spacing: -0.03em; }
-    .main-box-desc { margin-top: 16px; font-size: 22px; font-weight: 300; color: #666666; word-break: keep-all; }
-    .form-box, .list-box {
-      margin-top: 28px; background: #ffffff; border: 1px solid #d6d6d6; border-radius: 22px; padding: 24px;
+    .main-box-title {
+      font-size: 60px;
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
     }
-    .section-title { font-size: 28px; font-weight: 800; margin-bottom: 18px; }
-    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    .field { display: flex; flex-direction: column; gap: 10px; }
+    .main-box-desc {
+      margin-top: 16px;
+      font-size: 22px;
+      font-weight: 300;
+      color: #666666;
+      word-break: keep-all;
+    }
+    .form-box, .list-box {
+      margin-top: 28px;
+      background: #ffffff;
+      border: 1px solid #d6d6d6;
+      border-radius: 22px;
+      padding: 24px;
+    }
+    .section-title {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
     .field.full { grid-column: 1 / -1; }
     .field label { font-size: 16px; font-weight: 700; }
     .field input, .field select {
-      width: 100%; height: 56px; border: 1px solid #d6d6d6; border-radius: 16px; padding: 0 18px; font-size: 18px;
-      background: #ffffff; color: #111111; outline: none;
+      width: 100%;
+      height: 56px;
+      border: 1px solid #d6d6d6;
+      border-radius: 16px;
+      padding: 0 18px;
+      font-size: 18px;
+      background: #ffffff;
+      color: #111111;
+      outline: none;
     }
     .field input:focus, .field select:focus { border-color: #111111; }
     .field small { font-size: 14px; color: #777777; }
-    .action-row { display: flex; gap: 12px; margin-top: 22px; }
+    .action-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 22px;
+    }
     .primary-btn, .secondary-btn, .danger-btn {
-      height: 56px; padding: 0 24px; border-radius: 16px; font-size: 18px; font-weight: 700; cursor: pointer; border: 1px solid transparent;
+      height: 56px;
+      padding: 0 24px;
+      border-radius: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid transparent;
     }
-    .primary-btn { background: #111111; color: #ffffff; border-color: #111111; }
-    .secondary-btn { background: #ffffff; color: #111111; border-color: #d6d6d6; }
-    .danger-btn { background: #8b0000; color: #ffffff; border-color: #8b0000; }
-    .message-text { margin-top: 16px; font-size: 16px; color: #666666; }
-    .pitcher-list { display: grid; gap: 14px; }
+    .primary-btn {
+      background: #111111;
+      color: #ffffff;
+      border-color: #111111;
+    }
+    .secondary-btn {
+      background: #ffffff;
+      color: #111111;
+      border-color: #d6d6d6;
+    }
+    .danger-btn {
+      background: #8b0000;
+      color: #ffffff;
+      border-color: #8b0000;
+    }
+    .message-text {
+      margin-top: 16px;
+      font-size: 16px;
+      color: #666666;
+    }
+    .pitcher-list {
+      display: grid;
+      gap: 14px;
+    }
     .pitcher-card {
-      display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; border: 1px solid #e2e2e2;
-      border-radius: 18px; padding: 18px; background: #fafafa;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      border: 1px solid #e2e2e2;
+      border-radius: 18px;
+      padding: 18px;
+      background: #fafafa;
     }
-    .pitcher-card-left { display: flex; gap: 14px; align-items: flex-start; min-width: 0; }
-    .pitcher-logo { width: 58px; height: 58px; object-fit: contain; border-radius: 50%; background: #ffffff; flex-shrink: 0; }
+    .pitcher-card-left {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      min-width: 0;
+    }
+    .pitcher-logo {
+      width: 58px;
+      height: 58px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: #ffffff;
+      flex-shrink: 0;
+    }
     .pitcher-name { font-size: 28px; font-weight: 800; line-height: 1.15; }
     .pitcher-sub { margin-top: 6px; font-size: 18px; color: #666666; }
-    .pitcher-meta { margin-top: 10px; font-size: 17px; color: #333333; line-height: 1.6; word-break: keep-all; }
-    .pitcher-actions { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+    .pitcher-meta { margin-top: 10px; font-size: 17px; color: #333333; line-height: 1.6; }
+    .pitcher-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex-shrink: 0;
+    }
     .empty-list { font-size: 17px; color: #777777; }
     @media (max-width: 768px) {
       .page { padding: 24px 16px 44px; }
       .top-header h1 { font-size: 40px; }
-      .home-link { font-size: 16px !important; }
       .main-box { padding: 24px 18px 20px; }
       .main-box-title { font-size: 38px; }
       .main-box-desc { font-size: 18px; }
@@ -134,7 +222,7 @@
       <a href="admin.html" class="tab-link">관리자 홈</a>
       <a href="admin-lineup.html" class="tab-link">라인업 관리</a>
       <a href="admin-pitchers.html" class="tab-link active">투수 정보 관리</a>
-      <a href="admin-scoresheet.html" class="tab-link">기록지 관리</a>
+      <a href="admin-record.html" class="tab-link">기록지 관리</a>
     </nav>
 
     <main>
@@ -149,7 +237,6 @@
               <label for="nickname">닉네임</label>
               <input type="text" id="nickname" placeholder="예: 레이투수 1" />
             </div>
-
             <div class="field">
               <label for="handedness">투구 방향</label>
               <select id="handedness">
@@ -158,49 +245,38 @@
                 <option value="좌투">좌투</option>
               </select>
             </div>
-
             <div class="field full">
               <label for="pitchTypes">구종</label>
               <input type="text" id="pitchTypes" placeholder="예: 포심, 슬라이더, 체인지업" />
               <small>쉼표(,)로 구분해서 입력해줘.</small>
             </div>
-
             <div class="field full">
               <label for="logo">로고 경로</label>
               <input type="text" id="logo" placeholder="예: logos/rms.png" />
               <small>비워두면 기본 로고가 사용돼.</small>
             </div>
           </div>
-
           <div class="action-row">
             <button type="button" class="primary-btn" id="saveBtn">저장</button>
             <button type="button" class="secondary-btn" id="resetBtn">입력 초기화</button>
           </div>
-
-          <p id="messageText" class="message-text">저장 전입니다.</p>
+          <p id="messageText" class="message-text">아직 저장된 내용이 없습니다.</p>
         </div>
 
         <div class="list-box">
           <h3 class="section-title">등록된 투수 목록</h3>
-          <div id="pitcherList" class="pitcher-list"><div class="empty-list">불러오는 중...</div></div>
+          <div id="pitcherList" class="pitcher-list">
+            <div class="empty-list">불러오는 중...</div>
+          </div>
         </div>
       </section>
     </main>
   </div>
 
   <script type="module">
-    import { db } from "./firebase-config.js";
-    import {
-      collection,
-      addDoc,
-      updateDoc,
-      getDocs,
-      query,
-      where,
-      deleteDoc,
-      doc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { db, auth } from "./firebase-config.js";
+    import { collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
     const nicknameEl = document.getElementById("nickname");
     const handednessEl = document.getElementById("handedness");
@@ -210,13 +286,6 @@
     const resetBtn = document.getElementById("resetBtn");
     const messageText = document.getElementById("messageText");
     const pitcherListEl = document.getElementById("pitcherList");
-
-    const DEFAULT_LOGO = "data:image/svg+xml;utf8," + encodeURIComponent(`
-      <svg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'>
-        <rect width='128' height='128' rx='64' fill='#f2f2f2'/>
-        <path d='M64 26c21 0 38 17 38 38S85 102 64 102 26 85 26 64 43 26 64 26Z' fill='#ffffff' stroke='#d0d0d0' stroke-width='6'/>
-        <path d='M45 45c8-10 30-10 38 0M45 83c8-10 30-10 38 0' fill='none' stroke='#bcbcbc' stroke-width='5' stroke-linecap='round'/>
-      </svg>`);
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -235,12 +304,13 @@
     }
 
     function setMessage(text) { messageText.textContent = text; }
+
     function normalizePitchTypes(text) {
       return text.split(",").map(v => v.trim()).filter(Boolean);
     }
 
     function getLogoPath(data) {
-      return data.logo || data.logoUrl || data.teamLogo || data.logoPath || DEFAULT_LOGO;
+      return data.logo || data.logoUrl || data.teamLogo || data.logoPath || "logos/default.png";
     }
 
     async function savePitcher() {
@@ -249,38 +319,44 @@
       const pitchTypes = normalizePitchTypes(pitchTypesEl.value);
       const logo = logoEl.value.trim();
 
-      if (!nickname) { setMessage("닉네임은 꼭 입력해야 해."); nicknameEl.focus(); return; }
-      if (!handedness) { setMessage("우투인지 좌투인지 선택해줘."); handednessEl.focus(); return; }
-      if (!pitchTypes.length) { setMessage("구종은 하나 이상 입력해줘."); pitchTypesEl.focus(); return; }
+      if (!nickname) {
+        setMessage("닉네임은 꼭 입력해야 해.");
+        nicknameEl.focus();
+        return;
+      }
+      if (!handedness) {
+        setMessage("우투인지 좌투인지 선택해줘.");
+        handednessEl.focus();
+        return;
+      }
+      if (pitchTypes.length === 0) {
+        setMessage("구종은 하나 이상 입력해줘.");
+        pitchTypesEl.focus();
+        return;
+      }
 
       try {
-        const q = query(collection(db, "pitchers"), where("nickname", "==", nickname));
-        const snapshot = await getDocs(q);
-
-        const payload = {
+        await addDoc(collection(db, "pitchers"), {
           nickname,
           name: nickname,
+          playerName: nickname,
+          minecraftNickname: nickname,
+          nickName: nickname,
           handedness,
           throwType: handedness,
           throwHand: handedness,
+          hand: handedness,
+          armSide: handedness,
           pitchTypes,
           pitches: pitchTypes,
-          logo: logo || DEFAULT_LOGO,
-          logoUrl: logo || DEFAULT_LOGO,
+          logo: logo || "logos/default.png",
+          logoUrl: logo || "logos/default.png",
+          logoPath: logo || "logos/default.png",
+          createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
-        };
+        });
 
-        if (!snapshot.empty) {
-          await updateDoc(snapshot.docs[0].ref, payload);
-          setMessage("기존 투수 정보를 수정했어.");
-        } else {
-          await addDoc(collection(db, "pitchers"), {
-            ...payload,
-            createdAt: serverTimestamp()
-          });
-          setMessage("새 투수 정보를 저장했어.");
-        }
-
+        setMessage("투수 정보가 저장됐어.");
         resetForm();
         await loadPitchers();
       } catch (error) {
@@ -290,7 +366,8 @@
     }
 
     async function deletePitcher(id) {
-      if (!confirm("이 투수 정보를 삭제할까?")) return;
+      const ok = confirm("이 투수 정보를 삭제할까?");
+      if (!ok) return;
       try {
         await deleteDoc(doc(db, "pitchers", id));
         setMessage("투수 정보가 삭제됐어.");
@@ -303,40 +380,41 @@
 
     async function loadPitchers() {
       try {
-        const snapshot = await getDocs(collection(db, "pitchers"));
-        const docs = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-        docs.sort((a, b) => (a.nickname || a.name || "").localeCompare(b.nickname || b.name || "", "ko"));
+        const q = query(collection(db, "pitchers"), orderBy("nickname"));
+        const snapshot = await getDocs(q);
 
-        if (!docs.length) {
+        if (snapshot.empty) {
           pitcherListEl.innerHTML = `<div class="empty-list">등록된 투수가 아직 없어.</div>`;
           return;
         }
 
         pitcherListEl.innerHTML = "";
-        docs.forEach((data) => {
+
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const id = docSnap.id;
           const nickname = escapeHtml(data.nickname || data.name || "-");
           const handedness = escapeHtml(data.handedness || data.throwType || data.throwHand || "-");
           const pitchTypes = Array.isArray(data.pitchTypes)
             ? data.pitchTypes.map(v => escapeHtml(v)).join(", ")
-            : Array.isArray(data.pitches)
-              ? data.pitches.map(v => escapeHtml(v)).join(", ")
-              : escapeHtml(data.pitchTypes || data.pitches || "-");
+            : (Array.isArray(data.pitches) ? data.pitches.map(v => escapeHtml(v)).join(", ") : "-");
           const logo = escapeHtml(getLogoPath(data));
 
           const card = document.createElement("div");
           card.className = "pitcher-card";
           card.innerHTML = `
             <div class="pitcher-card-left">
-              <img src="${logo}" alt="팀 로고" class="pitcher-logo" onerror="this.src='${DEFAULT_LOGO}'">
+              <img src="${logo}" alt="팀 로고" class="pitcher-logo" onerror="this.src='logos/default.png'">
               <div>
                 <div class="pitcher-name">${nickname}</div>
                 <div class="pitcher-sub">${handedness}</div>
-                <div class="pitcher-meta">구종: ${pitchTypes}</div>
+                <div class="pitcher-meta">구종: ${pitchTypes || "등록된 구종 정보 없음"}</div>
               </div>
             </div>
             <div class="pitcher-actions">
-              <button type="button" class="danger-btn" data-id="${data.id}">삭제</button>
-            </div>`;
+              <button type="button" class="danger-btn" data-id="${id}">삭제</button>
+            </div>
+          `;
           pitcherListEl.appendChild(card);
         });
 
@@ -345,13 +423,21 @@
         });
       } catch (error) {
         console.error("목록 불러오기 실패:", error);
-        pitcherListEl.innerHTML = `<div class="empty-list">투수 목록을 불러오지 못했습니다: ${escapeHtml(error.message)}</div>`;
+        pitcherListEl.innerHTML = `<div class="empty-list">투수 목록을 불러오지 못했습니다.</div>`;
       }
     }
 
     saveBtn.addEventListener("click", savePitcher);
     resetBtn.addEventListener("click", resetForm);
-    loadPitchers();
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        alert("로그인이 필요합니다.");
+        location.href = "login.html";
+        return;
+      }
+      await loadPitchers();
+    });
   </script>
 </body>
 </html>
